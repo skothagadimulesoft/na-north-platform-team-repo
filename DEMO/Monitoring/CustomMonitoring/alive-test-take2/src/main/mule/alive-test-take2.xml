@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:custom-metrics="http://www.mulesoft.org/schema/mule/custom-metrics"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/custom-metrics http://www.mulesoft.org/schema/mule/custom-metrics/current/mule-custom-metrics.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e16c48c4-2a77-488e-a298-48f7a2e9dc3c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="alive-testFlow-main" doc:id="13589374-99ff-4e36-ba80-42d91463b363" >
+		<http:listener doc:name="Listener" doc:id="cce622c7-f56b-4f44-8374-b3edf5a6daa0" path="/ping" config-ref="HTTP_Listener_config" allowedMethods="POST"/>
+		<os:store doc:name="Register Store" doc:id="a1ca3fa8-6d1c-4a88-877f-3ef7d0e2962c" key="#[payload.storeid]">
+			<os:value ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	"storeId": payload.storeid as String,
+	"timeStamp": now()
+}]]]></os:value>
+		</os:store>
+		<logger level="INFO" doc:name="Logger" doc:id="16df8940-d743-46d9-8198-18be8fd3074f" message="#[payload]"/>
+	</flow>
+	<flow name="Retrieve-All-Key-Value" doc:id="17e0ac76-c0ce-4e74-b042-a7f8597d078a" >
+		<http:listener doc:name="Listener" doc:id="79d1e54a-0437-4758-8870-14f4c0f57e3a" config-ref="HTTP_Listener_config" path="/getAllKeys"/>
+		<os:retrieve-all-keys doc:name="Retrieve all Store Ids" doc:id="87a5725f-f640-472c-96ef-b9e4691a01b9" />
+		<ee:transform doc:name="Convert Array to JSON" doc:id="d73840da-bb2a-42a1-9fe0-1a9e6f125157" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map (payload01, index) -> 
+{
+    storeId: payload01
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Create Empty Accumulator" doc:id="302391b1-7d99-4c84-90b9-65c0c3ecacce" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="allValues" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="94512d2b-3bf5-445a-b968-df082c6afd7d" >
+			<os:retrieve doc:name="Retrieve" doc:id="a96fb297-2690-40b6-bc5c-604cb669f0ab" key="#[payload.storeId]"/>
+			<ee:transform doc:name="Accumulate all Responses" doc:id="1fc086e4-eeed-4292-ab68-b611fcfe56f0">
+				<ee:message>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="allValues" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.allValues + payload]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			
+		</foreach>
+		<ee:transform doc:name="Convert Accumulator to JSON" doc:id="c433cded-2de3-4cb8-a561-185dd1e73293">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.allValues]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Clear-Object-Store" doc:id="f46986b6-1b0d-4975-843c-6e17dc066b4f" >
+		<http:listener doc:name="Listener" doc:id="f82451b8-c9e1-4508-8325-87252e50be83" config-ref="HTTP_Listener_config" path="/clear"/>
+		<os:clear doc:name="Clear Object Store" doc:id="13b7bf0b-90ea-4be7-a414-566fd9fdea65" />
+		<ee:transform doc:name="Transform Message" doc:id="955d6291-7563-4f82-b1e9-3dd536a90fa8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="alive-testFlow-scheduler" doc:id="d82bd0ef-907b-48a7-99c8-f41deb5ca4b9" >
+		<scheduler doc:name="Scheduler" doc:id="a256689c-fa8a-4107-bb20-c604fccbd590" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="15" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="5af69059-e73d-417d-bff1-cd5fef6b833d" message="------------- Scheduler Running"/>
+		<os:retrieve-all-keys doc:name="Retrieve all Store Ids" doc:id="fc99ca47-6ef5-4570-a60e-7d2d174731d9" />
+		<ee:transform doc:name="Convert Array to JSON" doc:id="663ee594-3b49-4874-9ca1-a2267e636364">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map (payload01, index) -> 
+{
+    storeId: payload01
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<tracking:transaction doc:name="Set Transaction Id" doc:id="3bfa462e-0e25-4b3f-87a4-284c7f0c1499" id='#["Store-Status-" ++ (now() as DateTime)]' />
+		<foreach doc:name="For Each" doc:id="00e0586e-165b-458d-816c-133bc8d3f865" collection="#[payload]">
+			<set-variable value="#[payload.storeId]" doc:name="Set Store Id" doc:id="f435da61-e10f-4032-9427-d8874141df4f" variableName="store_Id"/>
+			<logger level="INFO" doc:name="Logger" doc:id="ef1525a6-bda8-41e6-9d6e-51ca3fe48ebc" message="************ store id being read #[vars.store_Id]"/>
+			<os:retrieve doc:name="Retrieve with Store Id" doc:id="48aceaaf-551c-4c68-b02f-3edff0beb92e" key="#[vars.store_Id]"/>
+			<choice doc:name="Choice" doc:id="13384469-4992-4626-a3a8-cd9e6333c70e" >
+				<when doc:id="01ffebb4-70a4-406e-9f10-996c98cb1f8b" expression="#[((now() as DateTime)- (payload.timeStamp as DateTime)).seconds &gt;30]">
+					<logger level="INFO" doc:name="Logger" doc:id="ea688448-9ebf-400b-853e-7cc8a5301e69" message="------------- Setting Trasactionn ID-----------------"/>
+					<logger level="INFO" doc:name="Logger" doc:id="af3ae73c-2f9c-4375-95df-43dcd626fdb7" message='#["Store-" ++ vars.store_Id ++"-" ++ (now() as DateTime)]'/>
+					<tracking:custom-event doc:name="Custom Business Event" doc:id="86f2315d-a98c-4e15-8717-e0d90be411cf" event-name="Heartbeat Event">
+			<tracking:meta-data key="StoreId" value="#[vars.store_Id]" />
+			<tracking:meta-data key="Status" value="DOWN" />
+		</tracking:custom-event>
+					<custom-metrics:send doc:name="Send Custom Metric" doc:id="b05daf43-2aa0-4b0c-adfb-06b28e6f588c" metricName="HeartBeat">
+			<custom-metrics:dimensions>
+				<custom-metrics:dimension dimensionName="StoreId" value="#[vars.store_Id]" />
+				<custom-metrics:dimension dimensionName="StatusDimension" value="DOWN" />
+			</custom-metrics:dimensions>
+			<custom-metrics:facts>
+				<custom-metrics:fact factName="StatusValue" value='#["1" as Number]' />
+			</custom-metrics:facts>
+		</custom-metrics:send>
+					<logger level="INFO" doc:name="Logger" doc:id="8e5187f6-2dea-4e96-9fba-1c2e750201fa" message="------------#[vars.store_Id]--------------Down"/>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="6e9a83a6-5d40-49a1-82d5-eeb59e3fd670" message="------------- Setting Trasactionn ID-----------------"/>
+					<logger level="INFO" doc:name="Logger" doc:id="64ba1dce-4cba-4bf3-a2b8-517b2fa568ba" message='#["Store-" ++ vars.store_Id ++"-" ++ (now() as DateTime)]'/>
+					<tracking:custom-event doc:name="Custom Business Event" doc:id="b5246a28-3a5e-4435-bda4-3275c40e2b95" event-name="Heartbeat Event">
+						<tracking:meta-data key="StoreId" value="#[vars.store_Id]" />
+						<tracking:meta-data key="Status" value="UP" />
+					</tracking:custom-event>
+					<custom-metrics:send doc:name="Send Custom Metric" doc:id="7c035cd0-e798-4e8b-842b-d21c5dec0fb3" metricName="HeartBeat" >
+						<custom-metrics:dimensions >
+							<custom-metrics:dimension dimensionName="StoreId" value="#[vars.store_Id]" />
+							<custom-metrics:dimension dimensionName="StatusDimension" value="UP" />
+						</custom-metrics:dimensions>
+						<custom-metrics:facts >
+							<custom-metrics:fact factName="StatusValue" value='#["1" as Number]' />
+						</custom-metrics:facts>
+					</custom-metrics:send>
+					<logger level="INFO" doc:name="Logger" doc:id="96b4dd76-d472-4122-b994-f0f174cdeec5" message="------------#[vars.store_Id]--------------UP" />
+				</otherwise>
+			</choice>
+		</foreach>
+	</flow>
+</mule>

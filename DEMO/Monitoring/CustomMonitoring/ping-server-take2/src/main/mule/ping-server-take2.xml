@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="41652a54-a726-4216-904e-c3c97ecf5702" >
+		<http:request-connection host="alive-test-take2.us-e2.cloudhub.io" port="80" />
+	</http:request-config>
+	<flow name="ping-serverFlow" doc:id="8a724bdd-f179-4a9c-b563-b829f3d42c37" >
+		<scheduler doc:name="Scheduler" doc:id="cf156686-859d-440a-8122-ca340f1a2cf3" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="15" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="Transform Message" doc:id="a38abd90-f0ea-4bf7-9b12-1bd763574f87" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "I am Alive",
+	"from": server.host,
+	"storeid": "3333",
+	"status":"UP"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9b761aff-36db-489a-baa5-9b9f1d77c2b0" message="#[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="7f7a8f82-6311-442a-9aba-15bdaf1ba9dd" config-ref="HTTP_Request_configuration" path="/ping"/>
+	</flow>
+	<flow name="ping-serverFlow1" doc:id="4d8eb86c-0ae9-40ea-a650-44e8e90c73a2" >
+		<scheduler doc:name="Scheduler" doc:id="4a1e5894-faec-4b98-bb12-bdfd31f33d08" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="15" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="Transform Message" doc:id="aef30330-b3e4-4aa0-83ef-b374919b06f1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "I am Alive",
+	"from": server.host,
+	"storeid": "2222",
+	"status":"UP"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6f8cc1b6-a446-4ec5-8476-5a56784ab23e" message="#[payload]" />
+		<http:request method="POST" doc:name="Request" doc:id="366facb9-448b-4afb-9591-5df41ccde78a" config-ref="HTTP_Request_configuration" path="/ping" />
+	</flow>
+	<flow name="ping-serverFlow2" doc:id="f4d07155-0376-486f-b2c0-4dcadd2eb18f" >
+		<scheduler doc:name="Scheduler" doc:id="d41475aa-489d-473b-aa8f-50e1fe46ec94" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="15" timeUnit="SECONDS" />
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="ransform Message" doc:id="21485c22-f6c6-4f67-8317-12a173361a5e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "I am Alive",
+	"from": server.host,
+	"storeid": "1111",
+	"status":"UP"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="31881c21-9846-4dc6-b1cd-bf5f30843163" message="#[payload]" />
+		<http:request method="POST" doc:name="Request" doc:id="720aa324-ab45-4ea2-a07a-e07c784d6f1a" config-ref="HTTP_Request_configuration" path="/ping" />
+	</flow>
+</mule>
