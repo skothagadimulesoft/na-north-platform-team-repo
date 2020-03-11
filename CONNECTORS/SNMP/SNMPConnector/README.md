@@ -5,7 +5,7 @@ This is a prototypal Mule Connector for SNMP. It is bi-directional in that it su
 ### NOTE: 
 This is not a production ready artifact. It is a POC that can be used to test out how SNMP traps can for instance be ingested and then forwarded upstream via a wide array of messaging mechanism (see accompanying Mule project that illustrates the forwarding of SNMP Traps over Kafka).
 
-In order to use this follow the following steps:
+In order to test out the connector perform the following steps:
 
 1) copy the current project into your Mule Studio Workspace
 
