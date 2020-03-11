@@ -1,6 +1,8 @@
 # SNMP Extension
 
-Add description ...
+This is a prototype Mule Connector for SNMP. It is bi-directional in that it supports both the sending and recpetion of SNMP Traps (v1,v2c, v3).
+
+
 
 
 ...
