@@ -1,0 +1,45 @@
+{
+  "configs": [
+    "connected_car_sfdc.xml",
+    "test_harness.xml",
+    "util.xml",
+    "cerriliion_invoke.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:connected_car_sfdc:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.1.4",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "log4j2.xml",
+        "application-types.xml",
+        "test_harness.xml",
+        "cerriliion_invoke.xml",
+        "examples/OrderCreateExample.json",
+        "examples/OrderChangeEvent.json",
+        "examples/productOrderResponseExample.json",
+        "examples/productOrderBodyExample.json",
+        "examples/OrderChangeEvent_OrderItem.json",
+        "examples/OrderItemChangeEvent_OrderItemAdd.json",
+        "examples/OrderChangeEvent_UpdateGeneric.json",
+        "examples/credentialsResponseExample.json",
+        "examples/OrderChangeEvent_PriceBook.json",
+        "examples/telematics_response.json",
+        "examples/credentialsExample.json",
+        "examples/OrderChangeEvent_Activated.json",
+        "examples/telematics_post_sample.json",
+        "connected_car_sfdc.xml",
+        "util.xml",
+        "mule-app.properties"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	
+	<configuration-properties doc:name="Configuration properties" doc:id="e1361e4d-60a6-4a9f-b825-df4179eed5a0" file="mule-app.properties" />
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="f70398ec-e9ee-4c2b-90f3-7f3ce6bc73b4" >
+		<salesforce:basic-connection username="${sfdc.user_name}" password="${sfdc.password}" securityToken="${sfdc.security_token}" />
+	</salesforce:sfdc-config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="5e2c15c6-d669-4a02-b101-90e7440ae526" />
+	<http:request-config name="HTTP_Request_configuration2" doc:name="HTTP Request configuration" doc:id="b95e8935-5f51-479c-af6e-94fe60d4ef0e" >
+		<http:request-connection host="${nokia.host}" port="${nokia.port}" />
+	</http:request-config>
+	<flow name="connected_car_sfdcFlow" doc:id="3a788940-7255-4e25-ac99-c7880c3484c9" >
+		<salesforce:subscribe-channel doc:id="aa2eacd5-ed82-486d-9ee4-9c7e7ab4b444" config-ref="Salesforce_Config" streamingChannel="/data/OrderChangeEvent"/>
+		<ee:transform doc:name="Transform Message" doc:id="ba232d57-e755-4afa-805d-08ccd377e075" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice"  >
+			<when  expression='#[%dw 2.0
+output application/java
+---
+
+payload.data.payload.ChangeEventHeader.changeType =="CREATE" and
+payload.data.payload.ChangeEventHeader.entityName == "Order" and
+payload.data.payload.Status == "Draft"]' >
+				<ee:transform doc:name="Transform Message" doc:id="5ed0f380-d9e6-4999-af0d-c18ee1fe2e12">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="CreateOrder_Log" doc:id="afed7158-5750-41a1-833a-e20e8a406b27" message="Received Create Order Event: #[payload]"/>
+				<flow-ref doc:name="Flow Reference" doc:id="5d502da6-b2e9-4802-b4bd-add43d471c97" name="connected_car_OrderCreate"/>
+			</when>
+			<when  expression='#[%dw 2.0
+output application/java
+---
+
+payload.data.payload.ChangeEventHeader.changeType =="CREATE" and
+payload.data.payload.ChangeEventHeader.entityName == "Order" and
+(payload.data.payload.Status == "Activated" or payload.data.payload.Status == "Provisioning")]' >
+				<ee:transform doc:name="Transform Message" doc:id="402a10a4-2501-4375-8cf2-4101f5e329d7">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="93cbbe47-9610-4c54-ab29-1ed929007644" message="======&gt; Create Order via SFDC Workflow &lt;======== : #[payload]"/>
+				<flow-ref doc:name="Flow Reference" doc:id="1b06369a-b52a-4c18-b411-45cf4f642de6" name="connected_car_OrderCreate"/>
+			</when>
+			<when  expression='#[%dw 2.0
+output application/java
+---
+payload.data.payload.ChangeEventHeader.changeType =="UPDATE" and
+payload.data.payload.ChangeEventHeader.entityName == "Order" and
+payload.data.payload.Status == "Provisioning"]' >
+				<ee:transform doc:name="Transform Message" doc:id="e2c9483a-022e-4823-8cbf-3533a6ad2e4c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="OrderID" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.data.payload.ChangeEventHeader.recordIds[0]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<set-variable value="#[payload]" doc:name="Set Variable" doc:id="71c0dfb8-4956-456e-92d4-c042584926bc" variableName="order_payload" mimeType="application/json"/>
+				<logger level="INFO" doc:name="UpdateOrder_Close_Log" doc:id="8625e8a4-928f-49df-a8e9-a57ea2d35320" message="Order Provisioned: #[payload]"/>
+				<flow-ref doc:name="callCerilion" doc:id="08db110b-a685-43fd-bdba-6d82cd15f3dd" name="connected_buildCerillionMessage" />
+				<os:retrieve doc:name="Retrieve" doc:id="01ae5892-b5bf-4dc4-9e97-302214b29bbe" key="#[vars.OrderID]" objectStore="Object_store"/>
+				<ee:transform doc:name="Transform Message" doc:id="f2de916c-7ab9-4f26-b916-ed870033c2c3">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="126371e3-9cb2-4424-b4c3-61a45629d1d6" message="===== &gt;&gt; Ext Id : #[payload.resource.orderItem[0].orderItem[0].id]"/>
+				<choice doc:name="Choice" doc:id="555e69ad-2b66-4c5f-8d26-f9921605ff58">
+					<when expression='#[payload.resource.orderItem[0].orderItem[0].id != "69"]'>
+						<logger level="INFO" doc:name="Logger" doc:id="5b7b9dad-e5e2-4a6c-b809-a220fe3cfeb2" message="@@@ This wa an NON -  Vehicle Charging Event @@@" />
+						<set-payload value="#[vars.order_payload]" doc:name="Set Payload" doc:id="75590987-a6a9-4a4d-a3fb-957a4b906a30" />
+						<async doc:name="Async" doc:id="6ce95a02-5078-4c10-8b92-fa65ded9ac87">
+					<scatter-gather doc:name="Scatter-Gather" doc:id="0ba00b2e-d13e-456d-8bb4-2a2db54f6808">
+						<route>
+							<flow-ref doc:name="callNokia" doc:id="8147d161-1b7f-4d5a-8705-60aa18056588" name="connected_car_nokia" />
+						</route>
+						<route>
+							<flow-ref doc:name="updateAssets" doc:id="ab13c365-05ab-4f35-9c8d-992b23cb7922" name="connected_car_sfdcFlow_UpdateAssets" />
+						</route>
+					</scatter-gather>
+				</async>
+					</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="81bc9c05-e630-4ad5-b87a-e0fe0fdab275" message="@@@ This was an Vehicle Charging Event @@@"/>
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="a26a3fc7-9afb-42b6-b5fa-1585464dc80f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="7127ddc0-a1a4-43d9-94fb-ce712e16d5d0" message="--Order Capture: Unknon  Condittion ! #[payload]" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="connected_car_OrderCreate" doc:id="0ef6870e-6dcf-4273-ba44-4a944eb90646" >
+		<ee:transform doc:name="Transform Message" doc:id="b995c239-1afa-490c-97de-d4ea291bc7fa">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	accessToken: payload.data.payload.OrderNumber,
+	resource: {
+		externalId:  payload.data.payload.OrderNumber default "Telco01",
+		"priority": "1",
+		"description": "JLR Service Order",
+		"category": "Residential",
+		"notificationContact": "jean.pontus@tmforum.com",
+		"baseType": "productOrder",
+		"type": "productOrder",
+		note: [{
+			"text": "JLR Service Order",
+			// "date":"2017-11-03T08:46:47.945Z",
+			"date": now(),
+			"author": "Jean-Lyuc Tymen"
+		}],
+		relatedParty: [{
+			"id": "11",
+			"href": "tmfAPI/customer/11.org",
+			"name": "Joe Doe",
+			"role": "customer",
+			"referredType": "individualParty"
+		}],
+		billingAccount: {
+			"id": "67",
+			"href": "tmfAPI/billingAccount/BA1513.org",
+			"name": "BA01",
+			"referredType": "billingAccount"
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="OrderNumber" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.data.payload.ChangeEventHeader.recordIds[0]]]></ee:set-variable>
+				<ee:set-variable variableName="AccountId" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.data.payload.AccountId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5ecb7e43-cc7c-4a47-9066-9700c12fa4ed" message="Storing OrderNumber: #[vars.OrderNumber] " />
+		<os:store doc:name="Store" doc:id="70c22532-ffe8-4938-8f66-8c65f3a5a12c" key="#[vars.OrderNumber]" objectStore="Object_store"/>
+		<os:store doc:name="Store" doc:id="3a754f25-356b-4e65-9dc0-aecbed615af6" key='#[vars.OrderNumber ++ "-acctid"]' objectStore="Object_store">
+			<os:value ><![CDATA[#[vars.AccountId]]]></os:value>
+		</os:store>
+	</flow>
+	<flow name="connected_buildCerillionMessage" doc:id="d02b2a25-c586-4e33-9784-8b111bdaf48e" >
+		<ee:transform doc:name="Transform Message" doc:id="0bcc0c8e-1c92-4b29-a9b5-093a9cb65b0b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	data: {
+		schema: payload.data.schema,
+		payload: {
+			Status: payload.data.payload.Status,
+			LastModifiedDate: payload.data.payload.LastModifiedDate,
+			ActivatedById: payload.data.payload.ActivatedById,
+			ChangeEventHeader: {
+				isTransactionEnd: payload.data.payload.ChangeEventHeader.isTransactionEnd,
+				commitNumber: payload.data.payload.ChangeEventHeader.commitNumber,
+				commitUser: payload.data.payload.ChangeEventHeader.commitUser,
+				sequenceNumber: payload.data.payload.ChangeEventHeader.sequenceNumber,
+				entityName: payload.data.payload.ChangeEventHeader.entityName,
+				changeType: payload.data.payload.ChangeEventHeader.changeType,
+				changeOrigin: payload.data.payload.ChangeEventHeader.changeOrigin,
+				transactionKey: payload.data.payload.ChangeEventHeader.transactionKey,
+				commitTimestamp: payload.data.payload.ChangeEventHeader.commitTimestamp,
+				recordIds: payload.data.payload.ChangeEventHeader.recordIds map ( recordId , indexOfRecordId ) -> recordId
+			},
+			ActivatedDate: payload.data.payload.ActivatedDate,
+			StatusCode: payload.data.payload.StatusCode
+		},
+		event: payload.data.event
+	},
+	channel: payload.channel
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="OrderID"><![CDATA[%dw 2.0
+output application/java
+---
+payload.data.payload.ChangeEventHeader.recordIds[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="df53d19a-7888-45cf-9e32-2f8223d9d7b6" message="Building Cerillion Message for Ordeer ID: #[payload.data.payload.ChangeEventHeader.recordIds[0]]"/>
+		<os:retrieve doc:name="Retrieve" doc:id="58c9c88a-bb1e-46ff-999b-8bdcedb4b800" key="#[%dw 2.0
+output application/java
+---
+vars.OrderID]" objectStore="Object_store"/>
+		<ee:transform doc:name="Transform Message" doc:id="4e88abba-05cd-46b8-b62b-6422fa9ce6c4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="OrderNumber" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.accessToken]]></ee:set-variable>
+				<ee:set-variable variableName="OrigCerillionPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:query doc:name="Query" doc:id="c14289fc-4af7-47fd-8cd8-7a73f8af78d3" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Id, Order.OrderNumber, Product2.Id, Product2.ExternalId, Product2.Name, Product2.Family, Quantity, UnitPrice, TotalPrice, PriceBookEntry.name FROM OrderItem where Order.OrderNumber = ':orderNum'
+
+
+</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	orderNum : vars.OrderNumber
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="49cdde03-4424-4c01-b955-570e10d113e1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	resource: {
+		externalId: vars.OrigCerillionPayload.resource.externalId,
+		priority: vars.OrigCerillionPayload.resource.priority,
+		description: vars.OrigCerillionPayload.resource.description,
+		category: vars.OrigCerillionPayload.resource.category,
+		notificationContact: vars.OrigCerillionPayload.resource.notificationContact,
+		baseType: vars.OrigCerillionPayload.resource.baseType,
+		"type": vars.OrigCerillionPayload.resource."type",
+		note: vars.OrigCerillionPayload.resource.note map ( note , indexOfNote ) -> {
+			text: note.text,
+			date: note.date,
+			author: note.author
+		},
+		relatedParty: vars.OrigCerillionPayload.resource.relatedParty map ( relatedParty , indexOfRelatedParty ) -> {
+			id: relatedParty.id,
+			href: relatedParty.href,
+			name: relatedParty.name,
+			role: relatedParty.role,
+			referredType: relatedParty.referredType
+		},
+		billingAccount: {
+			id: vars.OrigCerillionPayload.resource.billingAccount.id,
+			href: vars.OrigCerillionPayload.resource.billingAccount.href,
+			name: vars.OrigCerillionPayload.resource.billingAccount.name,
+			referredType: vars.OrigCerillionPayload.resource.billingAccount.referredType
+		},
+		orderItem: [
+			{
+			id: "75",
+			action: "add",
+			quantity: 1,
+			product: {
+				id: "73",
+				characteristic: [{
+					name: "",
+					value: ""
+				}],
+				relatedParty: [{
+					id: "",
+					href: "",
+					name: "",
+					role: "",
+					referredType: ""
+				}],
+				productSpecification: {
+					id: "",
+					href: "",
+					version: "",
+					name: ""
+				}
+			},
+			productOffering: {
+				"id": "73",
+				"name": "TMF25"
+			},
+			orderItem: payload map ( payload01 , indexOfPayload01 ) -> {
+				//id: payload01.Id default,
+				id: payload01.Product2.ExternalId ,
+				action: "add",
+				quantity: "1",
+				itemPrice: [{
+					name: payload01.PricebookEntry.Name default "AccessFee",
+					description: "Product/Service Fee",
+					priceType: "oneTime",
+					price: {
+						taxIncludedAmount: {
+							value: payload01.UnitPrice as Number default 0,
+							unit: "EUR"
+						}
+					}
+				}],
+				productOffering: {
+					id: payload01.Product2.Id default "",
+					name: payload01.Product2.Name default ""
+				},
+				product: {
+					id: "67",
+					characteristic: [{
+						"name": payload01.Product2.Family default "TEL_MSISDN",
+						"value": "27457958"
+					}],
+					relatedParty: [{
+						"id": "11",
+						"href": "tmfAPI/customer/11.org",
+						"name": "Joe Doe",
+						"role": "user",
+						"referredType": "individualParty"
+					}],
+					productSpecification: {
+						"id": "14307",
+						"href": "tmfAPI/productSpecification/14307.org",
+						"version": "1",
+						"name": "Vehicle Parts"
+					}
+				}
+			}
+		}
+			
+			
+		]
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="ccff9eca-8f96-490e-a767-f41ed055c7c1" variableName="cerillion_in_payload"/>
+		<flow-ref doc:name="invokeCerillion" doc:id="70b60e8d-28dc-4328-85dc-6b0de6a6a8e9" name="cerriliion_invokeFlow_createOrder"/>
+		<set-payload value="#[vars.OrderID]" doc:name="Set Payload" doc:id="81c7bb8d-389f-4eeb-97f5-bb68e20c5493" />
+		<flow-ref doc:name="updateOrderStatus" doc:id="4800de04-5337-4282-aa65-4dbfda35a56c" name="connected_car_updateOrderStatus_Delivered" />
+		<os:store doc:name="Store" doc:id="4f0ef9a1-c123-4c71-a95d-1f4aa7cc406f" key="#[vars.OrderID]" objectStore="Object_store">
+			<os:value ><![CDATA[#[vars.cerillion_in_payload]]]></os:value>
+		</os:store>
+	</flow>
+	<flow name="connected_car_sfdc_OrderItemFlow" doc:id="d7bbce4e-694b-446f-829d-7db9f2d25fd7" >
+		<salesforce:subscribe-channel doc:name="Subscribe channel" doc:id="6b91d7a6-e6fa-4267-89c8-b85b356f0941" config-ref="Salesforce_Config" streamingChannel="/data/OrderItemChangeEvent"/>
+		<ee:transform doc:name="Transform Message" doc:id="5c580661-fb77-4609-ac5d-126c0df8c61f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="order_item_event_payload" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="OrderId" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.data.payload.OrderId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="5742afa5-9685-407a-b792-26d6078a5e3f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b5872590-d443-496c-bd7f-d3b346117702" message="Order Item Id: #[payload.data.payload.ChangeEventHeader.recordIds[0] ]-  Change Event: #[payload]"/>
+		<salesforce:query-single doc:name="Query single" doc:id="5a84fc82-805d-403d-8cdb-16cb89125695" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Id, OrderNumber,Status,Account.Id  FROM Order where Id = ':order_id'
+
+</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	order_id : vars.OrderId
+}]]]></salesforce:parameters>
+		</salesforce:query-single>
+		<ee:transform doc:name="Transform Message" doc:id="bc088a3e-bee5-4b60-9aa9-0e80fd1f01e4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="OrderNum"><![CDATA[%dw 2.0
+output application/java
+---
+payload.OrderNumber]]></ee:set-variable>
+				<ee:set-variable variableName="OrderStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.Status]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="304368f0-90d3-497a-b41e-608f713c6198" message="----&gt;Add OrderItem Order Data= #[payload]" />
+		<choice doc:name="Choice" doc:id="5ec631c9-41b5-45bf-add2-5db59d036e1f" >
+			<when expression='#[payload.Status == "Activated" or payload.Status =="Fulfilled"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="1b55db83-94ed-47af-b21b-f5371378e706" message="+++ Order Id #[vars.OrderId] status #[vars.OrderStatus] being provisioned..."/>
+				<ee:transform doc:name="Transform Message" doc:id="107f7542-7b4e-460c-86d2-9b7949163685">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	data: {
+		schema: vars.order_item_event_payload.data.schema,
+		payload: {
+			Status: vars.OrderStatus as String,
+			LastModifiedDate: now(),
+			ChangeEventHeader: {
+				recordIds: [
+					vars.order_item_event_payload.data.payload.OrderId
+				]
+				},
+			StatusCode: vars.OrderStatus as String
+		}
+	},
+	channel: "/data/OrderChangeEvent"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="66d8a04d-d5b9-4beb-8da1-83a8967a2018" name="utilFlow_ExecuteWorkflow"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="1b27db6c-0489-4cdf-a462-766ce66b26c3" message="Got ORder item , however Order  #[vars.OrderId] not in Provisionung state !"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="connected_car_updateOrderStatus_Delivered" doc:id="b7b8fd5e-8d6b-412e-b471-0b60a17d370f" >
+		<logger level="INFO" doc:name="Logger" doc:id="6dcab341-d9ef-4d7f-8b84-abe534a4d942" message="----Updating order status to: Delivered ! for order Id: #[payload]"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="07923306-4df6-4b40-b557-fcbc98d8179e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	Id: payload,
+	Status: "Fulfilled",
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:update-single type="Order" doc:name="Copy_of_Update single" doc:id="01628125-122b-4902-82a1-f58559edbab9" config-ref="Salesforce_Config" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="b75e005d-eead-477b-b6cd-311eecc5a279" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="eab941d2-2cce-4724-8701-aa801056026e" message="Order Status updated response: #[payload]"/>
+	</flow>
+	<flow name="connected_car_nokia" doc:id="cb07dda6-0669-4339-b1f9-f739d102b601" >
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="965e7dd4-8075-442b-baec-338d294a60a7">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	data: {
+		schema: payload.data.schema,
+		payload: {
+			Status: payload.data.payload.Status,
+			LastModifiedDate: payload.data.payload.LastModifiedDate,
+			ActivatedById: payload.data.payload.ActivatedById,
+			ChangeEventHeader: {
+				isTransactionEnd: payload.data.payload.ChangeEventHeader.isTransactionEnd,
+				commitNumber: payload.data.payload.ChangeEventHeader.commitNumber,
+				commitUser: payload.data.payload.ChangeEventHeader.commitUser,
+				sequenceNumber: payload.data.payload.ChangeEventHeader.sequenceNumber,
+				entityName: payload.data.payload.ChangeEventHeader.entityName,
+				changeType: payload.data.payload.ChangeEventHeader.changeType,
+				changeOrigin: payload.data.payload.ChangeEventHeader.changeOrigin,
+				transactionKey: payload.data.payload.ChangeEventHeader.transactionKey,
+				commitTimestamp: payload.data.payload.ChangeEventHeader.commitTimestamp,
+				recordIds: payload.data.payload.ChangeEventHeader.recordIds map ( recordId , indexOfRecordId ) -> recordId
+			},
+			ActivatedDate: payload.data.payload.ActivatedDate,
+			StatusCode: payload.data.payload.StatusCode
+		},
+		event: payload.data.event
+	},
+	channel: payload.channel
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="OrderID"><![CDATA[%dw 2.0
+output application/java
+---
+payload.data.payload.ChangeEventHeader.recordIds[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="36f0d592-88ad-475a-b386-e4ddd6d0ff7d" message="Order ID: #[vars.OrderID]"/>
+		<set-variable value="${VIN}" doc:name="Set Variable" doc:id="9dbe6e58-5d00-46cf-ad60-dea49b7c09ce" variableName="VIN" />
+		<salesforce:query-single doc:name="Query single" doc:id="1fd6620c-05a6-4775-aee9-869215b752b7" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Id, OrderNumber,Account.Id  FROM Order where OrderNumber = ':order_num'</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	order_num : vars.OrderNumber
+}]]]></salesforce:parameters>
+		</salesforce:query-single>
+		<ee:transform doc:name="Transform Message" doc:id="f48036bd-eb57-4bed-a166-9de9faaaf88f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	workflowName: "PostHandoverData",
+	subscriberId: payload.Account.Id default "TMFDEMO",
+	data: {
+		telematics: {
+			VIN: vars.VIN,
+			Make: "Jaguar",
+			Model: "XF",
+			 productName: vars.OrigCerillionPayload.resource.orderItem[0].orderItem[0].productOffering.name,
+			//"Model": vars.OrigCerillionPayload.resource.orderItem[0].orderItem[0].productOffering.name default "Insane Mode",
+		// "productName": "Insane Mode"
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="OrderNumber" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.OrderNumber]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="59e536b9-05d6-4f32-bb8f-1091a4118ab0" variableName="outgoing_nokia_pahyload"/>
+		<os:retrieve doc:name="Retrieve" doc:id="3853f485-a38d-4134-bde1-122d301a80c8" key="#[vars.OrderID]" objectStore="Object_store" />
+		<logger level="INFO" doc:name="Logger" doc:id="da2fbef1-76fb-43f3-8e9f-b5cac6e6a99d" message="=======&gt; Cerilion OBject STore object: #[payload]"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="181fe505-b0af-46d3-b5ad-f9e3e9e5da29">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	workflowName: vars.outgoing_nokia_pahyload.workflowName,
+	subscriberId: vars.outgoing_nokia_pahyload.subscriberId,
+	data: {
+		telematics: {
+			VIN: vars.outgoing_nokia_pahyload.data.telematics.VIN,
+			Make: vars.outgoing_nokia_pahyload.data.telematics.Make,
+			//Model: vars.outgoing_nokia_pahyload.data.telematics.Model,
+			Model: payload.resource.orderItem[0].orderItem[0].productOffering.name,
+			productName: payload.resource.orderItem[0].orderItem[0].productOffering.name
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="OrderNumber"><![CDATA[%dw 2.0
+output application/java
+---
+payload.accessToken]]></ee:set-variable>
+				<ee:set-variable variableName="OrigCerillionPayload"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="cd95025f-5f0c-453e-8ea2-1e11adabdd0a" message="calling out to Nokia with payload: #[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="34be74b3-4489-42c8-9cd4-7f59d692636f" config-ref="HTTP_Request_configuration2" path="${nokia.path}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="66f914f9-105a-47e7-ad20-f6aeeacfc166" message="Nokia telematics response: #[payload]"/>
+	</flow>
+	<flow name="connected_car_sfdcFlow_UpdateAssets" doc:id="c958ae0f-8b1a-4d44-8b16-711d76a9b224" >
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="86282519-5964-4410-97b3-47103bf62213">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="OrderID"><![CDATA[%dw 2.0
+output application/java
+---
+payload.data.payload.ChangeEventHeader.recordIds[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="bfb38137-ac09-4a10-aed7-70426e9292d0" message="Crreating Assets  for Ordeer ID: #[payload.data.payload.ChangeEventHeader.recordIds[0]]" />
+		<salesforce:query-single doc:name="Query single" doc:id="377c4c0d-7098-4f79-96e2-ded7ea1d0cc9" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Id, OrderNumber,Account.Id  FROM Order where Id = ':order_id'</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	order_id : vars.OrderID
+}]]]></salesforce:parameters>
+		</salesforce:query-single>
+		<ee:transform doc:name="Transform Message" doc:id="73061a6c-bf66-43db-8031-4f4522559726" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="OrderNumber" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.OrderNumber]]></ee:set-variable>
+				<ee:set-variable variableName="AccountId" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.Account.Id]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="cacd19f1-9cfc-4f25-8245-7a4d706adc7c" message="++++looking for orderitems with: Acount Id: #[vars.AccountId]  and Order Number: #[vars.OrderNumber]"/>
+		<salesforce:query doc:name="Query" doc:id="0f96d963-130b-4775-bd28-8849926cbe44" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Id, Order.OrderNumber, Product2.Id, Product2.Name, Product2.Family, Product2.ProductCode,Quantity, UnitPrice, TotalPrice
+FROM OrderItem where Order.OrderNumber = ':orderNum'
+</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	orderNum : vars.OrderNumber
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="97df2557-5a77-4dfa-bc82-9deb1c6dac36" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	
+	Quantity: payload01.Quantity,
+	AccountId: vars.AccountId as String,
+	Product2Id: payload01.Product2.Id, 
+	Name: payload01.Product2.Name ,
+	Quantity: payload01.Quantity,
+	Price: payload01.UnitPrice,
+	PurchaseDate:now(),
+	SerialNumber:"J-93450-XT-" ++ indexOfPayload01 
+	
+	
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="587e0ae7-05a2-4573-8175-66df2754da20" message="+++++Assets going in : #[payload]"/>
+		<salesforce:create doc:name="Create" doc:id="dc82b30c-ef97-4305-9bd0-ada078a243da" config-ref="Salesforce_Config" type="Asset"/>
+		<ee:transform doc:name="Transform Message" doc:id="c0411b1e-572e-47ca-9d99-14776d715f08" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3cf0e640-ec5a-4c9d-ace5-14cc7a00243f" message="---added assets: #[payload]"/>
+	</flow>
+	
+
+</mule>

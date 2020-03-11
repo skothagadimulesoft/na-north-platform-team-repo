@@ -1,0 +1,149 @@
+{
+
+    "resource": {
+
+        "uid": 73,
+
+        "contactDetails": [
+
+          {
+
+            "firstName": "Bill",
+
+            "surname": "Jones",
+
+            "phoneNumber": "09876543210",
+
+            "emailAddress": "bill.jones@company.com",
+
+            "accountNotificationEmail": true,
+
+            "invoiceEmail": false
+
+          },
+
+          {
+
+            "firstName": "Marry",
+
+            "surname": "Jones",
+
+            "phoneNumber": "09876543211",
+
+            "emailAddress": "marry.jones@company.com",
+
+            "accountNotificationEmail": false,
+
+            "invoiceEmail": true
+
+          }
+
+        ],
+
+        "accountStatusUid": 1,
+
+        "accountSalesStatusUid": 1,
+
+        "lastAccountPaymentStatusUid": null,
+
+        "billingAddress": {
+
+            "uid": 81,
+
+            "addressLine1": "13 Wynan Road",
+
+            "addressLine2": null,
+
+            "town": "London",
+
+            "county": "London",
+
+            "postcode": "E14 3AF",
+
+            "countryUid": 121
+
+        },
+
+        "shippingAddress": {
+
+            "uid": 81,
+
+            "addressLine1": "13 Wynan Road",
+
+            "addressLine2": null,
+
+            "town": "London",
+
+            "county": "London",
+
+            "postcode": "E14 3AF",
+
+            "countryUid": 121
+
+        },
+
+        "accountPaymentMethodUid": 4,
+
+        "directDebitDetail": {
+
+            "accountHolderName": "Bill Jones",
+
+            "bankName": "BANK1",
+
+            "sortCode": "123456",
+
+            "bankAccountNumber": "****1111"
+
+        },
+
+        "currentBalance": 0.00,
+
+        "numActiveSubscriptions": 0,
+
+        "createdDate": 1444405695000,
+
+        "billDay": 8,
+
+        "nextBillDate": null,
+
+        "lastBillDate": null,
+
+        "key": "[B@5a601fca",
+
+        "customerUid": 4,
+
+        "selfPaid": true,
+
+        "billCycleAllocationMethodUid": 1,
+
+        "stmtPaidForAccount": false,
+
+        "accountInvoiceDeliveryMethodUid": 2,
+
+        "payerAccountUid": 0,
+
+        "countryCode": "GB",
+
+        "currencyCode": "GBP",
+
+        "languageCode": "en",
+
+        "customFields": null,
+
+        "href": "/accounts/73"
+
+    },
+
+    "status": {
+
+        "code": 200,
+
+        "message": "OK",
+
+        "errors": null
+
+    },
+
+    "paging": null
+
+}

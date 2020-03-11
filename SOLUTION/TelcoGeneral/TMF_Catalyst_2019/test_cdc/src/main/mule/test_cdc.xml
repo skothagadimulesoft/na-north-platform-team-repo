@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="9b76185a-9444-4103-9d47-484c0d87bfae" >
+		<salesforce:cached-basic-connection username="${sfdc.user_name}" password="${sfdc.password}" securityToken="${sfdc.security_token}" />
+	</salesforce:sfdc-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="fb860c7f-3deb-4a7d-80a8-9aabcfbbcbf3" file="test_cdc_2.properties"/>
+	<flow name="test_cdcFlow1" doc:id="52b91765-1658-49d0-bfbc-111394782d06" >
+		<salesforce:subscribe-channel doc:name="Subscribe channel" doc:id="e418f86d-1775-49fd-8f8f-f0898f924abc" config-ref="Salesforce_Config" streamingChannel="/data/ContactChangeEvent"/>
+		<ee:transform doc:name="Transform Message" doc:id="f2bc1b8f-0e9f-49b2-b8ea-c7083273220f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="36a06d14-cfc4-4dd0-ad97-ae8ab60f1513" message="++++ Contact Change Evente: #[payload]"/>
+	</flow>
+	<flow name="test_cdcFlow" doc:id="71b4b653-3f16-4a32-8575-f565ad424e74" >
+		<salesforce:subscribe-channel streamingChannel="/data/OrderChangeEvent" doc:name="Subscribe channel" doc:id="edb100dc-c285-4b5d-989a-f7de9b2f8f13" config-ref="Salesforce_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e9cdda56-bbed-4d9b-9efb-99e86c373829" message="-----On Change Event Streaming Channel: #[payload]"/>
+	</flow>
+</mule>

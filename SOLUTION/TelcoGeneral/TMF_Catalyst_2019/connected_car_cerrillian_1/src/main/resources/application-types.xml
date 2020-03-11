@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="credentials" format="json">
+      <types:shape format="weave" example="api/examples/credentialsExample.json"><![CDATA[%dw 2.0
+type credentials = {|
+  credentials: {|
+    emailAddress: String, 
+    password: String
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"credentials\":{\"emailAddress\":\"testapiuser@cerillionskyline.com\",\"password\":\"Password@123\"}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="credentialsResponse" format="json">
+      <types:shape format="weave" example="api/examples/credentialsResponseExample.json"><![CDATA[%dw 2.0
+type credentialsResponse = {|
+  resource: {|
+    accessToken: String, 
+    emailAddress: String
+  |}, 
+  status: {|
+    code: Number {"typeId": "int"}, 
+    message: String, 
+    errors: String
+  |}, 
+  paging: String
+|} {"MetadataFormat": "json",
+"example": "{\"resource\":{\"accessToken\":\"Cp4Ay8ZEoiaJ3ExKdWeoij4vfZeELc\",\"emailAddress\":\"testapiuser@cerillionskyline.com\"},\"status\":{\"code\":201,\"message\":\"Resource Created Successfully\",\"errors\":\"null\"},\"paging\":\"null\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="productOrder" format="json">
+      <types:shape format="weave" example="api/examples/productOrderBodyExample.json"><![CDATA[%dw 2.0
+type productOrder = {|
+  accessToken: String, 
+  resource: {|
+    externalId: String, 
+    priority: String, 
+    description: String, 
+    category: String, 
+    notificationContact: String, 
+    baseType: String, 
+    "type": String, 
+    note: Array<{|
+      text: String, 
+      date: String, 
+      author: String
+    |}>, 
+    relatedParty: Array<{|
+      id: String, 
+      href: String, 
+      name: String, 
+      role: String, 
+      referredType: String
+    |}>, 
+    billingAccount: {|
+      id: String, 
+      href: String, 
+      name: String, 
+      referredType: String
+    |}, 
+    orderItem: Array<{|
+      id: String, 
+      action: String, 
+      quantity: Number {"typeId": "int"}, 
+      product: {|
+        id: String, 
+        characteristic: Array<{|
+          name: String, 
+          value: String
+        |}>, 
+        relatedParty: Array<{|
+          id: String, 
+          href: String, 
+          name: String, 
+          role: String, 
+          referredType: String
+        |}>, 
+        productSpecification: {|
+          id: String, 
+          href: String, 
+          version: String, 
+          name: String
+        |}
+      |}, 
+      productOffering: {|
+        id: String, 
+        name: String
+      |}, 
+      orderItem: Array<{|
+        id: String, 
+        action: String, 
+        quantity: Number {"typeId": "int"}, 
+        itemPrice: Array<{|
+          name: String, 
+          description: String, 
+          priceType: String, 
+          price: {|
+            taxIncludedAmount: {|
+              value: Number {"typeId": "double"}, 
+              unit: String
+            |}
+          |}
+        |}>, 
+        productOffering: {|
+          id: String, 
+          name: String
+        |}, 
+        product: {|
+          id: String, 
+          characteristic: Array<{|
+            name: String, 
+            value: String
+          |}>, 
+          relatedParty: Array<{|
+            id: String, 
+            href: String, 
+            name: String, 
+            role: String, 
+            referredType: String
+          |}>, 
+          productSpecification: {|
+            id: String, 
+            href: String, 
+            version: String, 
+            name: String
+          |}
+        |}
+      |}>
+    |}>
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"accessToken\":\"Jpad9QSABmrwrrlF4It82IeO3NJ7I72h\",\"resource\":{\"externalId\":\"Telco01\",\"priority\":\"1\",\"description\":\"Order illustration UC1\",\"category\":\"Residential\",\"notificationContact\":\"jean.pontus@tmforum.com\",\"baseType\":\"productOrder\",\"type\":\"productOrder\",\"note\":[{\"text\":\"Order to illustrate UC1\",\"date\":\"2017-11-03T08:46:47.945Z\",\"author\":\"Jean-Lyuc Tymen\"}],\"relatedParty\":[{\"id\":\"11\",\"href\":\"tmfAPI\/customer\/11.org\",\"name\":\"Joe Doe\",\"role\":\"customer\",\"referredType\":\"individualParty\"}],\"billingAccount\":{\"id\":\"67\",\"href\":\"tmfAPI\/billingAccount\/BA1513.org\",\"name\":\"BA01\",\"referredType\":\"billingAccount\"},\"orderItem\":[{\"id\":\"75\",\"action\":\"add\",\"quantity\":1,\"product\":{\"id\":\"66\",\"characteristic\":[{\"name\":\"\",\"value\":\"\"}],\"relatedParty\":[{\"id\":\"\",\"href\":\"\",\"name\":\"\",\"role\":\"\",\"referredType\":\"\"}],\"productSpecification\":{\"id\":\"\",\"href\":\"\",\"version\":\"\",\"name\":\"\"}},\"productOffering\":{\"id\":\"75\",\"name\":\"TMF25\"},\"orderItem\":[{\"id\":\"83\",\"action\":\"add\",\"quantity\":1,\"itemPrice\":[{\"name\":\"AccessFee\",\"description\":\"Access Fee\",\"priceType\":\"oneTime\",\"price\":{\"taxIncludedAmount\":{\"value\":0.99,\"unit\":\"Euros\"}}}],\"productOffering\":{\"id\":\"108\",\"name\":\"TMF Mobile Telephony\"},\"product\":{\"id\":\"67\",\"characteristic\":[{\"name\":\"TEL_MSISDN\",\"value\":\"27457958\"}],\"relatedParty\":[{\"id\":\"11\",\"href\":\"tmfAPI\/customer\/11.org\",\"name\":\"Joe Doe\",\"role\":\"user\",\"referredType\":\"individualParty\"}],\"productSpecification\":{\"id\":\"14307\",\"href\":\"tmfAPI\/productSpecification\/14307.org\",\"version\":\"1\",\"name\":\"Mobile Telephony\"}}}]}]}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="productOrderResponse" format="json">
+      <types:shape format="weave" example="api/examples/productOrderResponseExample.json"><![CDATA[%dw 2.0
+type productOrderResponse = {|
+  resource: {|
+    id: String, 
+    href: String
+  |}, 
+  status: {|
+    code: Number {"typeId": "int"}, 
+    message: String, 
+    errors: String
+  |}, 
+  paging: String
+|} {"MetadataFormat": "json",
+"example": "{\"resource\":{\"id\":\"5\",\"href\":\"null\"},\"status\":{\"code\":201,\"message\":\"Resource Created Successfully\",\"errors\":\"null\"},\"paging\":\"null\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#5c879705-39a0-4ef4-bdfa-52bd3336ccd9">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="credentials"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="credentials"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#6ed0e7c6-8f25-412c-ab7a-fd390112c7e8">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="credentialsResponse"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="credentialsResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#13d1b447-a8f6-4fd4-af8d-adbb8edfa15a">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="productOrder"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#81443d02-a03d-42b7-afa5-275441d689a2">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="productOrderResponse"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

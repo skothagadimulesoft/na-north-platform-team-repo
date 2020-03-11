@@ -1,0 +1,37 @@
+{
+  "exec" : {
+    "id" : "0000016A-2C19-2CC9-2C19-2CB6C0A857E3_1555958140864",
+    "name" : "PostTelematicsData",
+    "channel" : "desktop",
+    "canResume" : false,
+    "isSuspended" : false,
+    "userRoles" : [ "SV_Console", "SV_User" ],
+    "suspendReason" : null,
+    "suspendNotes" : null,
+    "data" : {
+      "startParameters" : {
+        "workflow" : "PostTelematicsData",
+        "__runAsRoles_hidden" : "[SV_Console, SV_User]",
+        "subscriberId" : "TMFDEMO",
+        "telematics" : {
+          "VIN" : "13KAHDJ12ASJH123J",
+          "Make" : "Jaguar",
+          "Model" : "XF"
+        }
+      }
+    },
+    "locale" : "en_US",
+    "caseId" : null,
+    "debug" : null
+  },
+  "info" : null,
+  "prevStepId" : null,
+  "templateName" : "done",
+  "responseRequired" : false,
+  "isDone" : true,
+  "stepReportGuid" : null,
+  "endEventName" : "EndEvent_2",
+  "forceReload" : false,
+  "validSignals" : null,
+  "content" : "\r\n<div class=\"header\">\r\n</div>\r\n\r\n<div class=\"content done\">\r\n\r\n template.done.endmessage\r\n </div>\r\n<div class=\"buttons\">\r\n\t<button id=\"reload\" class='btn btn-default'>template.done.button.startover</button>\r\n</div>\r\n\r\n<script>\r\nMotive.executeInContext(\r\n\tfunction(){\r\n\t\tvar wf = this.wf;\r\n\t\twf.$(\"button\").button();\r\n\t\twf.$(\"button#reload\").bind(\"click\", function(){\r\n\t\t\t$(this).attr('disabled', 'disabled');\r\n\t\t\twf.doRestart();\r\n\t\t\t$(this).removeAttr('disabled');\r\n\t\t});\r\n\r\n\t\t// this is to disable the timeout button when a workflow has finished\r\n\t\tif (window.parent.document.getElementById('event-button')) {\r\n            window.parent.document.getElementById('event-button').style.display = 'none';\r\n        }\r\n\t\t\r\n\t\t// disable the breadcrumb when the flow is done\r\n\t\tvar bcControl = wf.getBreadcrumbControl();\r\n\t\tbcControl.jBreadCrumb(\"removeAllCrumbs\");\r\n\t\t//also disable feedback\r\n\t\twf.data.feedbackControl.disableFeedback();\r\n\t}\r\n);\r\n</script>\r\n\r\n"
+}

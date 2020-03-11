@@ -1,0 +1,117 @@
+{
+   "accessToken": "Jpad9QSABmrwrrlF4It82IeO3NJ7I72h",
+   "resource": {
+	   "externalId":"Telco01",
+	   "priority":"1",
+	   "description":"Order illustration UC1",
+	   "category":"Residential",
+	   "notificationContact":"jean.pontus@tmforum.com",
+	   "baseType":"productOrder",
+	   "type":"productOrder",
+	   "note":[
+	      {
+	         "text":"Order to illustrate UC1",
+	         "date":"2017-11-03T08:46:47.945Z",
+	         "author":"Jean-Lyuc Tymen"
+	      }
+	         ],
+	   "relatedParty":[
+	      {
+	         "id":"11",
+	         "href":"tmfAPI/customer/11.org",
+	         "name":"Joe Doe",
+	         "role":"customer",
+	         "referredType":"individualParty"
+	      }
+	   ],
+	   "billingAccount":{
+	      "id":"67",
+	      "href":"tmfAPI/billingAccount/BA1513.org",
+	      "name":"BA01",
+	      "referredType":"billingAccount"
+	   },
+   "orderItem":[
+      {
+         "id":"75",
+         "action":"add",
+         "quantity":1,
+         "product":{
+            "id":"66",
+            "characteristic":[
+               {
+                  "name":"",
+                  "value":""
+               }
+            ],
+            "relatedParty":[
+               {
+                  "id":"",
+                  "href":"",
+                  "name":"",
+                  "role":"",
+                  "referredType":""
+               }
+            ],
+            "productSpecification":{
+               "id":"",
+               "href":"",
+               "version":"",
+               "name":""
+            }
+         },
+         "productOffering":{
+            "id":"75",
+            "name":"TMF25"
+         },
+         "orderItem":[
+            {
+               "id":"83",
+               "action":"add",
+               "quantity":1,
+               "itemPrice":[
+                  {
+                     "name":"AccessFee",
+                     "description":"Access Fee",
+                     "priceType":"oneTime",
+                     "price":{
+                        "taxIncludedAmount":{
+                           "value":0.99,
+                           "unit":"Euros"
+                        }
+                     }
+                  }
+               ],
+               "productOffering":{
+                  "id":"108",
+                  "name":"TMF Mobile Telephony"
+               },
+               "product":{
+                  "id" : "67",
+                  "characteristic":[
+                     {
+                        "name":"TEL_MSISDN",
+                        "value":"27457958"
+                     }
+                  ],
+                  "relatedParty":[
+                     {
+                        "id":"11",
+                        "href":"tmfAPI/customer/11.org",
+                        "name":"Joe Doe",
+                        "role":"user",
+                        "referredType":"individualParty"
+                     }
+                  ],
+                  "productSpecification":{
+                     "id":"14307",
+                     "href":"tmfAPI/productSpecification/14307.org",
+                     "version":"1",
+                     "name":"Mobile Telephony"
+                  }
+               }
+            }
+         ]
+      }
+   ]
+}
+}

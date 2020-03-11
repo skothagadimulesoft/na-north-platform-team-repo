@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="9ae0e067-4547-4c06-8e31-2b8d27d84593" >
+		<http:request-connection host="${cerillian.host}" port="${cerillian.port}" />
+	</http:request-config>
+	
+	
+	<flow name="cerriliion_invokeFlow_login" doc:id="3a806342-34f9-42e0-90b5-3f73ed51b8da" >
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="5aed7eef-6f20-4c55-97ca-11e15999b520" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"credentials": {
+		"emailAddress": "testapiuser@cerillionskyline.com",  
+		"password": "Password@123" 
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Copy_of_LoginRequest" doc:id="10fb9ddc-54c1-4816-bea3-c9a992cfc99b" path="/api/v1/login" config-ref="HTTP_Request_configuration"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="2214e141-c409-4b88-8d8b-5da5d75f2e51" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	resource: payload.resource
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="c1508853-af4f-47d1-ad8f-1ac6bbeb51b8" message="Cerillion Login Payload: #[payload]"/>
+	</flow>
+</mule>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+
+	
+	
+	<flow name="utilFlow" doc:id="0564c84e-c069-43a1-8444-69bcaca0eb07" >
+		<http:listener doc:name="Listener" doc:id="2279c06d-45bd-420f-9dcb-e5e90fbb97bd" config-ref="HTTP_Listener_config" path="/sfdc/order"/>
+		<flow-ref doc:name="Flow Reference" doc:id="e107697d-d34a-45fd-b4e9-5d7ffa4726f4" name="getOrderItems"/>
+		<logger level="INFO" doc:name="Logger" doc:id="72ef6199-be5f-4416-9b35-663cc4b9107f" message="OrderItems: #[payload]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="dcbcaecc-d42f-4db1-b8a9-097621b94793" name="utilFlow_getWorkOrders"/>
+		<logger level="INFO" doc:name="Logger" doc:id="bb247bc0-3117-4d83-a00f-00008a349fca" message="Work Orders: #[payload]"/>
+	</flow>
+	<flow name="utilFlow_getWorkOrders" doc:id="310b7a0f-6184-4513-9e6a-5943e1ae101a" >
+		<set-variable value="00000236" doc:name="Set Variable" doc:id="1a5f17d3-1a1f-49db-ae28-f52757fa17cb" variableName="order_number"/>
+		<salesforce:query doc:name="Query" doc:id="e7443a11-f7e6-40ee-8178-e629046a4a6e" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Id, WorkOrderNumber, Account.Name, WorkType.Name,Order__r.OrderNumber FROM WorkOrder
+where Order__r.OrderNumber = ':orderNum'
+</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	orderNum : vars.order_number
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="67c3b0c4-af73-4743-903f-093e3b8be11f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getOrderItems" doc:id="ec0e0688-66de-4c17-827b-bdab5829c500" >
+		<set-variable value="00000236" doc:name="Set Variable" doc:id="b3f0de54-97a3-4735-9f73-d1a51e7d6de5" variableName="order_number"/>
+		<logger level="INFO" doc:name="Logger" doc:id="18fa4df7-acb7-40b5-adde-1c276ce06a99" message="order num: #[vars.order_number]"/>
+		<salesforce:query doc:name="Query" doc:id="da519ecd-2cb9-4deb-8462-15ae0c935ca7" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Id, Order.OrderNumber, Product2.Id, Product2.Name, Quantity, UnitPrice, TotalPrice FROM OrderItem where Order.OrderNumber = ':orderNum'
+
+
+
+</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	orderNum : vars.order_number
+}]]]></salesforce:parameters>
+			
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="ae5255c5-9309-4678-a35e-f67165bd6266" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="utilFlow1" doc:id="2032ce5d-e189-4953-b0b4-f31aa5b8508f" >
+		<ee:transform doc:name="Transform Message" doc:id="09d2495a-02ea-4bcb-ae96-991df3e382a1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="Order" doc:name="Create" doc:id="fa60aa22-baa8-47fe-8ffe-d778bb17a44d" config-ref="Salesforce_Config"/>
+	</flow>
+	<flow name="utilFlow2" doc:id="bf42f68b-540a-4e2a-a3bc-c7f4a347c015" >
+		<http:listener doc:name="Listener" doc:id="a2cdee98-53a2-44a7-97c7-bea8807b0d16" config-ref="HTTP_Listener_config" path="/sfdc/order/delivered"/>
+		<ee:transform doc:name="Transform Message" doc:id="62c9106e-c79f-416f-a1bc-f2df1b0ad71f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	Id: "8011U000000TgboQAC",
+	Status: "Delivered",
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:update-single doc:name="Update single" doc:id="83d50a6d-f59f-4021-a40d-73c05d803d22" config-ref="Salesforce_Config" type="Order"/>
+		<ee:transform doc:name="Transform Message" doc:id="782a3fd9-484f-4ca4-a5d2-cbb3d3b97f78" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="utilFlow3" doc:id="ac0d6b0a-1356-48d0-9693-47c4311865c7" >
+		<http:listener doc:name="Listener" doc:id="49d1614e-f32a-4b52-9a46-c651329e99fd" config-ref="HTTP_Listener_config" path="/nokia"/>
+		<flow-ref doc:name="Flow Reference" doc:id="2864eeb5-2ee5-4755-92d1-6d29a6f6c232" name="connected_car_nokia"/>
+	</flow>
+	<flow name="utilFlow4_publish_vehicle_event" doc:id="163f1aa2-963c-497b-8764-aed192aacbd7">
+		<http:listener doc:name="Listener" doc:id="f3c15bc5-636e-434d-b882-8944ff3a8932" config-ref="HTTP_Listener_config" path="/vehicle_event" />
+		<ee:transform doc:name="Transform Message" doc:id="e3c27d7b-ecd6-40f6-be6c-7e3e082e798f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	Subscriber_ID__c: "0011U00000O9fDkQAJ",
+    Asset_ID__c: "02i1U000000UawyQAC",
+    Is_Critical__c: "true",
+    Signal_Message__c: "Tire Pressure is critically low"
+   }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create-single type="Vehicle_Signal__e" doc:name="Create single" doc:id="3eb1f27b-92ba-413c-8608-b53c9e649526" config-ref="Salesforce_Config"/>
+	</flow>
+	<flow name="utilFlow4" doc:id="865e1847-1362-43c5-ac1e-b0a0d1d94823" >
+		<http:listener doc:name="Listener" doc:id="0b9593cb-4cc8-4d88-bc54-8c8e1a0fcecd" config-ref="HTTP_Listener_config" path="/asset"/>
+		<ee:transform doc:name="Transform Message" doc:id="66435090-f876-4593-aaa2-994958a7d97f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="Product2" doc:name="Create" doc:id="7d363f7d-24db-4c94-9666-cd5cad8296bd" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="b7b23216-e377-41b4-ac1b-04a6ff09e10f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="utilFlow_ExecuteWorkflow" doc:id="09993782-d6a9-4210-a97c-c5444378371b" >
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="4dd54ffc-0dc1-421c-b8dd-1b6122f77cc7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="OrderID" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.data.payload.ChangeEventHeader.recordIds[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="a93567ad-81d0-43c9-95a1-2fe4900c211e" variableName="order_payload" mimeType="application/json" />
+		<logger level="INFO" doc:name="Copy_of_UpdateOrder_Close_Log" doc:id="a9302c23-0745-4f47-8a7f-fb95aec63a14" message="Order Provisioned: #[payload]" />
+		<flow-ref doc:name="Copy_of_callCerilion" doc:id="0839e117-f56e-42e4-bca5-1b813ad9f251" name="connected_buildCerillionMessage" />
+		<os:retrieve doc:name="Retrieve" doc:id="ac8e5251-7e4c-4792-800b-a0b4e1df54a6" key="#[vars.OrderID]" objectStore="Object_store"/>
+		<ee:transform doc:name="Transform Message" doc:id="03088fdd-a019-4f5b-8885-060613d0b11a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="e14709bd-1848-474f-9d3a-2d48e96f5b04" message="===== &gt;&gt; Ext Id : #[payload.resource.orderItem[0].orderItem[0].id]"/>
+		<choice doc:name="Choice" doc:id="bd5d9d52-dd1f-45d0-964b-a3375a013772" >
+			<when expression='#[payload.resource.orderItem[0].orderItem[0].id != "69"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="6994080b-4c99-4215-8dee-abea730dff88" message="@@@ This wa an NON -  Vehicle Charging Event @@@"/>
+				<set-payload value="#[vars.order_payload]" doc:name="Copy_of_Set Payload" doc:id="3eaf0632-d6d9-49ba-a264-341db05a9f15" />
+				<async doc:name="Copy_of_Async" doc:id="1937ae4c-6ee9-48da-9b06-0159984ee64f">
+			<scatter-gather doc:name="Copy_of_Scatter-Gather" doc:id="d35eaa0a-ec1e-4ee4-a5df-6f2b9aa4abc4">
+				<route>
+					<flow-ref doc:name="Copy_of_callNokia" doc:id="3519709a-c26a-4e6a-afdb-eaee1c2424ec" name="connected_car_nokia" />
+				</route>
+				<route>
+					<flow-ref doc:name="Copy_of_updateAssets" doc:id="68e6baa5-3fc6-4778-9178-015fc41d49c1" name="connected_car_sfdcFlow_UpdateAssets" />
+				</route>
+			</scatter-gather>
+		</async>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="e819398d-10a5-47b9-b4f8-5dd95fdd5e71" message="@@@ This was an Vehicle Charging Event @@@"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="utilFlow5" doc:id="4cafc385-6157-4f53-9634-744c584cb41a" >
+		<http:listener doc:name="Listener" doc:id="96ac0e91-8f48-434e-abc2-5df2796eedd9" config-ref="HTTP_Listener_config" path="/parking"/>
+		<ee:transform doc:name="Transform Message" doc:id="8130a9b2-b6c2-4d83-9be1-9ce5c52411fa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	CreatedDate: now(),
+	Charging_Stations_Id__c: "789654123654",
+	Status__c: "Busy"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ed46397a-67be-44d8-96bc-9c71ee0c7b44" message="Creting Parking evente: #[payload]"/>
+		<salesforce:create-single type="Parking_Status_Event__e" doc:name="Create single" doc:id="79062f0c-b8c6-406d-b226-c13306695cb7" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="16dad27f-024e-4827-9bec-4920c76cb846" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3156bb33-e8cd-4caf-a127-a0a5773b0a6c" message="Creating Parking Event" />
+	</flow>
+	<!--  
+	<flow name="utilFlow_ParkingStatusEventHandler" doc:id="438074bc-760c-4d53-9116-e932bd7f9c56" >
+		<salesforce:subscribe-channel doc:name="Subscribe channel" doc:id="a657dc7e-a7e2-4ff5-a6c0-ba5434303cf1" config-ref="Salesforce_Config" streamingChannel="/event/Parking_Status_Event__e"/>
+		<logger level="INFO" doc:name="Logger" doc:id="5e00f256-726f-42ee-bbf8-125e373656dd" message="Parking Status Event: #[payload]" />
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="0bf9dd59-58d1-4ccf-8b45-cb143dca80f2" variableName="ParkingStatusEvent"/>
+	</flow>
+	-->
+	
+</mule>

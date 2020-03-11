@@ -1,0 +1,55 @@
+#%RAML 1.0
+version: v1
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/d648fcfc-987b-436d-8bb8-8199f55021f7/ # 
+title: Connect_Car
+
+uses:
+  connectedCarDataTypes: exchange_modules/9be0b2dd-a5cd-4497-aeb4-1674a4f5a4b5/connected_car_data_types/1.0.11/connected_car_data_types.raml
+
+/v1/login:
+  post:
+    description: login to the service and get a login token
+    body:
+      application/json:
+        type: connectedCarDataTypes.loginCredentials
+        example: !include examples/credentialsExample.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: connectedCarDataTypes.credentialsResponse
+            example: !include examples/credentialsResponseExample.json
+/v1/productOrderingManagement/productOrder:
+  post:
+    description: place an order
+    body:
+      application/json:
+        type: connectedCarDataTypes.productOrder
+        example: !include examples/productOrderBodyExample.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: connectedCarDataTypes.productOrderResponse
+            example: !include examples/productOrderResponseExample.json
+              
+/v1/accountManagement/accounts:
+  /{account_id}:
+    get:
+      queryParameters:
+        access_token: 
+          type: string
+          
+      responses:
+        200:
+          body:
+            application/json:
+              example:  !include  examples/get_account_response.json
+
+          
+
+
+        
+        
+
+      

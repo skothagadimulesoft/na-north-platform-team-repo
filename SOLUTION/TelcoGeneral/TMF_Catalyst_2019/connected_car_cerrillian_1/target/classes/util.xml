@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="30857627-9280-477c-be4f-654dd1f6c7dc" >
+		<os:connection >
+			<reconnection >
+				<reconnect />
+			</reconnection>
+		</os:connection>
+	</os:config>
+	<os:object-store name="Cerillian_Object_store" doc:name="Object store" doc:id="e1521262-19ef-4e0d-a9e9-84e8596b757a" config-ref="ObjectStore_Config" />
+	<flow name="loginFlow" doc:id="74aa36e2-5115-4a46-915d-dc4906fce8c7" >
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="5c879705-39a0-4ef4-bdfa-52bd3336ccd9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"credentials": {
+		"emailAddress": (payload.credentials.emailAddress default "testapiuser@cerillionskyline.com"),  
+		"password": (payload.credentials.password default "Password@123") 
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Copy_of_Request" doc:id="aad28737-da33-466d-a0e4-f7be26d0fc8a" config-ref="HTTP_Request_configuration" path="/skyline/api/v1/login" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="6ed0e7c6-8f25-412c-ab7a-fd390112c7e8">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<os:store doc:name="Store" doc:id="ae96bde5-77ce-4a49-b800-74505f24965a" key="login_token" objectStore="Cerillian_Object_store">
+			<os:value ><![CDATA[#[payload.resource.accessToken]]]></os:value>
+		</os:store>
+	</flow>
+</mule>

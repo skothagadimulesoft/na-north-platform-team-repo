@@ -1,0 +1,189 @@
+#%RAML 1.0 Library
+usage: Data Types for the Connected car demo
+
+types:
+  
+
+
+  loginCredentials:
+    type: object
+    properties:
+      credentials:
+        type: object
+        properties:
+          emailAddress: string
+          password: string
+
+  credentialsResponse:
+    type: object
+    properties:
+      resource:
+        type: object
+        properties:
+          accessToken: string
+          emailAddress: string
+      status:
+        type: object
+        properties:
+          code: number
+          message: string
+          errors?: string
+      paging?: string
+    
+  productOrder:
+    type: object
+    properties:
+      accessToken: string
+      resource:
+        type: object
+        properties:
+          externalId: string
+          priority: string
+          description: string
+          category: string
+          notificationContact: string
+          baseType: string
+          type: string
+          note:
+            type: note
+          relatedParty:
+            type: relatedParty
+          billingAccount:
+            type: billingAccount
+          orderItem:
+            type: array
+            items:
+              type: orderItem
+
+  note:
+    type: array
+    items:
+      type: object
+      properties:
+        text: string
+        date: string
+        author: string
+
+  relatedParty:
+    type: array
+    items:
+      type: object
+      properties:
+        id: string
+        href: string
+        name: string
+        role: string
+        referredType: string
+
+  billingAccount:
+    type: object
+    properties:
+      id: string
+      href: string
+      name: string
+      referredType: string
+
+  orderItem:
+    type: object
+    properties:
+      id: string
+      action: string
+      quantity: number
+      product: 
+        type: productObj
+      productOffering: productOffering
+      orderItem:
+        type: array
+        items:
+          type: orderItemWithItemPrice
+  
+  characteristic:
+    type: object
+    properties:
+      name: string
+      value: string
+
+  productSpecification:
+    type: object
+    properties:
+      id: string
+      href: string
+      version: string
+      name: string
+
+  productOffering:
+    type: object
+    properties:
+      id: string
+      name: string
+
+  orderItemWithItemPrice:
+    type: object
+    properties:
+      id: string
+      action: string
+      quantity: number
+      itemPrice:
+        type: array
+        items:
+          type: itemPrice
+      productOffering: productOffering
+      product: 
+        type: object
+        properties:
+          id: string
+          characteristic:
+            type: array
+            items:
+              characteristic
+          relatedParty: relatedParty
+          productSpecification: productSpecification
+
+  itemPrice:
+    type: object
+    properties:
+      name: string
+      description: string
+      priceType: string
+      price: price
+
+  price: 
+    type: object
+    properties:
+      taxIncludedAmount: taxIncludedAmount
+
+  taxIncludedAmount:
+    type: object
+    properties:
+      value: number
+      unit: string
+
+  productObj: 
+    type: object
+    properties:
+      id: string
+      characteristic:
+        type: array
+        items:
+          characteristic
+      relatedParty:
+        type: relatedParty
+      productSpecification:
+        type: productSpecification
+
+  productOrderResponse:
+    type: object
+    properties:
+      resource: 
+        type: object
+        properties:
+          id: string
+          href?: string
+      status:
+        type: object
+        properties:
+          code: number
+          message: string
+          errors?: string
+      paging?: string
+      

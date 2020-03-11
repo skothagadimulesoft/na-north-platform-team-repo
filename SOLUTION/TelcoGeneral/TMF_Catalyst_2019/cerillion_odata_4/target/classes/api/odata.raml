@@ -1,0 +1,33 @@
+#%RAML 1.0 Library
+uses:
+  odata: libraries/odataLibrary.raml
+
+types:
+  CerillionAccount:
+    (odata.remote): resource
+    properties:
+      AccountID:
+        type: string
+        (odata.key): true
+        (odata.nullable): false
+        required: true
+      Salesforce_Account:
+        type: string
+        (odata.key): false
+        (odata.nullable): true
+        required: true
+      Balance:
+        type: number
+        (odata.nullable): true
+        (odata.key): false
+        format: float
+      AccountSubscriptions:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+      CurrencyCode:
+        type: string
+        (odata.nullable): true
+        (odata.key): false
+     
+  

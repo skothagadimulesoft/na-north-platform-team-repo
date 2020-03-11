@@ -1,0 +1,38 @@
+{
+  "data": {
+    "schema": "scF92k1cUdDb13zEQEHRog",
+    "payload": {
+      "LastModifiedDate": "2019-05-02T20:01:36.000Z",
+      "Description": "AutonomousControl",
+      "Quantity": 1.0,
+      "ListPrice": 150.0,
+      "OrderId": "8011U000000tpFxQAI",
+      "CurrencyIsoCode": "EUR",
+      "AvailableQuantity": 1.0,
+      "OrderItemNumber": "0000000511",
+      "UnitPrice": 123.0,
+      "CreatedById": "0051U000005ORsBQAW",
+      "PricebookEntryId": "01u1U0000019xNkQAI",
+      "ChangeEventHeader": {
+        "isTransactionEnd": true,
+        "commitNumber": 188628072104,
+        "commitUser": "0051U000005ORsBQAW",
+        "sequenceNumber": 2,
+        "entityName": "OrderItem",
+        "changeType": "CREATE",
+        "changeOrigin": "",
+        "transactionKey": "00050fd7-4f9e-2080-ca42-b2c181b53f37",
+        "commitTimestamp": 1556827296000,
+        "recordIds": [
+          "8021U00000298UqQAI"
+        ]
+      },
+      "CreatedDate": "2019-05-02T20:01:36.000Z",
+      "LastModifiedById": "0051U000005ORsBQAW"
+    },
+    "event": {
+      "replayId": 75982
+    }
+  },
+  "channel": "/data/OrderItemChangeEvent"
+  }

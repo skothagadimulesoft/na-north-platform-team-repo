@@ -1,0 +1,27 @@
+{
+  "data": {
+    "schema": "vyDzDCdGfhQXfaHcelh6KQ",
+    "payload": {
+      "LastModifiedDate": "2019-04-11T01:53:45.000Z",
+      "ChangeEventHeader": {
+        "isTransactionEnd": true,
+        "commitNumber": 10517109177228,
+        "commitUser": "0051a000000MCD8AAO",
+        "sequenceNumber": 2,
+        "entityName": "Order",
+        "changeType": "UPDATE",
+        "changeOrigin": "",
+        "transactionKey": "0005279b-1ffb-8a64-db43-525b039712d0",
+        "commitTimestamp": 1554947625000,
+        "recordIds": [
+          "8011P000005awxrQAA"
+        ]
+      },
+      "TotalAmount": 260000.0
+    },
+    "event": {
+      "replayId": 10844
+    }
+  },
+  "channel": "/data/OrderChangeEvent"
+}

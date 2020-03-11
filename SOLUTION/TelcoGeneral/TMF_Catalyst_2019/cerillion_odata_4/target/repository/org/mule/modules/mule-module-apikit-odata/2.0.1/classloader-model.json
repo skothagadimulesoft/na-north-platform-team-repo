@@ -1,0 +1,867 @@
+{
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "org.mule.modules",
+    "artifactId": "mule-module-apikit-odata",
+    "version": "2.0.1",
+    "type": "jar",
+    "classifier": "mule-plugin"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.guava",
+        "artifactId": "guava",
+        "version": "25.1-jre",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/guava/guava/25.1-jre/guava-25.1-jre.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.code.findbugs",
+        "artifactId": "jsr305",
+        "version": "3.0.2",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.checkerframework",
+        "artifactId": "checker-qual",
+        "version": "2.0.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.errorprone",
+        "artifactId": "error_prone_annotations",
+        "version": "2.1.3",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/errorprone/error_prone_annotations/2.1.3/error_prone_annotations-2.1.3.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.j2objc",
+        "artifactId": "j2objc-annotations",
+        "version": "1.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/j2objc/j2objc-annotations/1.1/j2objc-annotations-1.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.codehaus.mojo",
+        "artifactId": "animal-sniffer-annotations",
+        "version": "1.14",
+        "type": "jar"
+      },
+      "uri": "repository/org/codehaus/mojo/animal-sniffer-annotations/1.14/animal-sniffer-annotations-1.14.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "io.projectreactor",
+        "artifactId": "reactor-core",
+        "version": "3.2.0.M1",
+        "type": "jar"
+      },
+      "uri": "repository/io/projectreactor/reactor-core/3.2.0.M1/reactor-core-3.2.0.M1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.reactivestreams",
+        "artifactId": "reactive-streams",
+        "version": "1.0.2",
+        "type": "jar"
+      },
+      "uri": "repository/org/reactivestreams/reactive-streams/1.0.2/reactive-streams-1.0.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.amlorg",
+        "artifactId": "amf-client_2.12",
+        "version": "3.1.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/amlorg/amf-client_2.12/3.1.1/amf-client_2.12-3.1.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.scala-lang",
+        "artifactId": "scala-library",
+        "version": "2.12.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/scala-lang/scala-library/2.12.6/scala-library-2.12.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.amlorg",
+        "artifactId": "amf-core_2.12",
+        "version": "3.1.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/amlorg/amf-core_2.12/3.1.1/amf-core_2.12-3.1.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.syaml",
+        "artifactId": "syaml_2.12",
+        "version": "0.6.3",
+        "type": "jar"
+      },
+      "uri": "repository/org/mule/syaml/syaml_2.12/0.6.3/syaml_2.12-0.6.3.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.common",
+        "artifactId": "scala-common_2.12",
+        "version": "0.4.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/mule/common/scala-common_2.12/0.4.0/scala-common_2.12-0.4.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.amlorg",
+        "artifactId": "amf-webapi_2.12",
+        "version": "3.1.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/amlorg/amf-webapi_2.12/3.1.1/amf-webapi_2.12-3.1.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.everit-org.json-schema",
+        "artifactId": "org.everit.json.schema",
+        "version": "1.9.2",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/everit-org/json-schema/org.everit.json.schema/1.9.2/org.everit.json.schema-1.9.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-validator",
+        "artifactId": "commons-validator",
+        "version": "1.6",
+        "type": "jar"
+      },
+      "uri": "repository/commons-validator/commons-validator/1.6/commons-validator-1.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-digester",
+        "artifactId": "commons-digester",
+        "version": "1.8.1",
+        "type": "jar"
+      },
+      "uri": "repository/commons-digester/commons-digester/1.8.1/commons-digester-1.8.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-logging",
+        "artifactId": "commons-logging",
+        "version": "1.2",
+        "type": "jar"
+      },
+      "uri": "repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-collections",
+        "artifactId": "commons-collections",
+        "version": "3.2.2",
+        "type": "jar"
+      },
+      "uri": "repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-beanutils",
+        "artifactId": "commons-beanutils",
+        "version": "1.9.3",
+        "type": "jar"
+      },
+      "uri": "repository/commons-beanutils/commons-beanutils/1.9.3/commons-beanutils-1.9.3.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.damnhandy",
+        "artifactId": "handy-uri-templates",
+        "version": "2.1.6",
+        "type": "jar"
+      },
+      "uri": "repository/com/damnhandy/handy-uri-templates/2.1.6/handy-uri-templates-2.1.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.re2j",
+        "artifactId": "re2j",
+        "version": "1.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/re2j/re2j/1.1/re2j-1.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.amlorg",
+        "artifactId": "amf-aml_2.12",
+        "version": "3.1.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/amlorg/amf-aml_2.12/3.1.1/amf-aml_2.12-3.1.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.amlorg",
+        "artifactId": "amf-validation_2.12",
+        "version": "3.1.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/amlorg/amf-validation_2.12/3.1.1/amf-validation_2.12-3.1.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.slf4j",
+        "artifactId": "slf4j-simple",
+        "version": "1.7.12",
+        "type": "jar"
+      },
+      "uri": "repository/org/slf4j/slf4j-simple/1.7.12/slf4j-simple-1.7.12.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.scopt",
+        "artifactId": "scopt_2.12",
+        "version": "3.7.0",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/scopt/scopt_2.12/3.7.0/scopt_2.12-3.7.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.scala-lang.modules",
+        "artifactId": "scala-java8-compat_2.12",
+        "version": "0.8.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/scala-lang/modules/scala-java8-compat_2.12/0.8.0/scala-java8-compat_2.12-0.8.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.json4s",
+        "artifactId": "json4s-native_2.12",
+        "version": "3.5.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/json4s/json4s-native_2.12/3.5.4/json4s-native_2.12-3.5.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.json4s",
+        "artifactId": "json4s-core_2.12",
+        "version": "3.5.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/json4s/json4s-core_2.12/3.5.4/json4s-core_2.12-3.5.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.json4s",
+        "artifactId": "json4s-ast_2.12",
+        "version": "3.5.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/json4s/json4s-ast_2.12/3.5.4/json4s-ast_2.12-3.5.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.json4s",
+        "artifactId": "json4s-scalap_2.12",
+        "version": "3.5.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/json4s/json4s-scalap_2.12/3.5.4/json4s-scalap_2.12-3.5.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.thoughtworks.paranamer",
+        "artifactId": "paranamer",
+        "version": "2.8",
+        "type": "jar"
+      },
+      "uri": "repository/com/thoughtworks/paranamer/paranamer/2.8/paranamer-2.8.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.scala-lang.modules",
+        "artifactId": "scala-xml_2.12",
+        "version": "1.0.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.topbraid",
+        "artifactId": "shacl",
+        "version": "1.2.0-INTERNAL",
+        "type": "jar"
+      },
+      "uri": "repository/org/topbraid/shacl/1.2.0-INTERNAL/shacl-1.2.0-INTERNAL.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.jena",
+        "artifactId": "jena-arq",
+        "version": "3.8.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/jena/jena-arq/3.8.0/jena-arq-3.8.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.jena",
+        "artifactId": "jena-core",
+        "version": "3.8.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/jena/jena-core/3.8.0/jena-core-3.8.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.jena",
+        "artifactId": "jena-iri",
+        "version": "3.8.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/jena/jena-iri/3.8.0/jena-iri-3.8.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-cli",
+        "artifactId": "commons-cli",
+        "version": "1.4",
+        "type": "jar"
+      },
+      "uri": "repository/commons-cli/commons-cli/1.4/commons-cli-1.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-codec",
+        "artifactId": "commons-codec",
+        "version": "1.11",
+        "type": "jar"
+      },
+      "uri": "repository/commons-codec/commons-codec/1.11/commons-codec-1.11.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.jena",
+        "artifactId": "jena-base",
+        "version": "3.8.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/jena/jena-base/3.8.0/jena-base-3.8.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.commons",
+        "artifactId": "commons-csv",
+        "version": "1.5",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/commons/commons-csv/1.5/commons-csv-1.5.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.andrewoma.dexx",
+        "artifactId": "collection",
+        "version": "0.7",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/andrewoma/dexx/collection/0.7/collection-0.7.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.jena",
+        "artifactId": "jena-shaded-guava",
+        "version": "3.8.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/jena/jena-shaded-guava/3.8.0/jena-shaded-guava-3.8.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.httpcomponents",
+        "artifactId": "httpclient",
+        "version": "4.5.5",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/httpcomponents/httpclient/4.5.5/httpclient-4.5.5.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.httpcomponents",
+        "artifactId": "httpcore",
+        "version": "4.4.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/httpcomponents/httpcore/4.4.9/httpcore-4.4.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.github.jsonld-java",
+        "artifactId": "jsonld-java",
+        "version": "0.12.0",
+        "type": "jar"
+      },
+      "uri": "repository/com/github/jsonld-java/jsonld-java/0.12.0/jsonld-java-0.12.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-io",
+        "artifactId": "commons-io",
+        "version": "2.6",
+        "type": "jar"
+      },
+      "uri": "repository/commons-io/commons-io/2.6/commons-io-2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.httpcomponents",
+        "artifactId": "httpclient-cache",
+        "version": "4.5.5",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/httpcomponents/httpclient-cache/4.5.5/httpclient-cache-4.5.5.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.thrift",
+        "artifactId": "libthrift",
+        "version": "0.10.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/thrift/libthrift/0.10.0/libthrift-0.10.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.slf4j",
+        "artifactId": "jcl-over-slf4j",
+        "version": "1.7.25",
+        "type": "jar"
+      },
+      "uri": "repository/org/slf4j/jcl-over-slf4j/1.7.25/jcl-over-slf4j-1.7.25.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.commons",
+        "artifactId": "commons-lang3",
+        "version": "3.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.slf4j",
+        "artifactId": "slf4j-api",
+        "version": "1.7.25",
+        "type": "jar"
+      },
+      "uri": "repository/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.commons",
+        "artifactId": "commons-compress",
+        "version": "1.18",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/commons/commons-compress/1.18/commons-compress-1.18.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.fasterxml.jackson.core",
+        "artifactId": "jackson-databind",
+        "version": "2.9.8",
+        "type": "jar"
+      },
+      "uri": "repository/com/fasterxml/jackson/core/jackson-databind/2.9.8/jackson-databind-2.9.8.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.fasterxml.jackson.core",
+        "artifactId": "jackson-annotations",
+        "version": "2.9.0",
+        "type": "jar"
+      },
+      "uri": "repository/com/fasterxml/jackson/core/jackson-annotations/2.9.0/jackson-annotations-2.9.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.fasterxml.jackson.core",
+        "artifactId": "jackson-core",
+        "version": "2.9.8",
+        "type": "jar"
+      },
+      "uri": "repository/com/fasterxml/jackson/core/jackson-core/2.9.8/jackson-core-2.9.8.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.cxf",
+        "artifactId": "cxf-rt-frontend-jaxrs",
+        "version": "3.2.5",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/cxf/cxf-rt-frontend-jaxrs/3.2.5/cxf-rt-frontend-jaxrs-3.2.5.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.cxf",
+        "artifactId": "cxf-core",
+        "version": "3.2.5",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/cxf/cxf-core/3.2.5/cxf-core-3.2.5.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.fasterxml.woodstox",
+        "artifactId": "woodstox-core",
+        "version": "5.0.3",
+        "type": "jar"
+      },
+      "uri": "repository/com/fasterxml/woodstox/woodstox-core/5.0.3/woodstox-core-5.0.3.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.codehaus.woodstox",
+        "artifactId": "stax2-api",
+        "version": "3.1.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/codehaus/woodstox/stax2-api/3.1.4/stax2-api-3.1.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.ws.xmlschema",
+        "artifactId": "xmlschema-core",
+        "version": "2.2.3",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/ws/xmlschema/xmlschema-core/2.2.3/xmlschema-core-2.2.3.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "javax.ws.rs",
+        "artifactId": "javax.ws.rs-api",
+        "version": "2.1",
+        "type": "jar"
+      },
+      "uri": "repository/javax/ws/rs/javax.ws.rs-api/2.1/javax.ws.rs-api-2.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "javax.annotation",
+        "artifactId": "javax.annotation-api",
+        "version": "1.3",
+        "type": "jar"
+      },
+      "uri": "repository/javax/annotation/javax.annotation-api/1.3/javax.annotation-api-1.3.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.cxf",
+        "artifactId": "cxf-rt-transports-http",
+        "version": "3.2.5",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/cxf/cxf-rt-transports-http/3.2.5/cxf-rt-transports-http-3.2.5.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jboss.oreva",
+        "artifactId": "odata-core",
+        "version": "1.0.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/jboss/oreva/odata-core/1.0.0/odata-core-1.0.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jboss.oreva",
+        "artifactId": "common",
+        "version": "1.0.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/jboss/oreva/common/1.0.0/common-1.0.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jboss.spec.javax.ws.rs",
+        "artifactId": "jboss-jaxrs-api_2.0_spec",
+        "version": "1.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.0_spec/1.0.0.Final/jboss-jaxrs-api_2.0_spec-1.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "joda-time",
+        "artifactId": "joda-time",
+        "version": "2.1",
+        "type": "jar"
+      },
+      "uri": "repository/joda-time/joda-time/2.1/joda-time-2.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-lang",
+        "artifactId": "commons-lang",
+        "version": "2.6",
+        "type": "jar"
+      },
+      "uri": "repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.code.gson",
+        "artifactId": "gson",
+        "version": "2.3.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/code/gson/gson/2.3.1/gson-2.3.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.freemarker",
+        "artifactId": "freemarker",
+        "version": "2.3.23",
+        "type": "jar"
+      },
+      "uri": "repository/org/freemarker/freemarker/2.3.23/freemarker-2.3.23.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.json",
+        "artifactId": "json",
+        "version": "20160810",
+        "type": "jar"
+      },
+      "uri": "repository/org/json/json/20160810/json-20160810.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.skyscreamer",
+        "artifactId": "jsonassert",
+        "version": "1.3.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/skyscreamer/jsonassert/1.3.0/jsonassert-1.3.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx",
+        "artifactId": "jibx-tools",
+        "version": "1.2.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/jibx-tools/1.2.6/jibx-tools-1.2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx",
+        "artifactId": "jibx-schema",
+        "version": "1.2.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/jibx-schema/1.2.6/jibx-schema-1.2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx",
+        "artifactId": "jibx-bind",
+        "version": "1.2.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/jibx-bind/1.2.6/jibx-bind-1.2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx",
+        "artifactId": "jibx-run",
+        "version": "1.2.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/jibx-run/1.2.6/jibx-run-1.2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "xpp3",
+        "artifactId": "xpp3",
+        "version": "1.1.3.4.O",
+        "type": "jar"
+      },
+      "uri": "repository/xpp3/xpp3/1.1.3.4.O/xpp3-1.1.3.4.O.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "bcel",
+        "artifactId": "bcel",
+        "version": "5.1",
+        "type": "jar"
+      },
+      "uri": "repository/bcel/bcel/5.1/bcel-5.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "regexp",
+        "artifactId": "regexp",
+        "version": "1.2",
+        "type": "jar"
+      },
+      "uri": "repository/regexp/regexp/1.2/regexp-1.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "log4j",
+        "artifactId": "log4j",
+        "version": "1.2.17",
+        "type": "jar"
+      },
+      "uri": "repository/log4j/log4j/1.2.17/log4j-1.2.17.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.thoughtworks.qdox",
+        "artifactId": "qdox",
+        "version": "1.12.1",
+        "type": "jar"
+      },
+      "uri": "repository/com/thoughtworks/qdox/qdox/1.12.1/qdox-1.12.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx",
+        "artifactId": "jibx-extras",
+        "version": "1.2.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/jibx-extras/1.2.6/jibx-extras-1.2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "dom4j",
+        "artifactId": "dom4j",
+        "version": "1.6.1",
+        "type": "jar"
+      },
+      "uri": "repository/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "xml-apis",
+        "artifactId": "xml-apis",
+        "version": "1.0.b2",
+        "type": "jar"
+      },
+      "uri": "repository/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jdom",
+        "artifactId": "jdom",
+        "version": "1.1.3",
+        "type": "jar"
+      },
+      "uri": "repository/org/jdom/jdom/1.1.3/jdom-1.1.3.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.core.contenttype",
+        "version": "3.4.100.v20110423-0524",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.core.contenttype/3.4.100.v20110423-0524/org.eclipse.core.contenttype-3.4.100.v20110423-0524.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.core.jobs",
+        "version": "3.5.100.v20110404",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.core.jobs/3.5.100.v20110404/org.eclipse.core.jobs-3.5.100.v20110404.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.core.resources",
+        "version": "3.7.100.v20110510-0712",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.core.resources/3.7.100.v20110510-0712/org.eclipse.core.resources-3.7.100.v20110510-0712.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.core.runtime",
+        "version": "3.7.0.v20110110",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.core.runtime/3.7.0.v20110110/org.eclipse.core.runtime-3.7.0.v20110110.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.equinox.common",
+        "version": "3.6.0.v20110523",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.equinox.common/3.6.0.v20110523/org.eclipse.equinox.common-3.6.0.v20110523.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.equinox.preferences",
+        "version": "3.4.0.v20110502",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.equinox.preferences/3.4.0.v20110502/org.eclipse.equinox.preferences-3.4.0.v20110502.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.jdt.core",
+        "version": "3.7.0.v_B61",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.jdt.core/3.7.0.v_B61/org.eclipse.jdt.core-3.7.0.v_B61.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.osgi",
+        "version": "3.7.0.v20110613",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.osgi/3.7.0.v20110613/org.eclipse.osgi-3.7.0.v20110613.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jibx.config.3rdparty.org.eclipse",
+        "artifactId": "org.eclipse.text",
+        "version": "3.5.100.v20110505-0800",
+        "type": "jar"
+      },
+      "uri": "repository/org/jibx/config/3rdparty/org/eclipse/org.eclipse.text/3.5.100.v20110505-0800/org.eclipse.text-3.5.100.v20110505-0800.jar"
+    }
+  ]
+}

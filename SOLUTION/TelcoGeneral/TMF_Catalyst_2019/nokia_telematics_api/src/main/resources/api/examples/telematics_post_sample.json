@@ -1,0 +1,11 @@
+ {
+ 	"workflowName": "PostTelematicsData",
+ 	"subscriberId": "TMFDEMO",
+ 	"data": {
+ 		"telematics": {
+ 			"VIN": "02i1U000000UawyQAC",
+ 			"Make": "Jaguar",
+ 			"Model": "XF"
+ 		}
+ 	}
+ }

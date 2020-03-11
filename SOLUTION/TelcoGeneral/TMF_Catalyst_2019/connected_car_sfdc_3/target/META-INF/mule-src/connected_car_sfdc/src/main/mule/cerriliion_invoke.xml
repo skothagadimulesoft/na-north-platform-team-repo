@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="4a6cc8d7-1f98-485c-bff2-2b57213f6714" >
+		<http:request-connection host="${cerillian.host}" port="${cerillian.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="c1bb754b-b9c9-43e7-8fb3-71abe120e8bd" >
+		<http:request-connection host="${cerillian.host}" port="${cerillian.port}" />
+	</http:request-config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="faf4d873-6a05-47b0-ab12-d527f5b75c9c" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<flow name="cerriliion_invokeFlow_login" doc:id="66daa74e-2371-4a49-a55f-3e46f9e3c59e" >
+		<ee:transform doc:name="Transform Message" doc:id="46fe0ab9-e591-4e90-9bf4-6ed55a55645d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"credentials": {
+		"emailAddress": "testapiuser@cerillionskyline.com",  
+		"password": "Password@123" 
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="LoginRequest" doc:id="dd6bcac8-0e8a-4e60-89d6-bead32bb01e1" config-ref="HTTP_Request_configuration" path="/api/v1/login"/>
+		<ee:transform doc:name="Transform Message" doc:id="51c07b2f-5893-4a1c-ac48-5d60d344a6b9">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	resource: payload.resource
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="cerriliion_invokeFlow_createOrder" doc:id="ebc05393-0662-4f89-a474-08a8e44d716f" >
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="b91cbb15-007a-4ac2-93fa-a8aa878f6958" variableName="SFDC_Order" mimeType="application/json"/>
+		<flow-ref doc:name="Login" doc:id="9d0710fe-ca3b-4ae6-8af9-dca2cd4a3935" name="cerriliion_invokeFlow_login"/>
+		<ee:transform doc:name="Transform Message" doc:id="118d0864-f5df-45da-a034-c54fc6d9b93b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	accessToken: payload.resource.accessToken,
+	resource: {
+		externalId: vars.SFDC_Order.resource.externalId,
+		priority: vars.SFDC_Order.resource.priority,
+		description: vars.SFDC_Order.resource.description,
+		category: vars.SFDC_Order.resource.category,
+		notificationContact: vars.SFDC_Order.resource.notificationContact,
+		baseType: vars.SFDC_Order.resource.baseType,
+		"type": vars.SFDC_Order.resource."type",
+		note: vars.SFDC_Order.resource.note map ( note , indexOfNote ) -> {
+			text: note.text,
+			date: note.date,
+			author: note.author
+		},
+		relatedParty: vars.SFDC_Order.resource.relatedParty map ( relatedParty , indexOfRelatedParty ) -> {
+			id: relatedParty.id,
+			href: relatedParty.href,
+			name: relatedParty.name,
+			role: relatedParty.role,
+			referredType: relatedParty.referredType
+		},
+		billingAccount: vars.SFDC_Order.resource.billingAccount,
+		orderItem: vars.SFDC_Order.resource.orderItem map ( orderItem , indexOfOrderItem ) -> {
+			id: orderItem.id,
+			action: orderItem.action,
+			quantity: orderItem.quantity,
+			product: orderItem.product,
+			productOffering: orderItem.productOffering,
+			orderItem: orderItem.orderItem map ( orderItem01 , indexOfOrderItem01 ) -> {
+				id: orderItem01.id,
+				action: orderItem01.action,
+				quantity: orderItem01.quantity,
+				itemPrice: orderItem01.itemPrice map ( itemPrice , indexOfItemPrice ) -> {
+					name: itemPrice.name,
+					description: itemPrice.description,
+					priceType: itemPrice.priceType,
+					price: itemPrice.price
+				},
+				productOffering: {
+					id: orderItem01.productOffering.id,
+					name: orderItem01.productOffering.name
+				},
+				product: {
+					id: orderItem01.product.id,
+					characteristic: orderItem01.product.characteristic map ( characteristic , indexOfCharacteristic ) -> {
+						name: characteristic.name,
+						value: characteristic.value
+					},
+					relatedParty: orderItem01.product.relatedParty map ( relatedParty , indexOfRelatedParty ) -> {
+						id: relatedParty.id,
+						href: relatedParty.href,
+						name: relatedParty.name,
+						role: relatedParty.role,
+						referredType: relatedParty.referredType
+					},
+					productSpecification: {
+						id: orderItem01.product.productSpecification.id,
+						href: orderItem01.product.productSpecification.href,
+						version: orderItem01.product.productSpecification.version,
+						name: orderItem01.product.productSpecification.name
+					}
+				}
+			}
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="0355f692-1683-4140-b69c-e894a54a4f10" message="++++ Payload going  to Cerillion: #[payload]"/>
+		<http:request method="POST" doc:name="cerillionProduct" doc:id="2684c28d-02a4-49de-b2c3-a8d8bc0369e9" config-ref="HTTP_Request_configuration1" path="/api/v1/productOrderingManagement/productOrder"/>
+	</flow>
+	<flow name="cerriliion_invokeFlow_updateOrder" doc:id="9f7e117e-3e78-4185-85aa-1b86894a2974" >
+		<logger level="INFO" doc:name="Logger" doc:id="cb1befd0-f6bd-4339-a812-ddf207274d3a" />
+	</flow>
+	<flow name="cerriliion_invokeFlow_updateOrderOrderItem" doc:id="f1bd58ed-1289-46a9-ad1a-30239fdf2aa2" >
+		<logger level="INFO" doc:name="Logger" doc:id="63942024-9e29-45eb-8905-1813f960813a" />
+	</flow>
+</mule>

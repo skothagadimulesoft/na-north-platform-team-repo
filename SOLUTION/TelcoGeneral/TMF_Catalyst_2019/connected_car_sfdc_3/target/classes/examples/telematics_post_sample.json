@@ -1,0 +1,12 @@
+ {
+ 	"workflowName": "PostTelematicsData",
+ 	"subscriberId": "TMFDEMO",
+ 	"data": {
+ 		"telematics": {
+ 			"VIN": "13KAHDJ12ASJH123J",
+ 			"Make": "Jaguar",
+ 			"Model": "XF",
+ 			"productName":"Insane Mode"
+ 		}
+ 	}
+ }

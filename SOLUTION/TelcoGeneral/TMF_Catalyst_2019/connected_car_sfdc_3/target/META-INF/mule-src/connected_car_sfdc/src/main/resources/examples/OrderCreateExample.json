@@ -1,0 +1,60 @@
+{
+  "data": {
+    "schema": "PaffO6wC8hH74uRPCXUb_g",
+    "payload": {
+      "LastModifiedDate": "2019-04-13T01:42:23.000Z",
+      "AccountId": "0011U00000O9fDkQAJ",
+      "OrderNumber": "00000235",
+      "StatusCode": "Draft",
+      "SBQQ__PaymentTerm__c": "Net 30",
+      "SBQQ__OrderBookings__c": 0.0,
+      "BillingAddress": {
+        "State": "ON",
+        "Street": "111 Main St",
+        "PostalCode": "M4W3M3",
+        "City": "Toronto"
+      },
+      "CreatedById": "0051U000005ORsBQAW",
+      "OwnerId": "0051U000005ORsBQAW",
+      "OpportunityId": "0061U000006nbWKQAY",
+      "SBQQ__TaxAmount__c": 0.0,
+      "SBQQ__PriceCalcStatus__c": "Not Started",
+      "Status": "Draft",
+      "SBQQ__TotalAmount__c": 0.0,
+      "Tracking_ID__c": "111111111111111",
+      "DB_Days__c": 10.0,
+      "TotalAmount": 0.0,
+      "IsReductionOrder": false,
+      "Shipping_Method__c": "FedEx",
+      "ChangeEventHeader": {
+        "isTransactionEnd": true,
+        "commitNumber": 171085610498,
+        "commitUser": "0051U000005ORsBQAW",
+        "sequenceNumber": 1,
+        "entityName": "Order",
+        "changeType": "CREATE",
+        "changeOrigin": "",
+        "transactionKey": "000663c7-5bac-27e3-bed0-cf7376b1682a",
+        "commitTimestamp": 1555119743000,
+        "recordIds": [
+          "8011U000000TgWAQA0"
+        ]
+      },
+      "ShippingAddress": {
+        "State": "ON",
+        "Street": "333 Main St.",
+        "PostalCode": "M4W3M3",
+        "City": "Toronto"
+      },
+      "CreatedDate": "2019-04-13T01:42:23.000Z",
+      "SBQQ__ComponentsCanBeOrderedSeparately__c": false,
+      "LastModifiedById": "0051U000005ORsBQAW",
+      "EffectiveDate": "2019-04-12",
+      "SBQQ__Contracted__c": false
+    },
+    "event": {
+      "replayId": 72733
+    }
+  },
+  "channel": "/data/OrderChangeEvent"
+}

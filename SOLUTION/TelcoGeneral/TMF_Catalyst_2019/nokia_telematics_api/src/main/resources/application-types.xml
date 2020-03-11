@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="telematics_in" format="json">
+      <types:shape format="weave" example="api/examples/telematics_post_sample.json"><![CDATA[%dw 2.0
+type telematics_in = {|
+  workflowName: String, 
+  subscriberId: String, 
+  data: {|
+    telematics: {|
+      VIN: String, 
+      Make: String, 
+      Model: String
+    |}
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"workflowName\":\"PostTelematicsData\",\"subscriberId\":\"TMFDEMO\",\"data\":{\"telematics\":{\"VIN\":\"13KAHDJ12ASJH123J\",\"Make\":\"Jaguar\",\"Model\":\"XF\"}}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#49f7cd55-41f9-4d38-b167-c623a2198fca">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="telematics_in"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

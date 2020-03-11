@@ -1,0 +1,565 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="cerrilian_login_req" format="json">
+      <types:shape format="weave" example="examples/credentialsExample.json"><![CDATA[%dw 2.0
+type cerrilian_login_req = {|
+  credentials: {|
+    emailAddress: String, 
+    password: String
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"credentials\":{\"emailAddress\":\"testapiuser@cerillionskyline.com\",\"password\":\"Password@123\"}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="cerillian_product_request" format="json">
+      <types:shape format="weave" example="examples/productOrderBodyExample.json"><![CDATA[%dw 2.0
+type cerillian_product_request = {|
+  accessToken: String, 
+  resource: {|
+    externalId: String, 
+    priority: String, 
+    description: String, 
+    category: String, 
+    notificationContact: String, 
+    baseType: String, 
+    "type": String, 
+    note: Array<{|
+      text: String, 
+      date: String, 
+      author: String
+    |}>, 
+    relatedParty: Array<{|
+      id: String, 
+      href: String, 
+      name: String, 
+      role: String, 
+      referredType: String
+    |}>, 
+    billingAccount: {|
+      id: String, 
+      href: String, 
+      name: String, 
+      referredType: String
+    |}, 
+    orderItem: Array<{|
+      id: String, 
+      action: String, 
+      quantity: Number {"typeId": "int"}, 
+      product: {|
+        id: String, 
+        characteristic: Array<{|
+          name: String, 
+          value: String
+        |}>, 
+        relatedParty: Array<{|
+          id: String, 
+          href: String, 
+          name: String, 
+          role: String, 
+          referredType: String
+        |}>, 
+        productSpecification: {|
+          id: String, 
+          href: String, 
+          version: String, 
+          name: String
+        |}
+      |}, 
+      productOffering: {|
+        id: String, 
+        name: String
+      |}, 
+      orderItem: Array<{|
+        id: String, 
+        action: String, 
+        quantity: Number {"typeId": "int"}, 
+        itemPrice: Array<{|
+          name: String, 
+          description: String, 
+          priceType: String, 
+          price: {|
+            taxIncludedAmount: {|
+              value: Number {"typeId": "double"}, 
+              unit: String
+            |}
+          |}
+        |}>, 
+        productOffering: {|
+          id: String, 
+          name: String
+        |}, 
+        product: {|
+          id: String, 
+          characteristic: Array<{|
+            name: String, 
+            value: String
+          |}>, 
+          relatedParty: Array<{|
+            id: String, 
+            href: String, 
+            name: String, 
+            role: String, 
+            referredType: String
+          |}>, 
+          productSpecification: {|
+            id: String, 
+            href: String, 
+            version: String, 
+            name: String
+          |}
+        |}
+      |}>
+    |}>
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"accessToken\":\"Jpad9QSABmrwrrlF4It82IeO3NJ7I72h\",\"resource\":{\"externalId\":\"Telco01\",\"priority\":\"1\",\"description\":\"Order illustration UC1\",\"category\":\"Residential\",\"notificationContact\":\"jean.pontus@tmforum.com\",\"baseType\":\"productOrder\",\"type\":\"productOrder\",\"note\":[{\"text\":\"Order to illustrate UC1\",\"date\":\"2017-11-03T08:46:47.945Z\",\"author\":\"Jean-Lyuc Tymen\"}],\"relatedParty\":[{\"id\":\"11\",\"href\":\"tmfAPI\/customer\/11.org\",\"name\":\"Joe Doe\",\"role\":\"customer\",\"referredType\":\"individualParty\"}],\"billingAccount\":{\"id\":\"67\",\"href\":\"tmfAPI\/billingAccount\/BA1513.org\",\"name\":\"BA01\",\"referredType\":\"billingAccount\"},\"orderItem\":[{\"id\":\"75\",\"action\":\"add\",\"quantity\":1,\"product\":{\"id\":\"66\",\"characteristic\":[{\"name\":\"\",\"value\":\"\"}],\"relatedParty\":[{\"id\":\"\",\"href\":\"\",\"name\":\"\",\"role\":\"\",\"referredType\":\"\"}],\"productSpecification\":{\"id\":\"\",\"href\":\"\",\"version\":\"\",\"name\":\"\"}},\"productOffering\":{\"id\":\"75\",\"name\":\"TMF25\"},\"orderItem\":[{\"id\":\"83\",\"action\":\"add\",\"quantity\":1,\"itemPrice\":[{\"name\":\"AccessFee\",\"description\":\"Access Fee\",\"priceType\":\"oneTime\",\"price\":{\"taxIncludedAmount\":{\"value\":0.99,\"unit\":\"Euros\"}}}],\"productOffering\":{\"id\":\"108\",\"name\":\"TMF Mobile Telephony\"},\"product\":{\"id\":\"67\",\"characteristic\":[{\"name\":\"TEL_MSISDN\",\"value\":\"27457958\"}],\"relatedParty\":[{\"id\":\"11\",\"href\":\"tmfAPI\/customer\/11.org\",\"name\":\"Joe Doe\",\"role\":\"user\",\"referredType\":\"individualParty\"}],\"productSpecification\":{\"id\":\"14307\",\"href\":\"tmfAPI\/productSpecification\/14307.org\",\"version\":\"1\",\"name\":\"Mobile Telephony\"}}}]}]}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="SFDC_Order_Create" format="json">
+      <types:shape format="weave" example="examples/OrderCreateExample.json"><![CDATA[%dw 2.0
+type SFDC_Order_Create = {|
+  data: {|
+    schema: String, 
+    payload: {|
+      Status: String, 
+      LastModifiedDate: String, 
+      AccountId: String, 
+      OrderNumber: String, 
+      ContractId: String, 
+      TotalAmount: Number {"typeId": "double"}, 
+      StatusCode: String, 
+      IsReductionOrder: Boolean, 
+      OwnerId: String, 
+      CreatedById: String, 
+      ChangeEventHeader: {|
+        isTransactionEnd: Boolean, 
+        commitNumber: Number {"typeId": "double"}, 
+        commitUser: String, 
+        sequenceNumber: Number {"typeId": "int"}, 
+        entityName: String, 
+        changeType: String, 
+        changeOrigin: String, 
+        transactionKey: String, 
+        commitTimestamp: Number {"typeId": "double"}, 
+        recordIds: Array<String>
+      |}, 
+      CreatedDate: String, 
+      LastModifiedById: String, 
+      EffectiveDate: String
+    |}, 
+    event: {| replayId: Number {"typeId": "int"} |}
+  |}, 
+  channel: String
+|} {"MetadataFormat": "json",
+"example": "{\"data\":{\"schema\":\"vyDzDCdGfhQXfaHcelh6KQ\",\"payload\":{\"Status\":\"Draft\",\"LastModifiedDate\":\"2019-04-10T21:01:31.000Z\",\"AccountId\":\"0011P00000xYOGNQA4\",\"OrderNumber\":\"00000113\",\"ContractId\":\"8001P000000c6sVQAQ\",\"TotalAmount\":0.0,\"StatusCode\":\"Draft\",\"IsReductionOrder\":false,\"OwnerId\":\"0051a000000MCD8AAO\",\"CreatedById\":\"0051a000000MCD8AAO\",\"ChangeEventHeader\":{\"isTransactionEnd\":true,\"commitNumber\":10517015962898,\"commitUser\":\"0051a000000MCD8AAO\",\"sequenceNumber\":1,\"entityName\":\"Order\",\"changeType\":\"CREATE\",\"changeOrigin\":\"\",\"transactionKey\":\"000514e6-0e1d-7afc-828d-af2efafad2c5\",\"commitTimestamp\":1554930091000,\"recordIds\":[\"8011P000005atUtQAI\"]},\"CreatedDate\":\"2019-04-10T21:01:31.000Z\",\"LastModifiedById\":\"0051a000000MCD8AAO\",\"EffectiveDate\":\"2019-04-10\"},\"event\":{\"replayId\":10834}},\"channel\":\"\/data\/OrderChangeEvent\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="cerillian_login_resp" format="json">
+      <types:shape format="weave" example="examples/credentialsResponseExample.json"><![CDATA[%dw 2.0
+type cerillian_login_resp = {|
+  resource: {|
+    accessToken: String, 
+    emailAddress: String
+  |}, 
+  status: {|
+    code: Number {"typeId": "int"}, 
+    message: String, 
+    errors: String
+  |}, 
+  paging: String
+|} {"MetadataFormat": "json",
+"example": "{\"resource\":{\"accessToken\":\"Cp4Ay8ZEoiaJ3ExKdWeoij4vfZeELc\",\"emailAddress\":\"testapiuser@cerillionskyline.com\"},\"status\":{\"code\":201,\"message\":\"Resource Created Successfully\",\"errors\":\"null\"},\"paging\":\"null\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="SFDCOrderCreate" format="json">
+      <types:shape format="weave" example="examples/OrderCreateExample.json"><![CDATA[%dw 2.0
+type SFDCOrderCreate = {|
+  data: {|
+    schema: String, 
+    payload: {|
+      LastModifiedDate: String, 
+      AccountId: String, 
+      OrderNumber: String, 
+      StatusCode: String, 
+      SBQQ__PaymentTerm__c: String, 
+      SBQQ__OrderBookings__c: Number {"typeId": "double"}, 
+      BillingAddress: {|
+        State: String, 
+        Street: String, 
+        PostalCode: String, 
+        City: String
+      |}, 
+      CreatedById: String, 
+      OwnerId: String, 
+      OpportunityId: String, 
+      SBQQ__TaxAmount__c: Number {"typeId": "double"}, 
+      SBQQ__PriceCalcStatus__c: String, 
+      Status: String, 
+      SBQQ__TotalAmount__c: Number {"typeId": "double"}, 
+      Tracking_ID__c: String, 
+      DB_Days__c: Number {"typeId": "double"}, 
+      TotalAmount: Number {"typeId": "double"}, 
+      IsReductionOrder: Boolean, 
+      Shipping_Method__c: String, 
+      ChangeEventHeader: {|
+        isTransactionEnd: Boolean, 
+        commitNumber: Number {"typeId": "double"}, 
+        commitUser: String, 
+        sequenceNumber: Number {"typeId": "int"}, 
+        entityName: String, 
+        changeType: String, 
+        changeOrigin: String, 
+        transactionKey: String, 
+        commitTimestamp: Number {"typeId": "double"}, 
+        recordIds: Array<String>
+      |}, 
+      ShippingAddress: {|
+        State: String, 
+        Street: String, 
+        PostalCode: String, 
+        City: String
+      |}, 
+      CreatedDate: String, 
+      SBQQ__ComponentsCanBeOrderedSeparately__c: Boolean, 
+      LastModifiedById: String, 
+      EffectiveDate: String, 
+      SBQQ__Contracted__c: Boolean
+    |}, 
+    event: {| replayId: Number {"typeId": "int"} |}
+  |}, 
+  channel: String
+|} {"MetadataFormat": "json",
+"example": "{\"data\":{\"schema\":\"PaffO6wC8hH74uRPCXUb_g\",\"payload\":{\"LastModifiedDate\":\"2019-04-13T01:42:23.000Z\",\"AccountId\":\"0011U00000O9fDkQAJ\",\"OrderNumber\":\"00000235\",\"StatusCode\":\"Draft\",\"SBQQ__PaymentTerm__c\":\"Net 30\",\"SBQQ__OrderBookings__c\":0.0,\"BillingAddress\":{\"State\":\"ON\",\"Street\":\"111 Main St\",\"PostalCode\":\"M4W3M3\",\"City\":\"Toronto\"},\"CreatedById\":\"0051U000005ORsBQAW\",\"OwnerId\":\"0051U000005ORsBQAW\",\"OpportunityId\":\"0061U000006nbWKQAY\",\"SBQQ__TaxAmount__c\":0.0,\"SBQQ__PriceCalcStatus__c\":\"Not Started\",\"Status\":\"Draft\",\"SBQQ__TotalAmount__c\":0.0,\"Tracking_ID__c\":\"111111111111111\",\"DB_Days__c\":10.0,\"TotalAmount\":0.0,\"IsReductionOrder\":false,\"Shipping_Method__c\":\"FedEx\",\"ChangeEventHeader\":{\"isTransactionEnd\":true,\"commitNumber\":171085610498,\"commitUser\":\"0051U000005ORsBQAW\",\"sequenceNumber\":1,\"entityName\":\"Order\",\"changeType\":\"CREATE\",\"changeOrigin\":\"\",\"transactionKey\":\"000663c7-5bac-27e3-bed0-cf7376b1682a\",\"commitTimestamp\":1555119743000,\"recordIds\":[\"8011U000000TgWAQA0\"]},\"ShippingAddress\":{\"State\":\"ON\",\"Street\":\"333 Main St.\",\"PostalCode\":\"M4W3M3\",\"City\":\"Toronto\"},\"CreatedDate\":\"2019-04-13T01:42:23.000Z\",\"SBQQ__ComponentsCanBeOrderedSeparately__c\":false,\"LastModifiedById\":\"0051U000005ORsBQAW\",\"EffectiveDate\":\"2019-04-12\",\"SBQQ__Contracted__c\":false},\"event\":{\"replayId\":72733}},\"channel\":\"\/data\/OrderChangeEvent\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="SFDCOrderItemCreate" format="json">
+      <types:shape format="weave" example="examples/OrderItemChangeEvent_OrderItemAdd.json"><![CDATA[%dw 2.0
+type SFDCOrderItemCreate = {|
+  data: {|
+    schema: String, 
+    payload: {|
+      LastModifiedDate: String, 
+      UnitPrice: Number {"typeId": "double"}, 
+      CreatedById: String, 
+      ChangeEventHeader: {|
+        isTransactionEnd: Boolean, 
+        commitNumber: Number {"typeId": "double"}, 
+        commitUser: String, 
+        sequenceNumber: Number {"typeId": "int"}, 
+        entityName: String, 
+        changeType: String, 
+        changeOrigin: String, 
+        transactionKey: String, 
+        commitTimestamp: Number {"typeId": "double"}, 
+        recordIds: Array<String>
+      |}, 
+      PricebookEntryId: String, 
+      CreatedDate: String, 
+      Quantity: Number {"typeId": "double"}, 
+      OrderId: String, 
+      ListPrice: Number {"typeId": "double"}, 
+      AvailableQuantity: Number {"typeId": "double"}, 
+      LastModifiedById: String, 
+      OrderItemNumber: String
+    |}, 
+    event: {| replayId: Number {"typeId": "int"} |}
+  |}, 
+  channel: String
+|} {"MetadataFormat": "json",
+"example": "{\"data\":{\"schema\":\"iRFyBHIg_VwsV--F_vMOwg\",\"payload\":{\"LastModifiedDate\":\"2019-04-11T02:24:27.000Z\",\"UnitPrice\":100000.0,\"CreatedById\":\"0051a000000MCD8AAO\",\"ChangeEventHeader\":{\"isTransactionEnd\":false,\"commitNumber\":10517116574868,\"commitUser\":\"0051a000000MCD8AAO\",\"sequenceNumber\":1,\"entityName\":\"OrderItem\",\"changeType\":\"CREATE\",\"changeOrigin\":\"\",\"transactionKey\":\"00052aa8-4bd0-16f7-05c3-cff1e366a287\",\"commitTimestamp\":1554949467000,\"recordIds\":[\"8021P000003FYZZQA4\"]},\"PricebookEntryId\":\"01u1a000000cUcBAAU\",\"CreatedDate\":\"2019-04-11T02:24:27.000Z\",\"Quantity\":1.0,\"OrderId\":\"8011P000005awxrQAA\",\"ListPrice\":100000.0,\"AvailableQuantity\":1.0,\"LastModifiedById\":\"0051a000000MCD8AAO\",\"OrderItemNumber\":\"0000000013\"},\"event\":{\"replayId\":10870}},\"channel\":\"\/data\/OrderItemChangeEvent\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="SFDCOrderUpdateGen" format="json">
+      <types:shape format="weave" example="examples/OrderChangeEvent_UpdateGeneric.json"><![CDATA[%dw 2.0
+type SFDCOrderUpdateGen = {|
+  data: {|
+    schema: String, 
+    payload: {|
+      Status: String, 
+      LastModifiedDate: String, 
+      ActivatedById: String, 
+      ChangeEventHeader: {|
+        isTransactionEnd: Boolean, 
+        commitNumber: Number {"typeId": "double"}, 
+        commitUser: String, 
+        sequenceNumber: Number {"typeId": "int"}, 
+        entityName: String, 
+        changeType: String, 
+        changeOrigin: String, 
+        transactionKey: String, 
+        commitTimestamp: Number {"typeId": "double"}, 
+        recordIds: Array<String>
+      |}, 
+      Pricebook2Id: String, 
+      TotalAmount: Number {"typeId": "double"}, 
+      ActivatedDate: String, 
+      StatusCode: String
+    |}, 
+    event: {| replayId: Number {"typeId": "int"} |}
+  |}, 
+  channel: String
+|} {"MetadataFormat": "json",
+"example": "{\"data\":{\"schema\":\"PaffO6wC8hH74uRPCXUb_g\",\"payload\":{\"Status\":\"Activated\",\"LastModifiedDate\":\"2019-04-13T02:06:17.000Z\",\"ActivatedById\":\"0051U000005ORsBQAW\",\"ChangeEventHeader\":{\"isTransactionEnd\":true,\"commitNumber\":171101358389,\"commitUser\":\"0051U000005ORsBQAW\",\"sequenceNumber\":1,\"entityName\":\"Order\",\"changeType\":\"UPDATE\",\"changeOrigin\":\"com\/salesforce\/api\/soap\/45.0;client=SfdcInternalAPI\/\",\"transactionKey\":\"00066517-07e2-6172-ad8e-bae1132389dd\",\"commitTimestamp\":1555121177000,\"recordIds\":[\"8011U000000TgWAQA0\"]},\"Pricebook2Id\":\"01s1a000000EQ24AAG\",\"TotalAmount\":260000.0,\"ActivatedDate\":\"2019-04-13T02:06:17.000Z\",\"StatusCode\":\"Activated\"},\"event\":{\"replayId\":72742}},\"channel\":\"\/data\/OrderChangeEvent\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="SFDCOrderUpdate_Provisioned" format="json">
+      <types:shape format="weave" example="examples/OrderChangeEvent_Activated.json"><![CDATA[%dw 2.0
+type SFDCOrderUpdate_Provisioned = {|
+  data: {|
+    schema: String, 
+    payload: {|
+      Status: String, 
+      LastModifiedDate: String, 
+      ActivatedById: String, 
+      ChangeEventHeader: {|
+        isTransactionEnd: Boolean, 
+        commitNumber: Number {"typeId": "double"}, 
+        commitUser: String, 
+        sequenceNumber: Number {"typeId": "int"}, 
+        entityName: String, 
+        changeType: String, 
+        changeOrigin: String, 
+        transactionKey: String, 
+        commitTimestamp: Number {"typeId": "double"}, 
+        recordIds: Array<String>
+      |}, 
+      ActivatedDate: String, 
+      StatusCode: String
+    |}, 
+    event: {| replayId: Number {"typeId": "int"} |}
+  |}, 
+  channel: String
+|} {"MetadataFormat": "json",
+"example": "{\"data\":{\"schema\":\"PaffO6wC8hH74uRPCXUb_g\",\"payload\":{\"Status\":\"Activated\",\"LastModifiedDate\":\"2019-04-13T02:06:17.000Z\",\"ActivatedById\":\"0051U000005ORsBQAW\",\"ChangeEventHeader\":{\"isTransactionEnd\":true,\"commitNumber\":171101358389,\"commitUser\":\"0051U000005ORsBQAW\",\"sequenceNumber\":1,\"entityName\":\"Order\",\"changeType\":\"UPDATE\",\"changeOrigin\":\"com\/salesforce\/api\/soap\/45.0;client=SfdcInternalAPI\/\",\"transactionKey\":\"00066517-07e2-6172-ad8e-bae1132389dd\",\"commitTimestamp\":1555121177000,\"recordIds\":[\"8011U000000TgWAQA0\"]},\"ActivatedDate\":\"2019-04-13T02:06:17.000Z\",\"StatusCode\":\"Activated\"},\"event\":{\"replayId\":72742}},\"channel\":\"\/data\/OrderChangeEvent\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="nokia_telematics_in" format="json">
+      <types:shape format="weave" example="examples/telematics_post_sample.json"><![CDATA[%dw 2.0
+type nokia_telematics_in = {|
+  workflowName: String, 
+  subscriberId: String, 
+  data: {|
+    telematics: {|
+      VIN: String, 
+      Make: String, 
+      Model: String, 
+      productName: String
+    |}
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"workflowName\":\"PostTelematicsData\",\"subscriberId\":\"TMFDEMO\",\"data\":{\"telematics\":{\"VIN\":\"13KAHDJ12ASJH123J\",\"Make\":\"Jaguar\",\"Model\":\"XF\",\"productName\":\"Insane Mode\"}}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#46fe0ab9-e591-4e90-9bf4-6ed55a55645d">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cerrilian_login_req"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#51c07b2f-5893-4a1c-ac48-5d60d344a6b9">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="cerillian_login_resp"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cerillian_login_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#b995c239-1afa-490c-97de-d4ea291bc7fa">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="SFDCOrderCreate"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ba232d57-e755-4afa-805d-08ccd377e075">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="SFDCOrderCreate"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0bcc0c8e-1c92-4b29-a9b5-093a9cb65b0b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="SFDCOrderUpdate_Provisioned"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="SFDCOrderUpdate_Provisioned"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#4e88abba-05cd-46b8-b62b-6422fa9ce6c4">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#49cdde03-4424-4c01-b955-570e10d113e1">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#118d0864-f5df-45da-a034-c54fc6d9b93b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="SFDC_Order" type="cerillian_product_request"/>
+        </types:variables>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#f48036bd-eb57-4bed-a166-9de9faaaf88f">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="nokia_telematics_in"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#965e7dd4-8075-442b-baec-338d294a60a7">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="SFDCOrderUpdate_Provisioned"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#181fe505-b0af-46d3-b5ad-f9e3e9e5da29">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="nokia_telematics_in"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#86282519-5964-4410-97b3-47103bf62213">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="SFDCOrderUpdate_Provisioned"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="SFDCOrderUpdate_Provisioned"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#5c580661-fb77-4609-ac5d-126c0df8c61f">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="SFDCOrderItemCreate"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#107f7542-7b4e-460c-86d2-9b7949163685">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="SFDCOrderItemCreate"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="order_item_event_payload" type="SFDCOrderItemCreate"/>
+        </types:variables>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="SFDCOrderUpdate_Provisioned"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#4dd54ffc-0dc1-421c-b8dd-1b6122f77cc7">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="SFDCOrderUpdateGen"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#03088fdd-a019-4f5b-8885-060613d0b11a">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#f2de916c-7ab9-4f26-b916-ed870033c2c3">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="cerillian_product_request"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

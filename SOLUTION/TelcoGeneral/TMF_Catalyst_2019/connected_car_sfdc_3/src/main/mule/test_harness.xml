@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="test_harnessFlow" doc:id="d5e62e7c-7ff6-41b6-95b2-85d0eef7fe54" >
+		<http:listener doc:name="Listener" doc:id="4cb1c5f1-b9c0-429f-9148-8b6d7704b315" config-ref="HTTP_Listener_config" path="/sfdc/create_order"/>
+		<flow-ref doc:name="Flow Reference" doc:id="bb038b53-92d3-467b-a483-afafb81ee402" name="cerriliion_invokeFlow_createOrder"/>
+		<flow-ref doc:name="Flow Reference" doc:id="87cfe6c5-b3b4-4c10-bf77-764ebe072f7b" name="test_harnessFlow_updatePriceBook"/>
+		<flow-ref doc:name="Flow Reference" doc:id="e4eb2626-c1c5-47a6-9068-6b90f6b4a87d" name="cerriliion_invokeFlow_updateOrderOrderItem"/>
+		<flow-ref doc:name="Flow Reference" doc:id="fd2decb9-2a1a-46b1-8a97-bd0ba9ba45fd" name="test_harnesFLow_addWorkOrder"/>
+		<flow-ref doc:name="Flow Reference" doc:id="8f080272-9fa7-4d67-bb45-120c8d83d187" name="test_harnessFlow_updateIOrder_Provisioned"/>
+	</flow>
+	<flow name="test_harnessFlow_createOrder" doc:id="9dcccee3-2585-4884-a43a-a8ca79e7bf8d" >
+		<logger level="INFO" doc:name="Logger" doc:id="c2423d57-0165-4509-b2fd-13d9a71355e9" message="---creating Order"/>
+		<ee:transform doc:name="Transform Message" doc:id="e661b0f6-a8cb-467c-ba41-a396a6ed67b2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="Order" doc:name="Create" doc:id="ab98911a-09a5-4934-bb4c-8eac482d0b23" config-ref="Salesforce_Config" />
+		<ee:transform doc:name="Transform Message" doc:id="31bff48d-b668-4532-a199-532390e8fcf7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="test_harnessFlow_updatePriceBook" doc:id="36ebc665-9673-4930-af33-de7262242483" >
+		<logger level="INFO" doc:name="Logger" doc:id="b9a0aa9a-c9fc-4a8a-953e-69d85ef9de38" message="---updating Price Book"/>
+	</flow>
+	<flow name="test_harnessFlow_addOrderItem" doc:id="9c42a4dc-cbbb-49de-8d66-33c276bce9cb" >
+		<logger level="INFO" doc:name="Logger" doc:id="bc92aa6e-020e-4304-bbc4-62608fd2d2f5" message="---adding Order Item"/>
+	</flow>
+	<flow name="test_harnesFLow_addWorkOrder" doc:id="8a998878-a53e-43e0-b77b-d237796266bf" >
+		<logger level="INFO" doc:name="Logger" doc:id="3234c89c-9dff-4acb-8bb7-f213e4a8de9a" message="---adding Work Order"/>
+	</flow>
+	<flow name="test_harnessFlow_updateIOrder_Provisioned" doc:id="f5a5439c-f010-4cf9-bda5-347795475810" >
+		<logger level="INFO" doc:name="Logger" doc:id="e9d5fdf7-457f-4577-bb85-86756db25816" message="---closing Order"/>
+	</flow>
+</mule>

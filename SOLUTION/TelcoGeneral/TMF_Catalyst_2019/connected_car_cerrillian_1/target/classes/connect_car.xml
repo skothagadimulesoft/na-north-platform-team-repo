@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+    <http:listener-config name="connect_car-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="connect_car-config" raml="connect_car.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="c5dcdc8c-4428-4585-b4d3-4305406d38a8">
+        <http:request-connection protocol="HTTPS" host="t40.cerillionskyline.com" port="443" />
+    </http:request-config>
+    <configuration-properties doc:name="Configuration properties" doc:id="ede7a9b6-6c00-4c40-adae-558f532d8977" file="mule-app.properties" />
+    <flow name="connect_car-main">
+        <http:listener config-ref="connect_car-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]" />
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="connect_car-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="connect_car-console">
+        <http:listener config-ref="connect_car-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="connect_car-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\v1\login:application\json:connect_car-config">
+        <flow-ref doc:name="Flow Reference" doc:id="cde9c298-afbf-433b-8671-c74b9e1ada21" name="loginFlow" />
+        <logger level="INFO" doc:name="Logger" doc:id="811ce0c3-afeb-4fb9-97d8-7149f6576f12" message="CErilian Login Response: #[payload]" />
+    </flow>
+    <flow name="post:\v1\productOrderingManagement\productOrder:application\json:connect_car-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="11e74f9d-48c4-4b01-b5c3-fec27a968d19" variableName="original_req" mimeType="application/json" />
+        <os:retrieve doc:name="Retrieve" doc:id="cd3a0df2-fc1a-4ecb-a15a-d64cea05ae29" key="login_token" objectStore="Cerillian_Object_store" />
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="ccc74511-9c58-41b0-9fc6-5501558a0bc9" variableName="login_token" />
+        <logger level="INFO" doc:name="Logger" doc:id="13065a82-182f-4956-bfb9-11e9cc1483d2" message="Executing Cerilliion Product Order with login token: #[vars.login_token]" />
+        <ee:transform doc:name="Transform Message" doc:id="13d1b447-a8f6-4fd4-af8d-adbb8edfa15a">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	accessToken: vars.login_token as String,
+	resource: {
+		externalId: vars.original_req.resource.externalId,
+		priority: vars.original_req.resource.priority,
+		description: vars.original_req.resource.description,
+		category: vars.original_req.resource.category,
+		notificationContact: vars.original_req.resource.notificationContact,
+		baseType: vars.original_req.resource.baseType,
+		"type": vars.original_req.resource."type",
+		note: vars.original_req.resource.note map ( note , indexOfNote ) -> {
+			text: note.text,
+			date: note.date,
+			author: note.author
+		},
+		relatedParty: vars.original_req.resource.relatedParty map ( relatedParty , indexOfRelatedParty ) -> {
+			id: relatedParty.id,
+			href: relatedParty.href,
+			name: relatedParty.name,
+			role: relatedParty.role,
+			referredType: relatedParty.referredType
+		},
+		billingAccount: vars.original_req.resource.billingAccount,
+		orderItem: vars.original_req.resource.orderItem map ( orderItem , indexOfOrderItem ) -> {
+			id: orderItem.id,
+			action: orderItem.action,
+			quantity: orderItem.quantity,
+			product: {
+				id: orderItem.product.id,
+				characteristic: orderItem.product.characteristic map ( characteristic , indexOfCharacteristic ) -> {
+				},
+				relatedParty: orderItem.product.relatedParty map ( relatedParty , indexOfRelatedParty ) -> {
+				},
+				productSpecification: orderItem.product.productSpecification
+			},
+			productOffering: orderItem.productOffering,
+			orderItem: orderItem.orderItem map ( orderItem01 , indexOfOrderItem01 ) -> {
+				id: orderItem01.id,
+				action: orderItem01.action,
+				quantity: orderItem01.quantity,
+				itemPrice: orderItem01.itemPrice map ( itemPrice , indexOfItemPrice ) -> {
+					name: itemPrice.name,
+					description: itemPrice.description,
+					priceType: itemPrice.priceType,
+					price: {
+						taxIncludedAmount: {
+							value: itemPrice.price.taxIncludedAmount.value,
+							unit: itemPrice.price.taxIncludedAmount.unit
+						}
+					}
+				},
+				productOffering: {
+					id: orderItem01.productOffering.id,
+					name: orderItem01.productOffering.name
+				},
+				product: {
+					id: orderItem01.product.id,
+					characteristic: orderItem01.product.characteristic map ( characteristic , indexOfCharacteristic ) -> {
+						name: characteristic.name,
+						value: characteristic.value
+					},
+					relatedParty: orderItem01.product.relatedParty map ( relatedParty , indexOfRelatedParty ) -> {
+						id: relatedParty.id,
+						href: relatedParty.href,
+						name: relatedParty.name,
+						role: relatedParty.role,
+						referredType: relatedParty.referredType
+					},
+					productSpecification: {
+						id: orderItem01.product.productSpecification.id,
+						href: orderItem01.product.productSpecification.href,
+						version: orderItem01.product.productSpecification.version,
+						name: orderItem01.product.productSpecification.name
+					}
+				}
+			}
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="d050bbad-4b2a-4c4b-b99e-fdaca600b9c4" message="Data going in: #[payload]" />
+        <http:request method="POST" doc:name="Request" doc:id="8ed950ad-1430-47d4-9e18-d8441635ed24" config-ref="HTTP_Request_configuration" path="/skyline/api/v1/productOrderingManagement/productOrder" />
+        <ee:transform doc:name="Transform Message" doc:id="81443d02-a03d-42b7-afa5-275441d689a2">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="e75cf437-e3c5-4986-9aa9-0c2938f70ee3" message="Cerillion Produc creation response: #[payload]" />
+    </flow>
+    <flow name="get:\v1\accountManagement\accounts\(account_id):connect_car-config">
+        <set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="33b389f8-4efd-44da-88f7-abf9e2333b81" variableName="original_req" mimeType="application/json" />
+		<ee:transform doc:id="be8c11dc-5d9f-420a-a258-a88751fd0370">
+            <ee:variables>
+                <ee:set-variable variableName="account_id"><![CDATA[attributes.uriParams.account_id]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <os:retrieve doc:name="Copy_of_Retrieve" doc:id="646beae9-ca1d-4c73-9b41-0ec9afcb714a" key="login_token" objectStore="Cerillian_Object_store" />
+		<set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="bb9984f8-9746-4df1-9715-20fec27ea4d2" variableName="login_token" />
+		<logger level="INFO" doc:name="Logger" doc:id="d13bb66b-5620-45b0-8a2a-3cd542ed84be" message="Executing Cerilliion Get Accounts with login token: #[vars.login_token] and account id: #[vars.account_id]"/>
+		<http:request method="GET" doc:name="Request" doc:id="a26fb11a-bfff-4ef8-a2ba-b13bbfdf39c9" config-ref="HTTP_Request_configuration" path="/skyline/api/v1/accounts/{acct_id}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	acct_id : vars.account_id
+}]]]></http:uri-params>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"access_token" : vars.login_token
+}]]]></http:query-params>
+		</http:request>
+    </flow>
+</mule>

@@ -1,0 +1,30 @@
+{
+  "configs": [
+    "utill.xml",
+    "api.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:cerillion_odata_3:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.1.4",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "log4j2.xml",
+        "utill.xml",
+        "api/libraries/odataLibrary.raml",
+        "api/api.raml",
+        "api/odata.raml",
+        "api.xml",
+        "mule-app.properties"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}
