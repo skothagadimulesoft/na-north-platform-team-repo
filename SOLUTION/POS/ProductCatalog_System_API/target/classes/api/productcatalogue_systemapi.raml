@@ -1,0 +1,68 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/dcfd9d6c-e2c8-44b0-a54c-23b5525e3ab2/ # 
+version: v1
+title: ProductCatalogue_SystemAPI
+uses:
+  ProductDataType: exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/productdatatypes/1.0.5/productdatatypes.raml
+types: 
+  CT_Product: ProductDataType.Product
+  CT_Currency: ProductDataType.Currencies
+/Products:
+  get:
+    queryParameters:
+      stationid:
+        type: string
+        required: false
+      category: 
+        type: string
+        required: false
+      promotion:
+        type: boolean
+        required: false
+      upc_code:
+        type: string
+        required: false
+    description: Get All Products
+    responses:
+      200:
+        body:
+          application/json:
+            type: CT_Product[]
+            example:
+              !include examples/productList.json
+
+  /{ProductId}:
+    get:
+      description: Get the specific Product
+      responses:
+        200:
+          body:
+            application/json:
+              type: CT_Product
+              example:
+                !include examples/product.json
+    put:
+      description: Update the Price of Item
+      queryParameters:
+        NewPrice:
+          required: true
+          type: number
+        Currency:
+          required: true
+          type: CT_Currency
+      responses:
+        200: 
+          body:
+            application/json:
+              example:
+                {
+                  "message":"Price updated sucessfully"
+                }
+        204:
+          body:
+            application/json:
+              example:
+                {
+                  "message":"Item not found"
+                }
+

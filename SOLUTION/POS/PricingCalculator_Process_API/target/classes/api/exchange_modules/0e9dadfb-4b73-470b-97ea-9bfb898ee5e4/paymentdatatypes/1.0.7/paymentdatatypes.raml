@@ -1,0 +1,91 @@
+#%RAML 1.0 Library
+usage:
+
+types:
+
+  PaymentType:
+    type: 
+      enum: ["CC","Points","Cash"]
+
+  Currencies:
+    type: 
+      enum: ["USD","CAD","EU"]
+
+  CreditCard:
+    type: 
+      enum: ["VISA","MC", "AMEX"]
+  
+  Payment:
+    type: object
+    properties:
+      StationID:  string
+      PaymentTxID: string
+      OrderID:  string
+      CustomerID: string 
+      PaymentType: PaymentType
+      Sum:  number
+      Currency: Currencies
+      NumPoints:  integer
+      CCType: CreditCard
+
+  CCPayment:
+    type: object
+    properties:
+      PaymentTxID: string
+      StationID:  string
+      OrderID:  string
+      CustomerID: string 
+      Sum:  number
+      Currency: Currencies
+      CCType: CreditCard
+     
+  Price:
+    type: object
+    properties:
+      ItemID: string
+      cost: number
+      quantity: number
+
+  OrderPriceRequest:
+    type: object
+    properties:
+      IncludeDelivery: boolean
+      IncludeTaxes: boolean
+      StationId:  string
+      PriceList:  
+        type: array
+        items: Price
+
+  OrderPriceResponse:
+    type: object
+    properties:
+      Cost:  number
+      Taxes:  number
+      Delivery: number
+      TotalCost_Tax_Delivery: number
+
+
+  PaymentTransacation:
+    type: object
+    properties:
+      PaymentTxID: string
+      OrderID:  string
+      CustomerID: string
+      StationID:  string
+      PaymentType: PaymentType
+      Sum:  number
+      Currency: Currencies
+      Tstamp: datetime
+      NumPoints:  integer
+      CCType: CreditCard
+
+  PaymentTransacationList:
+    type: object
+    properties:
+        payment_transaction_list:
+          type: array
+          items:  PaymentTransacation
+
+        
+
+      

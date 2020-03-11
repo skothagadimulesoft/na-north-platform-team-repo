@@ -1,0 +1,12 @@
+com/promotions/util/Constants.class
+com/promotions/model/PromotionResponse.class
+com/promotions/processor/PromotionsProcessorTest.class
+com/promotions/model/PromotionsProcessorTest.class
+com/promotions/model/Offer.class
+com/promotions/model/PromotionRequest.class
+com/promotions/model/PromotionRequestMultiple.class
+com/promotions/util/Utils.class
+com/promotions/model/RelatedProductOffer.class
+com/promotions/util/Utils$PromotionType.class
+com/promotions/processor/PromotionsProcessor.class
+com/promotions/model/OffersList.class

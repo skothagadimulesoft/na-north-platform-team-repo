@@ -1,0 +1,157 @@
+[
+  {
+    "StationID": "004",
+    "StoreType": "Circle K",
+    "Address": "801 W ADDISON ST",
+    "Region": "CHICAGO",
+    "coordinates": {
+      "lat": "41.947255",
+      "lng": "-87.649644"
+    },
+    "Currency": "USD",
+    "SalesTax": "10.25",
+    "productTypes": [
+      "Coffee",
+      "Polar Pop",
+      "Roller Grill"
+    ]
+  },
+  {
+    "StationID": "010",
+    "StoreType": "Circle K ",
+    "Address": "2635 W 87TH ST",
+    "Region": "EVERGREEN PARK",
+    "coordinates": {
+      "lat": "41.735492",
+      "lng": "-87.688701"
+    },
+    "Currency": "USD",
+    "SalesTax": "9.75",
+    "productTypes": [
+      "Car Wash",
+      "Coffee",
+      "Polar Pop"
+    ]
+  },
+  {
+    "StationID": "015",
+    "StoreType": "Circle K ",
+    "Address": "9601 W GRAND AVE",
+    "Region": "FRANKLIN PARK",
+    "coordinates": {
+      "lat": "41.929356",
+      "lng": "-87.865608"
+    },
+    "Currency": "USD",
+    "SalesTax": "10",
+    "productTypes": [
+      "Car Wash",
+      "Coffee",
+      "Polar Pop"
+    ]
+  },
+  {
+    "StationID": "016",
+    "StoreType": "Circle K ",
+    "Address": "10200 W ROOSEVELT RD",
+    "Region": "WESTCHESTER",
+    "coordinates": {
+      "lat": "41.863727",
+      "lng": "-87.877944"
+    },
+    "Currency": "USD",
+    "SalesTax": "10",
+    "productTypes": [
+      "Car Wash",
+      "Coffee",
+      "Polar Pop"
+    ]
+  },
+  {
+    "StationID": "017",
+    "StoreType": "Circle K ",
+    "Address": "8700 S HARLEM AVE",
+    "Region": "BRIDGEVIEW",
+    "coordinates": {
+      "lat": "41.733196",
+      "lng": "-87.799636"
+    },
+    "Currency": "USD",
+    "SalesTax": "10",
+    "productTypes": [
+      "Car Wash",
+      "Coffee",
+      "Polar Pop"
+    ]
+  },
+  {
+    "StationID": "019",
+    "StoreType": "Circle K ",
+    "Address": "6101 S LAGRANGE RD (US ",
+    "Region": "COUNTRYSIDE",
+    "coordinates": {
+      "lat": "41.779113",
+      "lng": "-87.867759"
+    },
+    "Currency": "USD",
+    "SalesTax": "10",
+    "productTypes": [
+      "Car Wash",
+      "Coffee",
+      "Polar Pop"
+    ]
+  },
+  {
+    "StationID": "2655943",
+    "StoreType": "Circle K ",
+    "Address": "7933 W 95TH ST",
+    "Region": "HICKORY HILLS",
+    "coordinates": {
+      "lat": "41.7180094",
+      "lng": "-87.8161519"
+    },
+    "Currency": "USD",
+    "SalesTax": "9",
+    "productTypes": [
+      "Car Wash",
+      "Public Restrooms",
+      "Polar Pop"
+    ]
+  },
+  {
+    "StationID": "2655941",
+    "StoreType": "Circle K ",
+    "Address": "10631 SOUTHWEST HWY",
+    "Region": "WORTH",
+    "coordinates": {
+      "lat": "41.698158",
+      "lng": "-87.796971"
+    },
+    "Currency": "USD",
+    "SalesTax": "10",
+    "productTypes": [
+      "Car Wash",
+      "Public Restrooms",
+      "Polar Pop"
+    ]
+  },
+  {
+    "StationID": "2655942",
+    "StoreType": "Circle K ",
+    "Address": "12230 S CICERO AVE",
+    "Region": "ALSIP",
+    "coordinates": {
+      "lat": "41.670315",
+      "lng": "-87.739456"
+    },
+    "Currency": "USD",
+    "SalesTax": "10",
+    "productTypes": [
+      "Car Wash",
+      "Public Restrooms",
+      "Polar Pop"
+    ]
+  }
+]
+
+

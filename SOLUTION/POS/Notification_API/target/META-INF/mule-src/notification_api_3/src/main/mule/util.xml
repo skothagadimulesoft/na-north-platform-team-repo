@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:twilio-connector="http://www.mulesoft.org/schema/mule/twilio-connector"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/twilio-connector http://www.mulesoft.org/schema/mule/twilio-connector/current/mule-twilio-connector.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration_Twitter" doc:name="HTTP Request configuration" doc:id="06ee0443-777b-47ca-b8a6-e38af3c92a04" >
+		<http:request-connection host="${twitter.host}" port="${twitter.port}" />
+	</http:request-config>
+	
+	
+	<flow name="utilFlow_SMS" doc:id="1d125950-90f7-4ece-8c94-e6cde82cfe95" >
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="03fa1c85-fcc1-4dd2-a396-2a966e2180c6" message="Sending to SMS only !" />
+		<ee:transform doc:name="Transform Message" doc:id="bee65480-b772-45f9-8984-0cc33dfe6998" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	To: vars.to_phone,
+	From: vars.from_phone,
+	Body: payload.Message
+}
+	
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<twilio-connector:send-message doc:name="Send message" doc:id="a926af3f-2a28-4c5e-98e8-e2dbc79ecddc" config-ref="Twilio_Connector_Config" account-sid="${twilio.app.id}" />
+	</flow>
+	<flow name="utilFlow_Twitter" doc:id="3a3e35cd-b8d8-4c4a-92fc-a0be70541af7" >
+		<logger level="INFO" doc:name="Logger" doc:id="d59da9f1-d723-4b88-9c7c-f6104faed215" message="--&gt;Sending to Twitter only ! #[payload]" />
+		<http:request method="POST" doc:name="Request" doc:id="abecefe8-4e89-46d9-b5f5-33f57629b33c" config-ref="HTTP_Request_configuration_Twitter" path="/api/twitter_message"/>
+	</flow>
+</mule>

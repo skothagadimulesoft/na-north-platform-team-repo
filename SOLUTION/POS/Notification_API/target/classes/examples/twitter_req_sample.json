@@ -1,0 +1,8 @@
+{
+   "DebtorBank": "BOA",
+   "DebtorAcct":  "123",
+   "CreditorBank": "CITI",
+   "CreditorAcct": "567",
+    "Sum" :  33.33,
+    "Currency": "USD"
+}

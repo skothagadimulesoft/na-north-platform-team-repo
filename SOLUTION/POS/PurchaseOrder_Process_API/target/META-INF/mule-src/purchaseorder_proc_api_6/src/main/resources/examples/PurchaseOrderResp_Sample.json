@@ -1,0 +1,13 @@
+{
+      "CustomerID": "11777",
+      "OrderId":  "12345",
+      "Paid": true,
+      "Sum": 33.33,
+      "Currency": "USD",
+      "Tstamp": "2003-10-01T23:57:59-03:00",
+      "Delivery":false,
+      "Status": "Closed",
+      "PaymentMethod":  "CC",
+      "CCType":   "VISA" 
+
+}

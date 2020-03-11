@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.mulesoft.connectors</groupId>
+        <artifactId>mule-connectivity-parent</artifactId>
+        <version>1.2.3</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mule-twilio-connector</artifactId>
+    <version>3.0.1</version>
+    <packaging>mule-extension</packaging>
+    <name>Twilio Connector</name>
+
+    <properties>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <parser>RamlParser</parser>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-http-connector</artifactId>
+            <version>1.0.0</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+        <!-- test only dependencies -->
+        <dependency>
+            <groupId>com.mule.connectors.commons</groupId>
+            <artifactId>commons-rest-test</artifactId>
+            <version>1.1.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <scm>
+        <connection>scm:git:git://github.com:mulesoft/mule-twilio-connector.git</connection>
+        <developerConnection>scm:git:git@github.com:mulesoft/mule-twilio-connector.git</developerConnection>
+        <url>http://github.com/mulesoft/mule-twilio-connector</url>
+      <tag>mule-twilio-connector-3.0.0</tag>
+  </scm>
+</project>

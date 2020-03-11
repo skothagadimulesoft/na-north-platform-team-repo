@@ -1,0 +1,13 @@
+{
+    "StationID": "333",
+      "CustomerID": "11777",
+      "OrderID": "12345657",
+      "OrderInitiation": "Mobile",
+        "OrderClosure":	"POS",
+        "Status":  "Active",
+        "OrderDelivery":  false ,
+        "DeliveryAddress":  "",
+        "PayOnCheckout":  true,
+        "PaymentType":  "CC",
+        "Tstamp": "2003-10-01T23:57:59-03:00"
+  }

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+    <http:listener-config name="promotions_processapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    
+    <apikit:config name="promotions_processapi-config" raml="promotions_processapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <configuration-properties doc:name="Configuration properties" doc:id="252ac52d-946f-4df3-95d0-46c4960c877f" file="promotions_api.properties" />
+	<file:config name="File_Config" doc:name="File Config" doc:id="85cba085-af45-4d37-94af-75102b184a1b" >
+		<file:connection workingDir="${mule.home}/apps/${app.name}/" />
+	</file:config>
+	<os:object-store name="Promotions_Object_Store" doc:name="Object store" doc:id="78d39a06-304e-4f55-ad5a-450808a461c0" />
+	<flow name="promotions_processapi-main">
+        <http:listener config-ref="promotions_processapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="promotions_processapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="promotions_processapi-console">
+        <http:listener config-ref="promotions_processapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="promotions_processapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\PromotionEngine:application\json:promotions_processapi-config">
+		<logger level="INFO" message="post:\PromotionEngine:application\json:promotions_processapi-config" />
+		<file:read doc:name="Read" doc:id="995960a6-030c-4569-96df-7662ec46242c" config-ref="File_Config" path="${promotions.file}"/>
+		<ee:transform doc:name="Transform Message" doc:id="8c4738f7-d506-4128-8f66-52bdf6e523d4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	offers: payload map ((item,index)->{
+		productID: item.ProductID,
+		productName: item.ProductName,
+		offerType:	item.OfferType,
+		RelatedProducts: item.RelatedProducts map (item1,index1)->{
+			productID: item1.ProductID,
+			productName: item1.ProductName
+			
+		} as Object {class:"com.promotions.model.RelatedProductOffer"	},
+		offerAction: item.OfferAction,
+		discountValue: item.DiscountValue
+		
+	} as Object {class:"com.promotions.model.Offer"	}
+	) 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<async doc:name="Async" doc:id="e923f4c3-e930-4271-99cb-4eb88a509422" >
+			<ee:transform doc:name="Transform Message" doc:id="e300a329-5053-449a-a925-42fca7de2c6b" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="8ef725d2-cfc3-405d-a54a-27bdbed55224" message="Loaded Promotions File: #[payload]" />
+		</async>
+		<java:invoke-static doc:name="Invoke static" doc:id="15b77e3e-3c53-45f3-ad91-0d608cdb86a2" class="com.promotions.processor.PromotionsProcessor" method="initPromotionsEngine(ArrayList)">
+			<java:args ><![CDATA[#[payload as Object {class:"java.util.ArrayList"	}]]]></java:args>
+		</java:invoke-static>
+		<os:store doc:name="Store" doc:id="f06556f0-5d56-49fd-b815-4da3811c1b43" key="PromotionsEngineState" objectStore="Promotions_Object_Store">
+			<os:value ><![CDATA[#["started"]]]></os:value>
+		</os:store>
+		<ee:transform doc:name="Transform Message" doc:id="e610647f-fd78-4836-b687-0404ef466898">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	state: "started"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+	<flow name="get:\PromotionEngine:promotions_processapi-config">
+        <os:retrieve doc:name="Retrieve" doc:id="39fe27b9-89f1-44be-831c-c2d43518e6b1" key="PromotionsEngineState" objectStore="Promotions_Object_Store"/>
+		<logger level="INFO" doc:name="Logger" doc:id="4640ee16-053c-4b3c-a92e-27f39ed9929e" message="Current Promotions Engine State: #[payload]"/>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="55353345-852b-460d-9bfe-c6d5e01aa98a">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  state: payload
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="put:\PromotionEngine:application\json:promotions_processapi-config">
+        <os:store doc:name="Store" doc:id="251b9f84-648e-4c58-b5c4-9e106e463e62" objectStore="Promotions_Object_Store" key="PromotionsEngineState">
+			<os:value ><![CDATA[#[payload.state]]]></os:value>
+		</os:store>
+		<logger level="INFO" message="put:\PromotionEngine:application\json:promotions_processapi-config" />
+		<os:retrieve doc:name="Retrieve" doc:id="238ac762-6d22-4b98-b9eb-1c6ccdfeea29" key="PromotionsEngineState" objectStore="Promotions_Object_Store"/>
+		<ee:transform doc:name="Transform Message" doc:id="1aed9bfa-d2c8-492b-937f-eff84cc10d4a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	state: payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+	<flow name="post:\IndividualProductPromotion:application\json:promotions_processapi-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="4893e368-68ae-4383-80ed-a3b8a61c1bb9" variableName="PromoReq"/>
+		<os:retrieve doc:name="Retrieve" doc:id="2b23fdd9-9789-4249-b08d-b432bf31eea8" key="PromotionsEngineState" objectStore="Promotions_Object_Store"/>
+		<choice doc:name="Choice" doc:id="3db3756b-7581-4d71-b970-6291c6813826" >
+			<when doc:id="a3af4d4a-a043-4093-b1e6-6c0d72a2615c" expression='#[payload == "enabled"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="0c3423ca-9b9f-4a24-87a6-9602cc05f40d" message="Promotions Engine Enabled; getting Offer for : #[vars.PromoReq]"/>
+				<ee:transform doc:name="Transform Message" doc:id="961e6cc4-3645-47b6-949f-adf890e97cb2">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	customerID: vars.PromoReq.promotion.CustomerID,
+	productID: vars.PromoReq.promotion.ProductID,
+	productName: vars.PromoReq.promotion.ProductName,
+	productType: vars.PromoReq.promotion.ProductType,
+	stationID: vars.PromoReq.promotion.StationID
+} as Object {
+	class : "com.promotions.model.PromotionRequest"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="ce71d4a5-5335-44cb-a80d-d0c7382bde50" name="invokeRules" />
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="b2e5a41a-a97b-44d0-960a-03a3860bd42e">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PromotionName: payload.promotionName default "",
+	ProductName: payload.productName default "",
+	Offer: payload.offer default "",
+	OfferValue: payload.offerValue default "",
+	ProductID: payload.productID default "",
+	OfferType: payload.offerType default ""
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="542e65c6-a473-4598-9d12-a5faff0194aa" message="@@@@ Promotions Engine Not Enabled !!!! @@@@"/>
+				<ee:transform doc:name="Transform Message" doc:id="0ad303c7-d383-44de-bae2-a699c04cdd0d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Response: "Promotions Engine NOT ENABLED !"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+    </flow>
+	<flow name="post:\RelatedProductsPromotion:application\json:promotions_processapi-config">
+        <logger level="INFO" message="post:\RelatedProductsPromotion:application\json:promotions_processapi-config" />
+    </flow>
+</mule>

@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="PromotionRequest" format="java">
+      <types:shape format="java" element="com.promotions.model.PromotionRequest"/>
+    </types:type>
+    <types:type name="PromotionResponse" format="java">
+      <types:shape format="java" element="com.promotions.model.PromotionResponse"/>
+    </types:type>
+    <types:type name="PromotionsFile" format="json">
+      <types:shape format="weave" example="samples/OfferSamples.json"><![CDATA[%dw 2.0
+
+type PromotionsFile = Array<{|  ProductID: String,   ProductName: String,   OfferType: String,   RelatedProducts: Array<Any>, 
+  OfferAction: String, 
+  DiscountValue: String
+|}> {"example": "[{\"ProductID\":\"CK-123\",\"ProductName\":\"Coke\",\"OfferType\":\"BOGO\",\"RelatedProducts\":[],\"OfferAction\":\"DISCOUNT\",\"DiscountValue\":\"20\"},{\"ProductID\":\"PSP-123\",\"ProductName\":\"Pepsi\",\"OfferType\":\"BOGO\",\"RelatedProducts\":[],\"OfferAction\":\"FREE\",\"DiscountValue\":\"0\"},{\"ProductID\":\"HD-123\",\"ProductName\":\"HotDog\",\"OfferType\":\"BOGA\",\"RelatedProducts\":[{\"ProductID\":\"FT-123\",\"ProductName\":\"FrittoLays\"},{\"ProductID\":\"DT-123\",\"ProductName\":\"Dorittos\"}],\"OfferAction\":\"DISCOUNT\",\"DiscountValue\":\"20\"},{\"ProductID\":\"HD-123\",\"ProductName\":\"HotDog\",\"OfferType\":\"BOGA\",\"RelatedProducts\":[{\"ProductID\":\"FT-123\",\"ProductName\":\"FrittoLays\"},{\"ProductID\":\"DT-123\",\"ProductName\":\"Dorittos\"}],\"OfferAction\":\"FREE\",\"DiscountValue\":\"0\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="OfferList" format="java">
+      <types:shape format="java" element="com.promotions.model.OffersList"/>
+    </types:type>
+    <types:type name="xxxx" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#961e6cc4-3645-47b6-949f-adf890e97cb2">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="PromotionRequest"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#2c4b12e2-6bec-4ce3-81d9-865468a5d9bf">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="PromotionRequest"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#b2e5a41a-a97b-44d0-960a-03a3860bd42e">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="PromotionResponse"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#8c4738f7-d506-4128-8f66-52bdf6e523d4">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="PromotionsFile"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

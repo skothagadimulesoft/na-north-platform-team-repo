@@ -1,0 +1,66 @@
+{
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "org.mule.modules",
+    "artifactId": "mule-module-file-extension-common",
+    "version": "1.2.1",
+    "type": "jar",
+    "classifier": "mule-plugin"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "cglib",
+        "artifactId": "cglib",
+        "version": "3.2.10",
+        "type": "jar"
+      },
+      "uri": "repository/cglib/cglib/3.2.10/cglib-3.2.10.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.ow2.asm",
+        "artifactId": "asm",
+        "version": "7.0",
+        "type": "jar"
+      },
+      "uri": "repository/org/ow2/asm/asm/7.0/asm-7.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.ant",
+        "artifactId": "ant",
+        "version": "1.9.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/ant/ant/1.9.6/ant-1.9.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.ant",
+        "artifactId": "ant-launcher",
+        "version": "1.9.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/ant/ant-launcher/1.9.6/ant-launcher-1.9.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-io",
+        "artifactId": "commons-io",
+        "version": "2.6",
+        "type": "jar"
+      },
+      "uri": "repository/commons-io/commons-io/2.6/commons-io-2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.commons",
+        "artifactId": "commons-lang3",
+        "version": "3.8.1",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar"
+    }
+  ]
+}

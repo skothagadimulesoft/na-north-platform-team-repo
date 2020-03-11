@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="paymenttx_systemapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="paymenttx_systemapi-config" raml="paymenttx_systemapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus"/>
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="635b128e-d754-4485-9b4a-bc39c0eee39d">
+        <db:my-sql-connection host="mysql.shared.demos.mulesoft.com" port="3306" user="mule" password="Mule1379" database="Couche-Tard" />
+    </db:config>
+    <configuration-properties doc:name="Configuration properties" doc:id="e6924a4b-48eb-43b5-9eee-ab50d9be0a37" file="payment.properties" />
+    <flow name="paymenttx_systemapi-main">
+        <http:listener config-ref="paymenttx_systemapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]" />
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="paymenttx_systemapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="paymenttx_systemapi-console">
+        <http:listener config-ref="paymenttx_systemapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="paymenttx_systemapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\PaymentTransaction:application\json:paymenttx_systemapi-config">
+        <logger level="INFO" doc:name="Logger" doc:id="b6067321-ce09-472b-b7cd-6c3f2f87072c" message="insertint Payment: #[payload]" />
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="67c2d296-4b71-44e4-ab78-86e79d8488f2" variableName="original_payload" />
+        <db:insert doc:name="Insert" doc:id="d5bd1beb-b125-495e-96f1-b39cb4a92063" config-ref="Database_Config">
+            <db:sql>insert into PaymentTransaction(OrderID, CustomerID, StationID, PaymentMethod,NumPoints,Sum,Currency,TStamp,CCType) value(:order_id,:customer_id,:station_id,:payment_method,:num_points,:sum,:currency,:tstamp,:cc_type)</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	cc_type: payload.CCType,
+	tstamp: now() as String {format: "yyyy-MM-dd HH:mm:ss"},
+	station_id: payload.StationID,
+	sum: payload.Sum as String,
+	currency: payload.Currency,
+	customer_id: payload.CustomerID,
+	order_id: payload.OrderID,
+	num_points: payload.NumPoints as String,
+	payment_method: payload.PaymentType
+}]]]></db:input-parameters>
+        </db:insert>
+        <ee:transform doc:name="Transform Message" doc:id="c8b17cfd-b7af-4610-b35f-b8b063a443ed">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.original_payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\PaymentTransaction:paymenttx_systemapi-config">
+        <set-variable value="#[%dw 2.0
+output application/java
+---
+attributes.queryParams.orderId]" doc:name="Set Variable" doc:id="5c72daa2-626c-4772-ab22-4c9e156fea9c" variableName="Order_ID"/>
+		<choice doc:name="Choice" doc:id="7c1ab139-ac1a-437c-ac60-53c0cbbd3ac1" >
+			<when doc:id="421f4422-f108-4bde-b5bf-35d2cd6f6944" expression="#[%dw 2.0
+output application/java
+---
+vars.Order_ID != null]">
+				<flow-ref doc:name="Flow Reference" doc:id="8eaf3c74-050a-41aa-9559-bfe217226987" name="UtilFlow_getPaymentsByOrderId"/>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="Flow Reference" doc:id="361d4d75-3df9-48ef-8aa2-a9b2a7b9e635" name="UtilFlow_getAllPayments"/>
+			</otherwise>
+		</choice>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="e2a74aac-2a41-4775-854c-2e05fff9a23f">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	payment_transaction_list: payload map ( payload01 , indexOfPayload01 ) -> {
+		NumPoints: payload01.NumPoints default 0,
+		CCType: payload01.CCType default "",
+		Currency: payload01.Currency default "",
+		PaymentType: payload01.PaymentMethod default "",
+		Sum: payload01.Sum default 0,
+		CustomerID: payload01.CustomerID default "",
+		PaymentTxID: payload01.PaymentTxID as String,
+		OrderID: payload01.OrderID default "",
+		StationID: payload01.StationID default "",
+		Tstamp: payload01.TStamp as String default ""
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\PaymentTransaction\(PaymentTransactionID):paymenttx_systemapi-config">
+        <set-variable value="#[%dw 2.0
+output application/java
+---
+attributes.uriParams.PaymentTransactionID]" doc:name="Set Variable" doc:id="6db5d998-0c8c-4204-a645-fbe7f8ea391a" variableName="PaymentTxId"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3426fa39-440e-479d-b3c1-a0100379ae95" message="{aumentTxId var = #[vars.PaymentTxId] original value = #[attributes.uriParams.PaymentTransactionID]"/>
+		<db:select doc:name="Select" doc:id="a70de7e6-2a44-4641-b3a7-dc812afd3799" config-ref="Database_Config">
+            <db:sql>select * from PaymentTransaction
+where PaymentTxID = :payment_tx_id</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	payment_tx_id: vars.PaymentTxId
+}]]]></db:input-parameters>
+        </db:select>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="55c1b6b7-5828-47ee-945c-9718a454a1bf">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	NumPoints: payload[0].NumPoints default 0,
+	CCType: payload[0].CCType default "",
+	Currency: payload[0].Currency default "",
+	PaymentType: payload[0].PaymentMethod default "",
+	Sum: payload[0].Sum default 0,
+	CustomerID: payload[0].CustomerID default "",
+	PaymentTxID: payload[0].PaymentTxID,
+	OrderID: payload[0].OrderID default "",
+	StationID: payload[0].StationID default "",
+	Tstamp: payload[0].TStamp as String default ""
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="put:\PaymentTransaction\(PaymentTransactionID):application\json:paymenttx_systemapi-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="f8298ffa-2737-4612-9f48-f5db8567464c" variableName="OriginPayload"/>
+		<ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="PaymentTransactionID">attributes.uriParams.PaymentTransactionID</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:update doc:name="Update" doc:id="4aac14c1-8b58-4676-8d6f-b4d87a37ca22" config-ref="Database_Config">
+			<db:sql >UPDATE PaymentTransaction Set StationID = :station_id, PaymentMethod = :payment_method, NumPoints = :num_points, Sum = :sum, Currency = :currency,  CCType = :cc_type 
+WHERE PaymentTxID = :payment_tx_id
+</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	cc_type: payload.CCType,
+	payment_tx_id: payload.PaymentTxID,
+	station_id: payload.StationID,
+	sum: payload.Sum,
+	currency: payload.Currency,
+	num_points: payload.NumPoints ,
+	payment_method: payload.PaymentType
+}]]]></db:input-parameters>
+		</db:update>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="f55db760-5514-4f6b-b934-4b0d08a1427c">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	NumPoints: vars.OriginPayload.NumPoints,
+	CCType: vars.OriginPayload.CCType,
+	Currency: vars.OriginPayload.Currency,
+	PaymentType: vars.OriginPayload.PaymentType,
+	Sum: vars.OriginPayload.Sum,
+	CustomerID: vars.OriginPayload.CustomerID,
+	PaymentTxID: vars.OriginPayload.PaymentTxID,
+	OrderID: vars.OriginPayload.OrderID,
+	StationID: vars.OriginPayload.StationID,
+	Tstamp: vars.OriginPayload.Tstamp
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="delete:\PaymentTransaction\(PaymentTransactionID):paymenttx_systemapi-config">
+        <ee:transform doc:id="5cc61eca-77e8-4fc7-9f6c-9a799aa59300">
+            <ee:variables>
+                <ee:set-variable variableName="PaymentTransactionID"><![CDATA[attributes.uriParams.PaymentTransactionID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:delete doc:name="Delete" doc:id="cc921f93-3677-4145-b68d-4df77032291f" config-ref="Database_Config">
+			<db:sql >delete from PaymentTransaction 
+where PaymentTxID = :payment_tx_id</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	payment_tx_id: vars.PaymentTransactionID
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="40f464de-1a8c-490b-9968-024a14597047">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  PaymentTxId: vars.PaymentTransactionID,
+  Message: "Payment Transaction deleted succesfully !"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

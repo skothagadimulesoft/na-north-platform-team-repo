@@ -1,0 +1,10 @@
+{
+    "promotion":{
+       "StationID":  "333",
+      "CustomerID": "11777",
+      "ProductID":  "CK-123",
+      "ProductName":  "Coke",
+      "ProductType":  "NonAlcoholicBeverage"
+    }
+  
+}

@@ -1,0 +1,17 @@
+{
+  "StoreType": "Circle K",
+  "coordinates": {
+    "Latitude": "41.947255",
+    "Longitude": "-87.649644"
+  },
+  "StationID": "0001",
+  "Address": "803 E ADDISON ST",
+  "Currency": "USD",
+  "SalesTax": 10.25,
+  "Region": "CHICAGO",
+  "productTypes": [
+    "Coffee",
+    "Polar Pop",
+    "RollerGrille"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "org.mule.connectors",
+    "artifactId": "mule-file-connector",
+    "version": "1.2.2",
+    "type": "jar",
+    "classifier": "mule-plugin"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.modules",
+        "artifactId": "mule-module-file-extension-common",
+        "version": "1.2.1",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/modules/mule-module-file-extension-common/1.2.1/mule-module-file-extension-common-1.2.1-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-io",
+        "artifactId": "commons-io",
+        "version": "2.6",
+        "type": "jar"
+      },
+      "uri": "repository/commons-io/commons-io/2.6/commons-io-2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.commons",
+        "artifactId": "commons-lang3",
+        "version": "3.7",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/commons/commons-lang3/3.7/commons-lang3-3.7.jar"
+    }
+  ]
+}

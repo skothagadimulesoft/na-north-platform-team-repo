@@ -1,0 +1,85 @@
+[
+	{
+		"ProductID":	"CK-123",
+		"ProductName": "Coke",
+		"OfferType": "BOGO",
+		"RelatedProducts":[],
+		"OfferAction":	"DISCOUNT",
+		"DiscountValue":	"20"
+		
+	},
+	{
+		"ProductID":	"PSP-123",
+		"ProductName": "Pepsi",
+		"OfferType": "BOGO",
+		"RelatedProducts":[],
+		"OfferAction":	"FREE",
+		"DiscountValue":	"0"
+		
+	},
+	{
+		"ProductID":	"HD-123",
+		"ProductName": "HotDog",
+		"OfferType": "BOGO",
+		"RelatedProducts":[],
+		"OfferAction":	"DISCOUNT",
+		"DiscountValue":	"30"
+		
+	},
+	{
+		"ProductID":	"FTL-123",
+		"ProductName": "FrittoLays",
+		"OfferType": "BOGO",
+		"RelatedProducts":[],
+		"OfferAction":	"FREE",
+		"DiscountValue":	"0"
+		
+	},
+	{
+		"ProductID":	"CF-123",
+		"ProductName": "Coffee",
+		"OfferType": "BOGO",
+		"RelatedProducts":[],
+		"OfferAction":	"DISCOUNT",
+		"DiscountValue":	"50"
+		
+	},
+	{
+		"ProductID":	"HD-123",
+		"ProductName": "HotDog",
+		"OfferType": "BOGA",
+		"RelatedProducts":[
+			{
+				"ProductID":"FT-123",
+				"ProductName":"FrittoLays"
+			},
+			{
+				"ProductID":"DT-123",
+				"ProductName":"Dorittos"
+			}
+			
+		],
+		"OfferAction":	"DISCOUNT",
+		"DiscountValue":	"20"
+		
+	},
+	{
+		"ProductID":	"HD-123",
+		"ProductName": "HotDog",
+		"OfferType": "BOGA",
+		"RelatedProducts":[
+			{
+				"ProductID":"FT-123",
+				"ProductName":"FrittoLays"
+			},
+			{
+				"ProductID":"DT-123",
+				"ProductName":"Dorittos"
+			}
+			
+		],
+		"OfferAction":	"FREE",
+		"DiscountValue":	"0"
+		
+	}
+]

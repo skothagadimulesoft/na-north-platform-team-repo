@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="productcatalogue_systemapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="productcatalogue_systemapi-config" raml="productcatalogue_systemapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="672334e5-8fba-4549-9ea5-fae0bd3c4fc2">
+        <db:my-sql-connection host="${db.mysql.url}" port="${db.mysql.port}" user="${db.mysql.username}" password="${db.mysql.password}" database="${db.mysql.database}" />
+    </db:config>
+    <configuration-properties doc:name="Configuration properties" doc:id="8b601bc8-1c08-4d73-b46a-9ade9c69f461" file="mule-app.properties" />
+    <flow name="productcatalogue_systemapi-main">
+        <http:listener config-ref="productcatalogue_systemapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="productcatalogue_systemapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="e8c3fbb3-b211-4b1e-8922-ffbfb2415465">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE" enableNotifications="true" logException="true">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="cb571444-0e64-4236-9eda-d30ff043adf8">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE" enableNotifications="true" logException="true">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="cb5d236f-348e-41ab-b965-3e882cf5086c">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="productcatalogue_systemapi-console">
+        <http:listener config-ref="productcatalogue_systemapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="productcatalogue_systemapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="7b4be2cf-da3d-436c-a22c-6b8e7474212a">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\Products:productcatalogue_systemapi-config">
+        <set-variable value="#[%dw 2.0
+output application/java
+---
+attributes.queryParams.stationid]" doc:name="station" doc:id="8aee3720-10b7-4658-8568-0cebe17c6ab8" variableName="StationId"/>
+		<set-variable value="#[%dw 2.0
+output application/java
+---
+attributes.queryParams.category]" doc:name="Category" doc:id="87c88127-aef5-41c0-8b0b-fe56bbf927c4" variableName="Category"/>
+		<set-variable value="#[%dw 2.0
+output application/java
+---
+attributes.queryParams.promotion]" doc:name="promotion" doc:id="80a104cc-3463-474e-9c21-4a4052be93e0" variableName="promotionFlag"/>
+		<set-variable value="#[%dw 2.0
+output application/java
+---
+attributes.queryParams.upc_code]" doc:name="UPC_Code" doc:id="cfe8f18e-aa21-43ad-b8d3-df6a70c95293" variableName="upc_code"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b8182176-91ed-4bb3-b609-42793149b820" message="Station ID: #[vars.StationId] , Category: #[vars.Category], Promotion: #[vars.promotionFlag], UPC: #[vars.upc_code]"/>
+		<choice doc:name="Choice" >
+			<when  expression='#[%dw 2.0
+output application/java
+---
+vars.StationId != null and vars.Category == null and  vars.upc_code == null and (vars.promotionFlag == null or vars.promotionFlag == "false")]' >
+				<flow-ref doc:name="Flow Reference"  name="GetAllProducts_ByStationID"/>
+			</when>
+			<when  expression='#[%dw 2.0
+output application/java
+---
+vars.StationId == null and vars.Category != null and vars.upc_code == null and  (vars.promotionFlag == null or vars.promotionFlag == "false")]' >
+				<flow-ref doc:name="Flow Reference"  name="GetAllProducts_ByCategory"/>
+			</when>
+			<when  expression='#[%dw 2.0
+output application/java
+---
+vars.StationId != null and vars.Category != null and vars.upc_code == null and (vars.promotionFlag == null or vars.promotionFlag == "false")]' >
+				<flow-ref doc:name="Flow Reference"  name="GetAllProducts_ByStationID_ByCateogry"/>
+			</when>
+			<when expression='#[%dw 2.0
+output application/java
+---
+vars.StationId != null and vars.Category == null and vars.upc_code == null and vars.promotionFlag == "true"]' >
+				<flow-ref doc:name="Flow Reference"  name="GetAllProducts_ByStationID_With_Promotion"/>
+			</when>
+			<when expression='#[%dw 2.0
+output application/java
+---
+vars.StationId == null and vars.Category != null and vars.upc_code == null and vars.promotionFlag == "true"]' >
+				<flow-ref doc:name="Flow Reference"  name="GetAllProducts_ByCategory_With_Promotion"/>
+			</when>
+			<when expression='#[%dw 2.0
+output application/java
+---
+vars.StationId != null and vars.Category != null and vars.upc_code == null and vars.promotionFlag == "true"]' >
+				<flow-ref doc:name="Flow Reference"  name="GetAllProducts_ByStationID_ByCateogry_With_Promotion"/>
+			</when>
+			<when expression='#[%dw 2.0
+output application/java
+---
+vars.StationId == null and vars.Category == null and vars.upc_code == null and  vars.promotionFlag == "true"]' >
+				<flow-ref doc:name="Flow Reference"  name="GeAllProducts_WIth_Promotion"/>
+			</when>
+			<when expression='#[vars.StationId == null and vars.Category == null and vars.upc_code != null and  vars.promotionFlag == "true"]'>
+				<flow-ref doc:name="Flow Reference"  name="UtilFlow_GetByUPCCode_WithPromotions"/>
+			</when>
+			<when  expression='#[vars.StationId == null and vars.Category == null and vars.upc_code != null and  (vars.promotionFlag == null or vars.promotionFlag == "false")]'>
+				<flow-ref doc:name="Flow Reference"  name="UtilFlow_GetByUPCCode_NoPromotions"/>
+			</when>
+			<otherwise>
+				<flow-ref doc:name="Flow Reference"  name="GeAllProducts"/>
+			</otherwise>
+		</choice>
+    </flow>
+    <flow name="get:\Products\(ProductId):productcatalogue_systemapi-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="c033d29b-1811-4409-9be7-bb18e70d6f37">
+            <ee:variables>
+                <ee:set-variable variableName="ProductId"><![CDATA[attributes.uriParams.ProductId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:select doc:name="Select" doc:id="16e0d241-79dd-4b09-ac42-4b585d331e9e" config-ref="Database_Config">
+            <db:sql>SELECT * 
+FROM
+	Products
+WHERE 
+	ProductID = :productId;</db:sql>
+            <db:input-parameters><![CDATA[#[{
+	"productId":attributes.uriParams.ProductId as String
+}]]]></db:input-parameters>
+        </db:select>
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="25ea5ba6-9c59-4e56-8d86-16a951f4f7e6">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	ProductName: payload[0].ProductName,
+	Price: payload[0].ProductPrice as String,
+	StatinonID: payload[0].ProductStId,
+	ProductImageURL: payload[0].ProductImgURL,
+	Currency: payload[0].ProductCurrency,
+	ProductType: payload[0].ProductType,
+	ProductID: payload[0].ProductID,
+	StationID: payload[0].ProductStId,
+	QuantityAvailable: payload[0].ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload[0].ProductLoyaltyPtEq,
+	(Promotion: read(payload[0].Promotion default "{}", "application/json")) if (payload[0].Promotion != null)
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="put:\Products\(ProductId):productcatalogue_systemapi-config">
+		<set-variable value="#[attributes]" doc:name="Set Variable" doc:id="8bd5210a-8b25-469a-b6e2-24393eda6b66" variableName="queryAttributes"/>
+		<db:select doc:name="Select" doc:id="5a934822-625d-4eca-93b6-e51630d9404f" config-ref="Database_Config">
+			<db:sql >SELECT ProductID FROM Products where  ProductID = :productId;</db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"productId":vars.queryAttributes.uriParams.ProductId
+}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="2d490b2b-7f36-4965-9a31-18d0316e0b11" >
+			<when expression="#[payload.ProductID[0] == vars.queryAttributes.uriParams.ProductId]">
+				<db:update doc:name="Update" doc:id="805d5741-ff7a-4592-800b-3816bfb6785a" config-ref="Database_Config">
+					<db:sql>UPDATE
+	 Products
+SET 
+	ProductPrice=:productPrice,
+	ProductCurrency=:productCurrency
+WHERE 
+	ProductID = :productId;</db:sql>
+					<db:input-parameters><![CDATA[#[{
+	productId: vars.queryAttributes.uriParams.ProductId,
+	productPrice: vars.queryAttributes.queryParams.NewPrice,
+	productCurrency: vars.queryAttributes.queryParams.Currency	
+}]]]></db:input-parameters>
+				</db:update>
+				<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="6230e446-0372-4656-b54b-1dd93976c20c">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Price updated sucessfully."
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="c765c325-2a28-44a5-aad0-a6a19f4aa42b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "ProductID not found"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+    </flow>
+</mule>

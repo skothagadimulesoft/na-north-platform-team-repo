@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+    <http:listener-config name="qrcodegenerator-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="qrcodegenerator-config" raml="qrcodegenerator.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <configuration-properties doc:name="Configuration properties" doc:id="614d1f77-6568-4fff-a6b3-d9d37248b7fc" file="qr.properties" />
+	
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="11aad4c6-b76b-4de9-9ba8-9a4c330f5a96" >
+		<http:request-connection protocol="HTTPS" host="www.qrcoder.co.uk" port="443" connectionIdleTimeout="3000000"/>
+	</http:request-config>
+	
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="5faba250-5a6b-4340-a0d6-4a8b2fe1e69c" >
+		<email:smtp-connection host="${email.host}" port="${email.port}" user="${email.user}" password="${email.password}" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	
+	
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="5e71c006-669c-4d02-b5ff-6e7d353cfdc3">
+		<vm:queues >
+			<vm:queue queueName="qr_code_email" />
+		</vm:queues>
+	</vm:config>
+	<flow name="qrcodegenerator-main">
+        <http:listener config-ref="qrcodegenerator-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="qrcodegenerator-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="qrcodegenerator-console">
+        <http:listener config-ref="qrcodegenerator-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="qrcodegenerator-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\QRCode:qrcodegenerator-config">
+		<logger level="INFO" doc:name="Logger" doc:id="076b4dd6-673d-4633-a248-edc0d3501d85" message="getting QR code !" />
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="4b7e55e5-4097-44b5-9b20-9566fd1c8caf" variableName="data_message"/>
+		<http:request method="GET" doc:name="Request" doc:id="85d84978-3df5-42f8-8c48-2b3b4cfad8f9" path="api/v1/" config-ref="HTTP_Request_configuration">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"text" : payload.data,
+	"type" : "png",
+	"background" : "FFFFFF",
+	"foreground" : "880000",
+	"eo" : "F10000",
+	"ei" : "AA0000",
+	"size" : "4",
+	"padding" : "4"
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="7481bd8d-0432-482d-9293-d3a8f733d330" message="QR Code payload: #[payload]" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="24241480-df7f-43f7-bb17-f3cd90418b80" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/octet-stream
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="email_content" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	content:"QR Code generated"
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<vm:publish queueName="qr_code_email" doc:name="Publish" doc:id="a9f8e9bd-fe4e-492c-9d86-360e61571a81" config-ref="VM_Config"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="1aec66c8-ae33-4bb2-b607-d5fd10a031c2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result": "QR code succestully generated",
+	"qr_code": payload
+	
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="qr_code_gen" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+    </flow>
+	<flow name="qrcodegeneratorFlow" doc:id="4cd30e70-e0e0-4f6f-ad19-afc8db7ec150" >
+		<vm:listener doc:name="Listener" doc:id="95679b11-44e5-46d4-b205-8ce876a0c73e" config-ref="VM_Config" queueName="qr_code_email"/>
+		<logger level="INFO" doc:name="Logger" doc:id="935cf2e2-1c8b-474c-b402-d15f2b38199f" message="---&gt;Sending email !"/>
+		<set-variable value="QR Code generated for CIrcleK Purchase Order!" doc:name="Set Variable" doc:id="a7f8b194-bafa-4108-b398-bfc460f4a819" variableName="email_content"/>
+		<email:send doc:name="Send" doc:id="7ce45d81-f895-4e5e-8188-5e9bdcbd53b7" config-ref="Email_SMTP" fromAddress="${email.from}" subject="QR Code Generation email">
+			<email:to-addresses >
+				<email:to-address value="${email.to}" />
+			</email:to-addresses>
+			<email:body >
+				<email:content ><![CDATA[#[%dw 2.0
+output application/java
+---
+vars.email_content]]]></email:content>
+			</email:body>
+			<email:attachments ><![CDATA[#[%dw 2.0
+output application/java
+---
+attachment1: payload]]]></email:attachments>
+		</email:send>
+	</flow>
+</mule>

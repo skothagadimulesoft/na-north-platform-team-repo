@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="delivery_data" format="json">
+      <types:shape format="weave" example="examples/DeliveryPaylaod_Sample.json"><![CDATA[%dw 2.0
+
+type delivery_data = {|
+  OrderID: String, 
+  Address: String, 
+  delivery_items: Array<{|    ProductName: String,     ProductID: String,     UnitCost: String,     Currency: String  |}>, 
+  Subtotal: Number {"typeId": "double"}, 
+  Taxes: Number {"typeId": "double"}, 
+  DeliveryFee: Number {"typeId": "double"}, 
+  Total: Number {"typeId": "double"}
+|} {"example": "{\"OrderID\":\"1234\",\"Address\":\"123 Main St.\",\"delivery_items\":[{\"ProductName\":\"Coke\",\"ProductID\":\"123\",\"UnitCost\":\"2.33\",\"Currency\":\"USD\"}],\"Subtotal\":22.33,\"Taxes\":33.33,\"DeliveryFee\":10.00,\"Total\":100.00}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#6357b282-be6f-48d0-aa26-76321c8b58e2">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="delivery_data"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

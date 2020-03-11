@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+    <http:listener-config name="purchaseorder_processapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    
+    
+    <apikit:config name="purchaseorder_processapi-config" raml="purchaseorder_processapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus">
+        <apikit:flow-mappings>
+            <apikit:flow-mapping resource="/PurchaseOrder/{PurchaseOrderID}" action="get" flow-ref="purchaseorder_processapiFlow_ID" />
+        </apikit:flow-mappings>
+    </apikit:config>
+    <http:request-config name="HTTP_Request_configuration_PO_System" doc:name="HTTP Request configuration" doc:id="eaed7a67-550c-46c2-bd41-059bcaa45ca8">
+        <http:request-connection host="${po.system.url}" port="${po.system.port}" />
+    </http:request-config>
+    <http:request-config name="HTTP_Request_configuration_Payment" doc:name="HTTP Request configuration" doc:id="76083438-141d-4916-9d2e-b489e7fb314c">
+        <http:request-connection host="${payment.process.url}" port="${payment.process.port}" />
+    </http:request-config>
+    <configuration-properties doc:name="Configuration properties" doc:id="2a587d48-1ef7-4104-8e15-27c32700cc32" file="purchase_order.properties" />
+    <anypoint-mq:default-subscriber-config name="Anypoint_MQ_Default_subscriber" doc:name="Anypoint MQ Default subscriber" doc:id="ccd55994-2a1a-4103-9950-d6525b98f1af" >
+		<anypoint-mq:connection clientId="10ad1764593f4329ae9390b8d94d1df1" clientSecret="7BdB6eE6318F4DA89Dc325c69eC7B9EC" />
+	</anypoint-mq:default-subscriber-config>
+	<flow name="purchaseorder_processapi-main">
+        <http:listener config-ref="purchaseorder_processapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="purchaseorder_processapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="purchaseorder_processapi-console">
+        <http:listener config-ref="purchaseorder_processapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="purchaseorder_processapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\PurchaseOrder:application\json:purchaseorder_processapi-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="bd383182-1ea1-4f8b-949b-cdb0018184f7" variableName="OriginalPayload" />
+        <set-variable value="#[&quot;order-&quot; ++ uuid()]" doc:name="Set Variable" doc:id="c808b8b6-444f-485a-ac1e-114372991fe8" variableName="OrderID" />
+        <scatter-gather doc:name="Scatter-Gather" doc:id="6d82fb6c-626b-4b1c-8086-85f594a4a57b">
+            <route>
+                <choice doc:name="Choice_PO" doc:id="cb816c21-66ad-4b11-bc67-35769dee7836">
+                    <when doc:id="26a60cce-90f2-4d86-a1e8-f6c9fdc59f11" expression="#[vars.OriginalPayload.PayOnCheckout == true]">
+                        <logger level="INFO" doc:name="POOnCgkOut_Logger" doc:id="e0d6c5d5-f343-4fcc-be21-cb677bb04fc7" message="---1) PO with Payment on CheckOut: #[payload]" />
+                        <flow-ref doc:name="Flow Reference" doc:id="3a853520-3442-40f4-89bf-4471a516da40" name="UtilFlow_Proicing"/>
+						<logger level="INFO" doc:name="Logger" doc:id="d32e8a67-7e34-4318-8949-cf30774f03d2" message="---&gt;Total cost: #[payload]"/>
+						<ee:transform doc:name="Transform Message" doc:id="c1a077db-154c-42af-b088-c110b1e5f9db">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	StationID: vars.OriginalPayload.StationID,
+	CustomerID: vars.OriginalPayload.CustomerID,
+	OrderID: vars.OrderID,
+	OrderInitiation: vars.OriginalPayload.OrderInitiation,
+	OrderClosure: vars.OriginalPayload.OrderClosure,
+	Status: "Closed",
+	OrderDelivery: vars.OriginalPayload.OrderDelivery,
+	DeliveryAddress: vars.OriginalPayload.DeliveryAddress,
+	PayOnCheckout: vars.OriginalPayload.PayOnCheckout,
+	PaymentType: vars.OriginalPayload.PaymentType,
+	CCType: vars.OriginalPayload.CCType,
+	Cost: payload.TotalCost_Tax_Delivery,
+	Tstamp: vars.OriginalPayload.Tstamp default "",
+	OrderItems: vars.OriginalPayload.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		OrderItemID: orderItem.OrderItemID,
+		StationID: orderItem.StationID,
+		OrderID: orderItem.OrderID,
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		UnitPrice: orderItem.UnitPrice,
+		Currency: orderItem.Currency
+	}
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<http:request method="POST" doc:name="SubmitPO" doc:id="904a8719-5dac-480b-bcff-79a92b0ddd26" config-ref="HTTP_Request_configuration_PO_System" path="/api/PurchaseOrder" />
+                        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="1a65eb60-f719-4fdd-bc1c-01a0c2af3f56" variableName="PoSubmitPayload" />
+                    </when>
+                    <otherwise>
+                        <logger level="INFO" doc:name="Logger" doc:id="14d7dd36-caf3-494d-90a3-17b2c2b5b4ea" message="---PO with NO Payment on CheckOut: #[payload]" />
+                        <flow-ref doc:name="Flow Reference" doc:id="dbfc39fc-ae84-4e9b-9b56-4122007ca355" name="UtilFlow_Proicing"/>
+						<ee:transform doc:name="Transform Message" doc:id="8432dd7e-fdfe-4a78-9f32-515b9710377c">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	CCType: vars.OriginalPayload.CCType,
+	Cost: payload.TotalCost_Tax_Delivery,
+	StationID: vars.OriginalPayload.StationID,
+	CustomerID: vars.OriginalPayload.CustomerID,
+	OrderID: vars.OrderID,
+	OrderInitiation: vars.OriginalPayload.OrderInitiation,
+	OrderClosure: vars.OriginalPayload.OrderClosure,
+	Status: "Active",
+	OrderDelivery: vars.OriginalPayload.OrderDelivery,
+	DeliveryAddress: vars.OriginalPayload.DeliveryAddress,
+	PayOnCheckout:vars.OriginalPayload.PayOnCheckout,
+	PaymentType: vars.OriginalPayload.PaymentType,
+	Tstamp: vars.OriginalPayload.Tstamp default "",
+	OrderItems: vars.OriginalPayload.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		OrderItemID: orderItem.OrderItemID,
+		StationID: orderItem.StationID,
+		OrderID: orderItem.OrderID,
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		UnitPrice: orderItem.UnitPrice,
+		Currency: orderItem.Currency
+	}
+}]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+                        <http:request method="POST" doc:name="SubmitPO" doc:id="052113ca-b65d-478a-a423-7b3cb59a9db3" config-ref="HTTP_Request_configuration_PO_System" path="/api/PurchaseOrder" />
+                        <set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="4faa4b15-c82e-438b-be18-8b46318e861d" variableName="PoSubmitPayload" />
+                    </otherwise>
+                </choice>
+            </route>
+            <route>
+                <choice doc:name="Choice_Payment" doc:id="c634f4b8-b044-42dd-b2b6-57fa5018d303">
+                    <when doc:id="218e8f6e-a101-4f1d-ac0a-43f92f57044d" expression="#[vars.OriginalPayload.PayOnCheckout == true]">
+                        <logger level="INFO" doc:name="Logger" doc:id="f11b59e8-e217-49c9-a44b-5d8861d61020" message="---Payment on CKOUT: #[payload]" />
+                        <flow-ref doc:name="Flow Reference" doc:id="0ee273e0-bc73-4e5f-a6a1-3f52ed5d19da" name="UtilFlow_Proicing"/>
+                        <ee:transform doc:name="Transform Message" doc:id="0c1fec9d-dae0-490c-8e1b-c4d237d9fdf8">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentTxID: "",
+	OrderID: vars.OrderID,
+	CustomerID: vars.OriginalPayload.CustomerID,
+	StationID: vars.OriginalPayload.StationID,
+	PaymentType: vars.OriginalPayload.PaymentType,
+	Sum: payload.TotalCost_Tax_Delivery,
+	Currency: vars.OriginalPayload.OrderItems[0].Currency,
+	Tstamp: now(),
+	NumPoints: 0,
+	CCType: vars.OriginalPayload.CCType
+}]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+                        <http:request method="POST" doc:name="Payment" doc:id="de9a330d-9b73-4666-9094-e1e682f9238e" path="/api/Payment" config-ref="HTTP_Request_configuration_Payment" />
+                    </when>
+                    <otherwise>
+                        <logger level="INFO" doc:name="Logger" doc:id="bc355be1-2a66-462f-9bac-76ee62fbfee8" message="---NO Payment on CKOUT: #[payload]" />
+                        <ee:transform doc:name="Transform Message" doc:id="9249dfe8-e386-443d-abcd-3c3e9b74098f">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	CCType: payload.CCType,
+	StationID: payload.StationID,
+	CustomerID: payload.CustomerID,
+	OrderID: vars.OrderID,
+	OrderInitiation: payload.OrderInitiation,
+	OrderClosure: payload.OrderClosure,
+	Status: "Active",
+	OrderDelivery: payload.OrderDelivery,
+	DeliveryAddress: payload.DeliveryAddress,
+	PayOnCheckout: payload.PayOnCheckout,
+	PaymentType: payload.PaymentType,
+	Tstamp: payload.Tstamp default "",
+	OrderItems: payload.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		OrderItemID: orderItem.OrderItemID,
+		StationID: orderItem.StationID,
+		OrderID: orderItem.OrderID,
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		UnitPrice: orderItem.UnitPrice,
+		Currency: orderItem.Currency
+	}
+}]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+						<choice doc:name="Choice" doc:id="90993391-c7d1-4582-a7f4-4054dd8b16d1" >
+							<when doc:id="83820d3e-623f-48d4-853e-6f654ae38fba" expression='#[vars.OriginalPayload.OrderInitiation == "Mobile" and vars.OriginalPayload.OrderClosure == "POS"]'>
+								<logger level="INFO" doc:name="Logger" doc:id="0c50d339-aeb6-46bd-a0eb-22d3855afc3c" message="----Order on Phone, Pay in Store : send QR code to Mobile app" />
+								<flow-ref doc:name="sendQRCode" doc:id="96b89331-ac9f-4fe8-8223-255cfcb95dd3" name="qrCode" />
+							</when>
+							<when doc:id="aae616be-8f59-4710-a05e-79c689073bf3" expression='#[vars.OriginalPayload.OrderInitiation == "POS" and vars.OriginalPayload.OrderClosure == "Mobile"]'>
+								<logger level="INFO" doc:name="Logger" doc:id="022a4748-2188-481d-a881-44149093971e" message="-------Order in Store Pay on Phone: ASend notification to Mobile APP" />
+								<async doc:name="Async" doc:id="23f44add-748a-4827-b16d-7dc2ff29912a" >
+									<flow-ref doc:name="SendNotification" doc:id="169e0a43-83a3-46b2-9e0f-1f71b09d356f" name="UtilFlow_SendNotification_to_Mobile"/>
+								</async>
+							</when>
+							<otherwise>
+								<logger level="INFO" doc:name="Logger" doc:id="085e32fc-e07b-493e-8fcb-42f0c97598e2" message=" #### Invalid Payment scenario: PayOnChekout = False"/>
+							</otherwise>
+						</choice>
+                    </otherwise>
+                </choice>
+            </route>
+			<route >
+				<choice doc:name="Choice_Delivery" doc:id="d059fcca-4486-4526-870e-15b4f1774ff9">
+			<when doc:id="adb8763c-e904-410d-b0ba-675223601d05" expression="#[payload.OrderDelivery == true and payload.PayOnCheckout == true]">
+						<logger level="INFO" doc:name="Logger" doc:id="339778a6-4e72-48d1-ad55-7a9834d0e8e6" message="Delivering food to address PO #[vars.OrderID] at address :  #[payload.DeliveryAddress]"/>
+						<flow-ref doc:name="Flow Reference" doc:id="433b522c-311a-4a4f-bf54-2ce47ce05eec" name="UtilFlow_Proicing"/>
+						<ee:transform doc:name="Transform Message" doc:id="bce2a93f-61b9-4a3d-ad7b-043004ae8d99">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	OrderID: vars.OrderID,
+	Address: vars.OriginalPayload.DeliveryAddress,
+	delivery_items: vars.OriginalPayload.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		UnitCost: orderItem.UnitPrice as String,
+		Currency: orderItem.Currency
+	},
+	Subtotal: payload.Cost,
+	Taxes: payload.Taxes,
+	DeliveryFee: payload.Delivery,
+	Total: payload.TotalCost_Tax_Delivery
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<anypoint-mq:publish doc:name="Publish" doc:id="b08d63d1-b0ab-432d-af9d-ba7ca8467a96" config-ref="Anypoint_MQ_Default_subscriber" destination="delivery.queue"/>
+					</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="8683c709-3a40-4ee8-ac47-1fc75298f4af" message="No delivery required  for PO : #[vars.OrderID]"/>
+					</otherwise>
+		</choice>
+			</route>
+        </scatter-gather>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="ceb926eb-963b-4fd2-b067-6c706645cf0b">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.PoSubmitPayload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="2a8e59cb-d14e-4a7e-9666-2f67f8d23d79" name="UtilFlow_PrepareResponse"/>
+    </flow>
+	<flow name="get:\PurchaseOrder:purchaseorder_processapi-config">
+        <set-variable value="#[%dw 2.0
+output application/java
+---
+attributes.queryParams.customerId]" doc:name="Set Variable" doc:id="a11a9b1f-9f4d-473d-a1d9-1d1091c85cdb" variableName="CustomerId"/>
+		<choice doc:name="Choice" doc:id="d1ac42b1-9e3b-4a5a-ad94-2d9f2958514f" >
+			<when doc:id="2bfd5927-3e2c-43e8-bef4-917c2566492b" expression="#[vars.CustomerId != null]">
+				<logger level="INFO" doc:name="Logger" doc:id="b8cfcbec-6326-49dd-9608-759faa4ca215" message="Getting PO by Customer ID : #[vars.CustomerId]"/>
+				<http:request method="GET" doc:name="Copy_of_Request" doc:id="97735f6c-bfbb-4893-843b-c347be261402" config-ref="HTTP_Request_configuration_PO_System" path="/api/PurchaseOrder" >
+					<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"customerId" : vars.CustomerId
+}]]]></http:query-params>
+				</http:request>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="65b9bfac-8e45-4e26-ae7d-7c44dc7797ae" message="Getting all POs !"/>
+				<http:request method="GET" doc:name="Request" doc:id="487c3d37-d536-49a9-9827-ce338711c28e" config-ref="HTTP_Request_configuration_PO_System" path="/api/PurchaseOrder" />
+			</otherwise>
+		</choice>
+    </flow>
+    <flow name="get:\PurchaseOrder\(PurchaseOrderID):purchaseorder_processapi-config">
+        <ee:transform doc:name="Transform Message" doc:id="511b60d7-261f-44c7-9885-426484b33296">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+            </ee:message>
+            <ee:variables>
+                <ee:set-variable variableName="PurchaseOrderId"><![CDATA[attributes.uriParams.PurchaseOrderID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="ef8d52fa-777e-48a7-8858-497c687756b9" message="----Gettin PO By ID: #[vars.PurchaseOrderID]" />
+        <http:request method="GET" doc:name="Request" doc:id="6aeddcd2-6a9e-4a96-b049-f928f80b20e3" path="/api/PurchaseOrder/{PurchaseOrderID}" config-ref="HTTP_Request_configuration_PO_System">
+            <http:uri-params><![CDATA[#[output application/java
+---
+{
+	'PurchaseOrderID' : vars.PurchaseOrderId
+}]]]></http:uri-params>
+        </http:request>
+    </flow>
+    <flow name="put:\PurchaseOrder\(PurchaseOrderID):application\json:purchaseorder_processapi-config">
+        <ee:transform doc:id="0a68ed85-6d3a-490e-ad9e-4ab8475d8fc2">
+            <ee:variables>
+                <ee:set-variable variableName="PurchaseOrderID"><![CDATA[attributes.uriParams.PurchaseOrderID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <choice doc:name="Choice" doc:id="12d80846-8193-46fa-b7f7-e1572a388a50">
+            <when doc:id="8d4ec935-4df1-4a21-b180-a64f9a48d7f2" expression="#[payload.PayOnCheckout == true]">
+                <logger level="INFO" doc:name="Logger" doc:id="882eae61-3c31-4f95-9f2a-ad587254c10a" message="Upating PO !!! PayOnCkOut = true -&gt; Payment : #[payload]" />
+                <set-variable value="#[payload]" doc:name="OrigPayload" doc:id="f0842f42-9b9e-4aba-9ec5-924725e15f11" variableName="POSubmit" />
+                <flow-ref doc:name="Flow Reference" doc:id="cc492667-f244-435a-b785-ac013c7456b2" name="UtilFlow_Proicing"/>
+				<ee:transform doc:name="Transform Message" doc:id="90092d2e-8a16-4e77-b9db-f90e0583b9d6">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	StationID: vars.POSubmit.StationID,
+	CustomerID: vars.POSubmit.CustomerID,
+	OrderID: vars.POSubmit.OrderID,
+	OrderInitiation: vars.POSubmit.OrderInitiation,
+	OrderClosure:  vars.POSubmit.OrderClosure,
+	Status: "Closed",
+	OrderDelivery: vars.POSubmit.OrderDelivery,
+	DeliveryAddress: vars.POSubmit.DeliveryAddress,
+	PayOnCheckout: vars.POSubmit.PayOnCheckout,
+	PaymentType: vars.POSubmit.PaymentType,
+	CCType: vars.POSubmit.CCType,
+	Cost: payload.TotalCost_Tax_Delivery,
+	Tstamp: vars.POSubmit.Tstamp default now(),
+	OrderItems: vars.POSubmit.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		OrderItemID: orderItem.OrderItemID,
+		StationID: orderItem.StationID,
+		OrderID: orderItem.OrderID,
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		UnitPrice: orderItem.UnitPrice,
+		Currency: orderItem.Currency
+	}
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+				<http:request method="PUT" doc:name="POSubmit" doc:id="18d0ccb8-ece6-4dfd-8a5d-bad6fde0f94d" config-ref="HTTP_Request_configuration_PO_System" path="/api/PurchaseOrder/{PurchaseOrderID}">
+                    <http:uri-params><![CDATA[#[output application/java
+---
+{
+	"PurchaseOrderID" : payload.OrderID
+}]]]></http:uri-params>
+                </http:request>
+                <set-payload value="#[vars.POSubmit]" doc:name="Set Payload" doc:id="dceae23b-4259-4600-9087-7f3d3fc44a58" />
+                <flow-ref doc:name="Flow Reference" doc:id="f0310bc1-1e0c-4f1d-b4fe-b7f68f69d543" name="updatePayment" />
+            </when>
+            <otherwise>
+                <logger level="INFO" doc:name="Logger" doc:id="9532aff1-7103-4988-a927-bc9e654a1743" message="Upating PO !!! PayOnCkOut = false -&gt; No Payment" />
+                <set-variable value="#[payload]" doc:name="OrigPayload" doc:id="33e04fd8-3e79-4f68-85e2-8ffd3b602af8" variableName="POSubmit" />
+                <flow-ref doc:name="Flow Reference" doc:id="4eb0d902-f991-44be-bb16-e9e2635fbf0b" name="UtilFlow_Proicing"/>
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="ca91e6b5-951f-4ad4-838c-bb9e41d86e7e">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	StationID: vars.POSubmit.StationID,
+	CustomerID: vars.POSubmit.CustomerID,
+	OrderID: vars.POSubmit.OrderID,
+	OrderInitiation: vars.POSubmit.OrderInitiation,
+	OrderClosure: vars.POSubmit.OrderClosure,
+	Status: "Active",
+	OrderDelivery: vars.POSubmit.OrderDelivery,
+	DeliveryAddress: vars.POSubmit.DeliveryAddress,
+	PayOnCheckout: vars.POSubmit.PayOnCheckout,
+	PaymentType: vars.POSubmit.PaymentType,
+	CCType: vars.POSubmit.CCType,
+	Cost: payload.TotalCost_Tax_Delivery,
+	Tstamp: vars.POSubmit.Tstamp default now(),
+	OrderItems: vars.POSubmit.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		OrderItemID: orderItem.OrderItemID,
+		StationID: orderItem.StationID,
+		OrderID: orderItem.OrderID,
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		UnitPrice: orderItem.UnitPrice,
+		Currency: orderItem.Currency
+	}
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+				<http:request method="PUT" doc:name="POSubmit" doc:id="05fb5b1a-e124-434e-a3ef-03e947c7cbbe" config-ref="HTTP_Request_configuration_PO_System" path="/api/PurchaseOrder/{PurchaseOrderID}" >
+					<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"PurchaseOrderID" : payload.OrderID
+}]]]></http:uri-params>
+				</http:request>
+				<flow-ref doc:name="Copy_of_sendQRCode" doc:id="314c9b48-bc7d-4c6c-93ca-da56d854c5b4" name="qrCode" />
+            </otherwise>
+        </choice>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="bf6baac5-07ee-4546-a588-ede8cd3dc839">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: vars.POSubmit.Status,
+	OrderDelivery: vars.POSubmit.OrderDelivery,
+	OrderClosure: vars.POSubmit.OrderClosure,
+	OrderItems: vars.POSubmit.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		UnitPrice: orderItem.UnitPrice,
+		ProductName: orderItem.ProductName,
+		Currency: orderItem.Currency,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		ProductID: orderItem.ProductID,
+		OrderID: orderItem.OrderID,
+		StationID: orderItem.StationID,
+		OrderItemID: orderItem.OrderItemID
+	},
+	DeliveryAddress: vars.POSubmit.DeliveryAddress,
+	PaymentType: vars.POSubmit.PaymentType,
+	CustomerID: vars.POSubmit.CustomerID,
+	OrderID: vars.POSubmit.OrderID,
+	PayOnCheckout: vars.POSubmit.PayOnCheckout,
+	StationID: vars.POSubmit.StationID,
+	OrderInitiation: vars.POSubmit.OrderInitiation,
+	Tstamp: vars.POSubmit.Tstamp
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="dd28e890-cc0e-4a4f-b803-bb02b48d3e10" name="UtilFlow_PrepareResponse"/>
+    </flow>
+    <flow name="delete:\PurchaseOrder\(PurchaseOrderID):purchaseorder_processapi-config">
+        <ee:transform doc:id="dd45e05a-1875-4db4-9154-fa3f02b1d410">
+            <ee:variables>
+                <ee:set-variable variableName="PurchaseOrderID"><![CDATA[attributes.uriParams.PurchaseOrderID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <http:request method="DELETE" doc:name="Request" doc:id="496c7bd0-cddb-4e38-96fa-28856bc25561" config-ref="HTTP_Request_configuration_PO_System" path="/api/PurchaseOrder/{PurchaseOrderID}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"PurchaseOrderID" : vars.PurchaseOrderID
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="eda575cc-9cb2-4d83-aa47-39ff77faef8a">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  OrderID: vars.PurchaseOrderID,
+  Message: "Order successfuly deleted"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

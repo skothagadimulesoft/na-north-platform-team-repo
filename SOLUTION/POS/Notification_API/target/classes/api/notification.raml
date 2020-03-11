@@ -1,0 +1,28 @@
+#%RAML 1.0
+title: Notification
+
+uses:
+  notification_datatype:  exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/notification_datatypes/1.0.0/notification_datatypes.raml
+
+types: 
+  notification_destination:
+    enum: ["twitter","sms","twitter-sms","email","twitter-email-sms","twitter-email","sms-email"]
+
+/Notification:
+  post:
+    queryParameters: 
+      destination:  
+        type: notification_destination
+        example:  "twitter"
+    body: 
+      application/json:
+        type: notification_datatype.NotificationRequest
+        example:  !include Samples/Notification_sample.json
+    responses: 
+      200:
+        body: 
+          application/json:
+            example: !include Samples/Notification_Resp_Sample.json
+
+        
+        

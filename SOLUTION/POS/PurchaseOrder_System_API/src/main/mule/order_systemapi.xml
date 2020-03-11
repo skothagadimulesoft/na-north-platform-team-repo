@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="order_systemapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="order_systemapi-config" raml="order_systemapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="CoucheTard_Database_Config" doc:name="Database Config" doc:id="142f7069-3ef1-454b-94a5-97871632f92e">
+        <db:my-sql-connection host="mysql.shared.demos.mulesoft.com" port="3306" user="mule" password="Mule1379" database="Couche-Tard" />
+    </db:config>
+    <configuration-properties doc:name="Configuration properties" doc:id="0e2f30c8-febb-45bc-a17a-0125a72c538d" file="purchase_order.properties" />
+    <flow name="order_systemapi-main">
+        <http:listener config-ref="order_systemapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]" />
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="order_systemapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="order_systemapi-console">
+        <http:listener config-ref="order_systemapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="order_systemapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\PurchaseOrder:application\json:order_systemapi-config">
+        <logger level="INFO" doc:name="Logger" doc:id="0542d136-ca8c-4e53-ad0c-18b0f4fa711a" message="Creating Order: #[payload]" />
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="498e4997-fdf6-4e76-a089-caf3d7064b63" variableName="original_order" />
+        <ee:transform doc:name="Transform Message" doc:id="2b86b12d-a764-4307-9b4d-87b60efe1b17">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	order_id: uuid()
+}]]></ee:set-payload>
+            </ee:message>
+            <ee:variables>
+                <ee:set-variable variableName="uuid_var"><![CDATA[%dw 2.0
+output application/java
+---
+ "order-"++ uuid() as String]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:insert doc:name="Insert" doc:id="6066c10b-929e-437f-9c63-c077bff2dff4" config-ref="CoucheTard_Database_Config">
+            <db:sql>insert into ProductPurchaseOrder(OrderID,StationID, CustomerID, OrderInitiation, OrderClosure, Status, OrderDelivery,DeliveryAddress,TStamp	,PaymentMethod,Cost)
+ values(:order_id,:station_id,:customer_id,:order_initiation,:order_closure,:status,:order_delivery,:delivery_address,:tstamp,:payment_method,:cost)</db:sql>
+            <db:input-parameters><![CDATA[#[output application/java
+---
+{
+	order_id:	if(vars.original_order.OrderID == "") vars.uuid_var else vars.original_order.OrderID,
+	station_id: vars.original_order.StationID,
+	customer_id: vars.original_order.CustomerID,
+	payment_method: vars.original_order.PaymentType,
+	order_initiation: vars.original_order.OrderInitiation,
+	order_closure: vars.original_order.OrderClosure,
+	status: if(vars.original_order.PayOnCheckout == false) "Active" else "Closed",
+	order_delivery: vars.original_order.OrderDelivery,
+	delivery_address:vars.original_order.DeliveryAddress,
+	tstamp: now() as String {format: "yyyy-MM-dd HH:mm:ss"},
+	cost: vars.original_order.Cost
+}]]]></db:input-parameters>
+        </db:insert>
+        <foreach doc:name="For Each" doc:id="57826d99-9c24-4181-b4f5-53cc67391f95" collection="#[vars.original_order.OrderItems]">
+            <db:insert doc:name="Insert" doc:id="d79dd55f-1574-4cb2-8c03-1ed959a16681" config-ref="CoucheTard_Database_Config">
+                <db:sql>insert into ProductPurchaseOrderItem( OrderID, StationID,ProductID, ProductName, ProductType,Quantity,UnitPrice,Currency) values(:order_id,:station_id,:product_id,:product_name,:product_type,:quantity,:unit_price,:currency)</db:sql>
+                <db:input-parameters><![CDATA[#[{
+	order_id:	if(vars.original_order.OrderID == "") vars.uuid_var else vars.original_order.OrderID,
+	unit_price:	payload.UnitPrice,
+	product_name:	payload.ProductName,
+	currency:	payload.Currency,
+	product_type:	payload.ProductType,
+	quantity:	payload.Quantity,
+	product_id: payload.ProductID,
+	station_id:	payload.StationID
+}]]]></db:input-parameters>
+            </db:insert>
+        </foreach>
+        <ee:transform doc:name="Transform Message" doc:id="f20f7ad8-3c98-46d0-9595-fde475d797a5">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	StationID: vars.original_order.StationID,
+	CustomerID: vars.original_order.CustomerID,
+	OrderID: vars.original_order.OrderID,
+	OrderInitiation: vars.original_order.OrderInitiation,
+	OrderClosure: vars.original_order.OrderClosure,
+	Status: if(vars.original_order.PayOnCheckout == true) "Closed" else "Active",
+	OrderDelivery: vars.original_order.OrderDelivery,
+	DeliveryAddress: vars.original_order.DeliveryAddress,
+	PayOnCheckout: vars.original_order.PayOnCheckout,
+	PaymentType: vars.original_order.PaymentType,
+	Cost: vars.original_order.Cost default 0,
+	Tstamp: now() as String {format: "yyyy-MM-dd HH:mm:ss"},
+	OrderItems: vars.original_order.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		StationID: orderItem.StationID,
+		OrderID: orderItem.OrderID,
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		UnitPrice: orderItem.UnitPrice,
+		Currency: orderItem.Currency
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="fcdba76e-e255-438f-96ba-f67b1d019beb" message="created order: #[payload]" />
+    </flow>
+    <flow name="get:\PurchaseOrder:order_systemapi-config">
+        <set-variable value="#[attributes.queryParams.customerId]" doc:name="Set Variable" doc:id="5b7f9f55-d993-4fd1-afbd-032b3d80d498" variableName="CustomerId" />
+		<logger level="INFO" doc:name="Logger" doc:id="2fc7bfa4-dece-4019-8573-f55d4310df8b" message="CustomerId= #[vars.CustomerId] param customerID: #[attributes.queryParams.customerId]" />
+		<choice doc:name="Choice" doc:id="a3313ae8-928c-4e95-bdd4-db5c9f46d955" >
+			<when doc:id="cbc2aee1-5296-4b5a-b9dc-701c62510d13" expression='#[vars.CustomerId != null]'>
+				<logger level="INFO" doc:name="Logger" doc:id="f52d5d11-ae2d-46a6-a5db-769635cdad80" message="Getting Order for Customer: #[vars.CustomerId]"/>
+				<flow-ref doc:name="Flow Reference" doc:id="3e66ba85-411e-4374-8b55-3d65ea22ed89" name="Copy_of_UtilFlow_getPurchaseOrders_CustomerID"/>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="fccd9674-5a38-47ea-b9d8-a7b4101a06c2" message="Getting all Orders !"/>
+				<flow-ref doc:name="Flow Reference" doc:id="bee4a018-3816-4e13-b273-2142b8bd05e6" name="UtilFlow_getPurchaseOrders_All"/>
+			</otherwise>
+		</choice>
+    </flow>
+    <flow name="get:\PurchaseOrder\(PurchaseOrderID):order_systemapi-config">
+		<ee:transform doc:name="Transform Message" doc:id="d54d64ee-30bd-4e11-888d-c9378a48bfcb">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+            </ee:message>
+            <ee:variables>
+                <ee:set-variable variableName="Order_ID"><![CDATA[%dw 2.0
+output application/java
+---
+attributes.uriParams.PurchaseOrderID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="f1bb4446-e3e7-4035-8333-50ec57cd1749" message="Getting Order for ID:  #[vars.Order_ID]" />
+        <db:select doc:name="Select" doc:id="3881de98-28c7-40f0-bc09-55026771b114" config-ref="CoucheTard_Database_Config">
+            <db:sql>select *  from ProductPurchaseOrder where OrderID = :order_id</db:sql>
+            <db:input-parameters><![CDATA[#[{
+	order_id:vars.Order_ID
+}]]]></db:input-parameters>
+        </db:select>
+        <ee:transform doc:name="Transform Message" doc:id="086eea8f-57b1-4b8d-832a-e4f00be2b3a5">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	StationID: payload[0].StationID default "",
+	CustomerID: payload[0].CustomerID default "",
+	OrderID: payload[0].OrderID,
+	OrderInitiation: payload[0].OrderInitiation default "",
+	OrderClosure: payload[0].OrderClosure default "",
+	Status: payload[0].Status default "",
+	OrderDelivery: payload[0].OrderDelivery default true,
+	DeliveryAddress: payload[0].DeliveryAddress default "",
+	PayOnCheckout: if(payload[0].Status == "Active") false else true,
+	PaymentType: payload[0].PaymentMethod default "",
+	Tstamp: payload[0].TStamp as String default "",
+	Cost:	payload[0].Cost
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="cd608c53-d68a-48bc-bbb4-4cf2e182ae0b" variableName="product_order" />
+        <db:select doc:name="Select" doc:id="94438898-bb9f-4e84-94b9-fcafa61dab50" config-ref="CoucheTard_Database_Config">
+            <db:sql>select * from ProductPurchaseOrderItem where OrderID = :order_id</db:sql>
+            <db:input-parameters><![CDATA[#[output application/java
+---
+{
+	order_id: vars.Order_ID
+}]]]></db:input-parameters>
+        </db:select>
+        <ee:transform doc:name="Transform Message" doc:id="e9c9fb5e-3f41-4422-bfaf-1aa2942664c2" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	StationID:vars.product_order.StationID,
+	Cost: vars.product_order.Cost,
+	CustomerID: vars.product_order.CustomerID,
+	OrderID: vars.product_order.OrderID,
+	OrderInitiation: vars.product_order.OrderInitiation,
+	Tstamp: vars.product_order.Tstamp,
+	OrderClosure: vars.product_order.OrderClosure,
+	OrderItems: payload map ( payload01 , indexOfPayload01 ) -> {
+		UnitPrice: payload01.UnitPrice default 0,
+		ProductName: payload01.ProductName default "",
+		Currency: payload01.Currency default "",
+		ProductType: payload01.ProductType default "",
+		Quantity: payload01.Quantity default 0,
+		ProductID: payload01.ProductID default "",
+		OrderID: payload01.OrderID default "",
+		StationID: payload01.StationID default "",
+		OrderItemID: payload01.OrderItemID as String
+	},
+	Status: vars.product_order.Status,
+	OrderDelivery: vars.product_order.OrderDelivery,
+	DeliveryAddress: vars.product_order.DeliveryAddress,
+	PayOnCheckout: vars.product_order.PayOnCheckout,
+	PaymentType: vars.product_order.PaymentType
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="put:\PurchaseOrder\(PurchaseOrderID):application\json:order_systemapi-config">
+        <logger level="INFO" doc:name="Logger" doc:id="2ec44b79-b979-4a22-aec3-6a666e1a6c5c" message="size of PO Item set = #[sizeOf(payload.OrderItems)]" />
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="3e5c2010-f706-4327-b973-266365c1aa01" variableName="OriginalPayload" />
+        <ee:transform doc:id="51d606ad-2264-43e8-9bbe-391ad389bd15">
+            <ee:variables>
+                <ee:set-variable variableName="OrderID"><![CDATA[attributes.uriParams.PurchaseOrderID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:select doc:name="Select" doc:id="d42576e7-c5b0-495e-9c0f-08a0cd74f016" config-ref="CoucheTard_Database_Config">
+            <db:sql>select *  from ProductPurchaseOrder where OrderID = :order_id</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	order_id: vars.OrderID
+}]]]></db:input-parameters>
+        </db:select>
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="d7e6ff45-fd5a-4d2a-93c0-65a5dc4a9830" variableName="OrderResultSet" />
+        <db:select doc:name="Select" doc:id="b6554f24-d2b3-438a-ad97-bb9f1924fbe3" config-ref="CoucheTard_Database_Config">
+            <db:sql>select * from ProductPurchaseOrderItem where OrderID = :order_id</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	order_id: vars.OrderID
+}]]]></db:input-parameters>
+        </db:select>
+        <ee:transform doc:name="Transform Message" doc:id="631a2411-fb2b-4e24-a4da-6206d65a06db">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	OrderItems: payload map ( payload01 , indexOfPayload01 ) -> {
+		OrderItemID: payload01.OrderItemID as String,
+		StationID: payload01.StationID default "",
+		OrderID: payload01.OrderID default "",
+		ProductName: payload01.ProductName default "",
+		ProductID: payload01.ProductID default "",
+		ProductType: payload01.ProductType default "",
+		Quantity: payload01.Quantity default 0,
+		UnitPrice: payload01.UnitPrice default 0,
+		Currency: payload01.Currency default ""
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="67645808-6c9b-47fe-84e8-96b3415a07a5" variableName="OrderItemsSet" />
+        <logger level="INFO" doc:name="Logger" doc:id="02ae2336-e4f1-4d79-89cf-86b33357163f" message="size of DB Item Set= #[sizeOf(vars.OrderItemsSet.OrderItems)] ; " />
+        <choice doc:name="Choice" doc:id="9cf4ba74-b35b-4436-a377-27e3e7a590f0">
+            <when doc:id="29bf513b-2c8e-492d-8a3c-8c1b4baad201" expression="#[sizeOf(vars.OriginalPayload.OrderItems) &gt; sizeOf(vars.OrderItemsSet.OrderItems)]">
+                <logger level="INFO" doc:name="Logger" doc:id="7f609d91-179a-4aea-b55f-594f5b397612" message="New Order Items added to the Order !" />
+                <db:update doc:name="Update" doc:id="d85e9358-a655-4119-a25c-866b1c3f9f36" config-ref="CoucheTard_Database_Config">
+                    <db:sql>UPDATE ProductPurchaseOrder SET  Status = :status, OrderDelivery = :order_delivery, DeliveryAddress = :delivery_address, PaymentMethod = :payment_method, Cost = :cost
+WHERE OrderID = :order_id</db:sql>
+                    <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	delivery_address: vars.OriginalPayload.DeliveryAddress,
+	order_delivery: vars.OriginalPayload.OrderDelivery,
+	order_id: vars.OriginalPayload.OrderID,
+	payment_method: vars.OriginalPayload.PaymentType,
+	status: vars.OriginalPayload.Status,
+	cost:	vars.OriginalPayload.Cost
+}]]]></db:input-parameters>
+                </db:update>
+                <foreach doc:name="For Each" doc:id="606d8eb0-11f3-4de8-88e7-ad447e17a23f" collection="#[vars.OriginalPayload.OrderItems]">
+                    <choice doc:name="Choice" doc:id="90b9fecf-0d43-451e-a336-d6db02eebffe">
+                        <when doc:id="a750d946-f828-4c22-964d-9371bf70e2f3" expression="#[payload.OrderItemID !=&quot;&quot;]">
+                            <db:insert doc:name="Insert" doc:id="9a2a9cf5-ca67-44a6-8e60-85507fc42987" config-ref="CoucheTard_Database_Config">
+                                <db:sql>insert into ProductPurchaseOrderItem( OrderItemID,OrderID, StationID,ProductID, ProductName, ProductType,Quantity,UnitPrice,Currency) values(:order_item_id,:order_id,:station_id,:product_id,:product_name,:product_type,:quantity,:unit_price,:currency)
+ON DUPLICATE KEY UPDATE Quantity = :quantity</db:sql>
+                                <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	order_item_id:	payload.OrderItemID,
+	product_type: payload.ProductType,
+	quantity: payload.Quantity as String,
+	station_id: payload.StationID,
+	product_id: payload.ProductID,
+	currency: payload.Currency,
+	unit_price: payload.UnitPrice as String,
+	order_id: payload.OrderID,
+	product_name: payload.ProductName
+}]]]></db:input-parameters>
+                            </db:insert>
+                        </when>
+                        <otherwise>
+                            <db:insert doc:name="Insert" doc:id="8e5c3d19-ffe4-464a-ba7b-5dd2436efea6" config-ref="CoucheTard_Database_Config">
+                                <db:sql>insert into ProductPurchaseOrderItem( OrderID, StationID,ProductID, ProductName, ProductType,Quantity,UnitPrice,Currency) values(:order_id,:station_id,:product_id,:product_name,:product_type,:quantity,:unit_price,:currency)
+ON DUPLICATE KEY UPDATE Quantity = :quantity</db:sql>
+                                <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	product_type: payload.ProductType,
+	quantity: payload.Quantity as String,
+	station_id: payload.StationID,
+	product_id: payload.ProductID,
+	currency: payload.Currency,
+	unit_price: payload.UnitPrice as String,
+	order_id: payload.OrderID,
+	product_name: payload.ProductName
+}]]]></db:input-parameters>
+                            </db:insert>
+                        </otherwise>
+                    </choice>
+                </foreach>
+            </when>
+            <when doc:id="a76525c4-f5f2-44a8-8781-e43d9cc9518f" expression="#[sizeOf(vars.OriginalPayload.OrderItems) &lt; sizeOf(vars.OrderItemsSet.OrderItems)]">
+                <logger level="INFO" doc:name="Logger" doc:id="803e6625-07a9-4cb6-a519-1fc14aa30b52" message="Some Items wer removed from the original Order ! - incoming payload: #[vars.OriginalPayload]" />
+                <db:update doc:name="Update" doc:id="897edbe5-2435-4030-8d34-ceee0fce5abc" config-ref="CoucheTard_Database_Config">
+                    <db:sql>UPDATE ProductPurchaseOrder SET  Status = :status, OrderDelivery = :order_delivery, DeliveryAddress = :delivery_address, PaymentMethod = :payment_method, Cost = :cost
+WHERE OrderID = :order_id</db:sql>
+                    <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	delivery_address: vars.OriginalPayload.DeliveryAddress,
+	order_delivery: vars.OriginalPayload.OrderDelivery,
+	order_id: vars.OriginalPayload.OrderID,
+	payment_method: vars.OriginalPayload.PaymentType,
+	status: vars.OriginalPayload.Status,
+	cost:	vars.OriginalPayload.Cost
+}]]]></db:input-parameters>
+                </db:update>
+                <ee:transform doc:name="Transform Message" doc:id="706817a4-2d37-4182-bf3b-7c3d7a0b6347">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	OrderItems: vars.OrderItemsSet.OrderItems 
+	filter $.OrderItemID != vars.OriginalPayload.OrderItems[$$].OrderItemID 
+	map ( orderItem , indexOfOrderItem ) -> {
+		StationID: orderItem.StationID,
+		OrderID: orderItem.OrderID,
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		UnitPrice: orderItem.UnitPrice,
+		Currency: orderItem.Currency,
+		OrderItemID:	orderItem.OrderItemID
+	} 
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <logger level="INFO" doc:name="Logger" doc:id="49750c19-b5aa-46d7-9ea3-be8da80f19a2" message="New Item Set : #[payload]" />
+                <foreach doc:name="For Each" doc:id="7ea8e15e-101b-43cd-9cdf-07bab768d28b" collection="#[payload.OrderItems]">
+                    <db:delete doc:name="Delete" doc:id="596a7ef4-4492-41d8-a04f-94ba2cd8e5f2" config-ref="CoucheTard_Database_Config">
+                        <db:sql>delete from ProductPurchaseOrderItem 
+where OrderItemID = :order_item_id and OrderID = :order_id</db:sql>
+                        <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	order_id: payload.OrderID,
+	order_item_id: payload.OrderItemID
+}]]]></db:input-parameters>
+                    </db:delete>
+                </foreach>
+                <foreach doc:name="For Each" doc:id="ad9e4c80-3589-492e-8b2a-347b1b0a42c1" collection="#[vars.OriginalPayload.OrderItems]" counterVariableName="itemCounter">
+                    <db:update doc:name="Update" doc:id="9b9337b4-0f5f-453a-b08e-e32b66065761" config-ref="CoucheTard_Database_Config">
+                        <db:sql>update ProductPurchaseOrderItem SET Quantity = :quantity
+where OrderID = :order_id and OrderItemID = :OrderItemID</db:sql>
+                        <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	quantity: payload.Quantity as String,
+	order_id: payload.OrderID,
+	OrderItemID: payload.OrderItemID
+}]]]></db:input-parameters>
+                    </db:update>
+                </foreach>
+            </when>
+            <otherwise>
+                <logger level="INFO" doc:name="Logger" doc:id="798c243a-4e06-4c09-a587-4b2a59634f92" message="No New OrderItems added ! Updating existing !" />
+				<db:update doc:name="Copy_of_Update" doc:id="87577cf1-41b1-4eea-be4c-566c5670eab8" config-ref="CoucheTard_Database_Config" >
+					<db:sql >UPDATE ProductPurchaseOrder SET Status = :status, OrderDelivery = :order_delivery, DeliveryAddress = :delivery_address, PaymentMethod = :payment_method, Cost = :cost 
+WHERE OrderID = :order_id</db:sql>
+					<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	delivery_address: vars.OriginalPayload.DeliveryAddress,
+	order_delivery: vars.OriginalPayload.OrderDelivery,
+	order_id: vars.OriginalPayload.OrderID,
+	payment_method: vars.OriginalPayload.PaymentType,
+	status: vars.OriginalPayload.Status,
+	cost:	vars.OriginalPayload.Cost
+}]]]></db:input-parameters>
+				</db:update>
+				<foreach doc:name="Copy_of_For Each" doc:id="5f65aacd-dfde-415f-ac72-79a247198503" collection="#[vars.OriginalPayload.OrderItems]" counterVariableName="itemCounter" >
+					<db:update doc:name="Copy_of_Update" doc:id="a4b7cbe3-6e03-4bad-b445-fee1682b8a70" config-ref="CoucheTard_Database_Config" >
+						<db:sql >update ProductPurchaseOrderItem SET Quantity = :quantity
+where OrderID = :order_id and OrderItemID = :OrderItemID</db:sql>
+						<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	quantity: payload.Quantity,
+	order_id: payload.OrderID,
+	OrderItemID: payload.OrderItemID
+}]]]></db:input-parameters>
+					</db:update>
+				</foreach>
+            </otherwise>
+        </choice>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="3db351e3-c627-4f92-90bf-5f23cfc556bc">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: vars.OriginalPayload.Status,
+	OrderDelivery: vars.OriginalPayload.OrderDelivery,
+	OrderClosure: vars.OriginalPayload.OrderClosure,
+	OrderItems: vars.OriginalPayload.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		UnitPrice: orderItem.UnitPrice,
+		ProductName: orderItem.ProductName,
+		Currency: orderItem.Currency,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		ProductID: orderItem.ProductID,
+		OrderID: orderItem.OrderID,
+		StationID: orderItem.StationID
+	},
+	DeliveryAddress: vars.OriginalPayload.DeliveryAddress,
+	PaymentType: vars.OriginalPayload.PaymentType,
+	CustomerID: vars.OriginalPayload.CustomerID,
+	OrderID: vars.OriginalPayload.OrderID,
+	PayOnCheckout: vars.OriginalPayload.PayOnCheckout,
+	StationID: vars.OriginalPayload.StationID,
+	OrderInitiation: vars.OriginalPayload.OrderInitiation,
+	Tstamp: vars.OriginalPayload.Tstamp
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="delete:\PurchaseOrder\(PurchaseOrderID):order_systemapi-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="PurchaseOrderID">attributes.uriParams.PurchaseOrderID</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:delete doc:name="Delete" doc:id="296818f9-f43f-4b0a-b8d5-f15a8faa1b2c" config-ref="CoucheTard_Database_Config">
+			<db:sql >delete from ProductPurchaseOrder where OrderID = :order_id</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+  order_id:	vars.PurchaseOrderID
+}]]]></db:input-parameters>
+		</db:delete>
+		<db:delete doc:name="Delete" doc:id="138571d1-0c50-4154-8063-9c9e7ea155e4" config-ref="CoucheTard_Database_Config">
+			<db:sql >delete from ProductPurchaseOrderItem where OrderID = :order_id</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+  order_id:	vars.PurchaseOrderID
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="f0dbc675-85c0-4e0d-a717-2b3e2fabe64a">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  OrderID: "12345",
+  Message: "Order successfuly deleted"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="post:\Order:application\json:order_systemapi-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="b92bc5f1-8a09-407c-a922-ae2e7cea38b5" variableName="original_order" />
+        <ee:transform doc:name="Copy_of_Transform Message" doc:id="4484d0b9-a51d-4c3c-a402-82cc3a86a3ed">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	order_id: uuid()
+}]]></ee:set-payload>
+            </ee:message>
+            <ee:variables>
+                <ee:set-variable variableName="uuid_var"><![CDATA[%dw 2.0
+output application/java
+---
+ "order-"++ uuid() as String]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:insert doc:name="Copy_of_Insert" doc:id="227f0d2e-dfe9-4d4c-aee7-25f821e81fe2" config-ref="CoucheTard_Database_Config">
+            <db:sql>insert into ProductPurchaseOrder(OrderID,StationID, CustomerID, OrderInitiation, OrderClosure, Status, OrderDelivery,DeliveryAddress,TStamp	,PaymentMethod,Cost)
+ values(:order_id,:station_id,:customer_id,:order_initiation,:order_closure,:status,:order_delivery,:delivery_address,:tstamp,:payment_method,:cost)</db:sql>
+            <db:input-parameters><![CDATA[#[output application/java
+---
+{
+	order_id:	if(vars.original_order.OrderID == "") vars.uuid_var else vars.original_order.OrderID,
+	station_id: vars.original_order.StationID,
+	customer_id: vars.original_order.CustomerID,
+	payment_method: vars.original_order.PaymentType,
+	order_initiation: vars.original_order.OrderInitiation,
+	order_closure: vars.original_order.OrderClosure,
+	status: if(vars.original_order.PayOnCheckout == false) "Active" else "Closed",
+	order_delivery: vars.original_order.OrderDelivery,
+	delivery_address:vars.original_order.DeliveryAddress,
+	tstamp: now() as String {format: "yyyy-MM-dd HH:mm:ss"},
+	cost: vars.original_order.Cost
+}]]]></db:input-parameters>
+        </db:insert>
+        <ee:transform doc:name="Transform Message" doc:id="3395c108-8ed1-4b08-96e1-c44dbfb87ba5">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: vars.original_order.Status,
+	OrderDelivery: vars.original_order.OrderDelivery,
+	OrderClosure: vars.original_order.OrderClosure,
+	DeliveryAddress: vars.original_order.DeliveryAddress,
+	PaymentType: vars.original_order.PaymentType,
+	CustomerID: vars.original_order.CustomerID,
+	OrderID: vars.uuid_var,
+	StationID: vars.original_order.StationID,
+	OrderInitiation: vars.original_order.OrderInitiation,
+	Cost: vars.original_order.Cost,
+	Tstamp: vars.original_order.Tstamp
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="get:\Order:order_systemapi-config">
+        <set-variable value="#[%dw 2.0
+output application/java
+---
+attributes.queryParams.customerId]" doc:name="Set Variable" doc:id="054eea57-7ba9-40ae-8882-69daf4190b2f" variableName="CustomerId"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ea725248-ce44-485a-82b7-af594c8d4f34" />
+		<choice doc:name="Choice" doc:id="4ed430ac-9277-41a5-8220-94560eb6399b" >
+			<when doc:id="8a5252b4-8642-4619-9eb6-58edafd45d3c" expression="#[vars.CustomerId != null]">
+				<logger level="INFO" doc:name="Logger" doc:id="b0837947-76b4-4f49-96c0-5c1a0e01980d" message="Getting order by Customer ID: #[vars.CustomerId]"/>
+				<flow-ref doc:name="Flow Reference" doc:id="6d8924b9-5423-4749-bda0-117f60ee841b" name="Copy_of_UtilFlow_getOrderByCustomreId"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="744dacf7-c7ee-4dde-8a35-6aab601086bd" />
+				<flow-ref doc:name="Flow Reference" doc:id="6a8955fb-23da-429f-b13a-a0a6cdfcad4c" name="UtilFlow_getAllOrders"/>
+			</otherwise>
+		</choice>
+    </flow>
+    <flow name="get:\Order\(OrderID):order_systemapi-config">
+        <ee:transform doc:id="109ca0d5-4e34-4dcf-9752-51d83da7ab62">
+            <ee:variables>
+                <ee:set-variable variableName="OrderID"><![CDATA[attributes.uriParams.OrderID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:select doc:name="Copy_of_Select" doc:id="6f29e54f-3646-43f1-9b20-87b51654ae15" config-ref="CoucheTard_Database_Config">
+            <db:sql>select * from ProductPurchaseOrder where OrderID = :order_id</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	order_id: vars.OrderID
+}]]]></db:input-parameters>
+        </db:select>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="9106b243-1d0c-4cba-a21c-5e8b4f8d8516">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: payload[0].Status default "",
+	OrderDelivery: payload[0].OrderDelivery default false,
+	OrderClosure: payload[0].OrderClosure default "",
+	DeliveryAddress: payload[0].DeliveryAddress default "",
+	PaymentType: payload[0].PaymentMethod default "",
+	CustomerID: payload[0].CustomerID default "",
+	OrderID: payload[0].OrderID default "",
+	StationID: payload[0].StationID default "",
+	OrderInitiation: payload[0].OrderInitiation default "",
+	Cost: payload[0].Cost default 0,
+	Tstamp: payload.TStamp as String default ""
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="put:\Order\(OrderID):application\json:order_systemapi-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="b6175af1-66db-46c7-88e6-026dcd2a3ee4" variableName="original_payload" />
+        <ee:transform doc:id="82b930a1-0336-43e0-b3b1-43714f8f43ae">
+            <ee:variables>
+                <ee:set-variable variableName="OrderID"><![CDATA[attributes.uriParams.OrderID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:update doc:name="Copy_of_Update" doc:id="8702cc7a-4ffb-4c79-9ae8-ff1777cb136e" config-ref="CoucheTard_Database_Config">
+            <db:sql>UPDATE ProductPurchaseOrder SET  Status = :status, OrderDelivery = :order_delivery, DeliveryAddress = :delivery_address, PaymentMethod = :payment_method, Cost = :cost
+WHERE OrderID = :order_id</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	delivery_address: vars.original_payload.DeliveryAddress,
+	order_delivery: vars.original_payload.OrderDelivery,
+	order_id: vars.OrderID,
+	payment_method: vars.original_payload.PaymentType,
+	status: vars.original_payload.Status,
+	cost:	vars.original_payload.Cost
+}]]]></db:input-parameters>
+        </db:update>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="97bb6a31-d77c-4c85-b43c-994d4db2eaa6">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: vars.original_payload.Status,
+	OrderDelivery: vars.original_payload.OrderDelivery,
+	OrderClosure: vars.original_payload.OrderClosure,
+	DeliveryAddress: vars.original_payload.DeliveryAddress,
+	PaymentType: vars.original_payload.PaymentType,
+	CustomerID: vars.original_payload.CustomerID,
+	OrderID: vars.original_payload.OrderID,
+	StationID: vars.original_payload.StationID,
+	OrderInitiation: vars.original_payload.OrderInitiation,
+	Cost: vars.original_payload.Cost,
+	Tstamp: vars.original_payload.Tstamp
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="delete:\Order\(OrderID):order_systemapi-config">
+        <ee:transform doc:id="86e97f31-b82f-4ada-81f2-f3dfe42f8b29">
+            <ee:variables>
+                <ee:set-variable variableName="OrderID"><![CDATA[attributes.uriParams.OrderID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:delete doc:name="Delete" doc:id="a3b932c1-163a-4ace-8d30-2ca9dcf62dd9" config-ref="CoucheTard_Database_Config">
+            <db:sql>delete from ProductPurchaseOrder where OrderID = :order_id</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	order_id: vars.OrderID
+}]]]></db:input-parameters>
+        </db:delete>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="aba1424d-3cd3-4303-9fbb-7203ea166915">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	OrderID: vars.OrderID,
+  	Message: "Order successfuly deleted"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="post:\OrderItem:application\json:order_systemapi-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="057dc4cf-eede-4e89-a260-cfe9fe49ba1d" variableName="original_order_item" />
+        <db:insert doc:name="Copy_of_Insert" doc:id="c3c8dc0c-a886-4d77-b746-adc3a5e6e238" config-ref="CoucheTard_Database_Config">
+            <db:sql>insert into ProductPurchaseOrderItem( OrderID, StationID,ProductID, ProductName, ProductType,Quantity,UnitPrice,Currency) values(:order_id,:station_id,:product_id,:product_name,:product_type,:quantity,:unit_price,:currency)</db:sql>
+            <db:input-parameters><![CDATA[#[{
+	order_id:	payload.OrderID,
+	unit_price:	payload.UnitPrice,
+	product_name:	payload.ProductName,
+	currency:	payload.Currency,
+	product_type:	payload.ProductType,
+	quantity:	payload.Quantity,
+	product_id: payload.ProductID,
+	station_id:	payload.StationID
+}]]]></db:input-parameters>
+        </db:insert>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="ad35e901-58a6-4b0a-8ea3-0a5cb09ee05b">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.original_order_item]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\OrderItem:order_systemapi-config">
+        <db:select doc:name="Select" doc:id="3d78a58c-74e5-4eb7-9cd4-b72bbbc282e7" config-ref="CoucheTard_Database_Config">
+            <db:sql>select * from ProductPurchaseOrderItem</db:sql>
+        </db:select>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="12225a5d-0515-4f0d-b5bc-b1446a6ba752">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	OrderItems: payload map ( payload01 , indexOfPayload01 ) -> {
+		UnitPrice: payload01.UnitPrice default 0,
+		ProductName: payload01.ProductName default "",
+		Currency: payload01.Currency default "",
+		ProductType: payload01.ProductType default "",
+		Quantity: payload01.Quantity default 0,
+		ProductID: payload01.ProductID default "",
+		OrderID: payload01.OrderID default "",
+		StationID: payload01.StationID default "",
+		OrderItemID: payload01.OrderItemID as String
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="get:\OrderItem\(OrderItemID):order_systemapi-config">
+        <ee:transform doc:id="770578b5-c391-4e95-8965-dba9082111a3">
+            <ee:variables>
+                <ee:set-variable variableName="OrderItemID"><![CDATA[attributes.uriParams.OrderItemID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:select doc:name="Copy_of_Select" doc:id="924ed20e-0759-4140-bdee-f7f0170bfd7c" config-ref="CoucheTard_Database_Config">
+            <db:sql>select * from ProductPurchaseOrderItem where OrderItemID = :order_item_id</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	order_item_id: vars.OrderItemID
+}]]]></db:input-parameters>
+        </db:select>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="6ed7e958-745f-42a6-9b06-af94639a7705">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	UnitPrice: payload[0].UnitPrice default 0,
+	ProductName: payload[0].ProductName default "",
+	Currency: payload[0].Currency default "",
+	ProductType: payload[0].ProductType default "",
+	Quantity: payload[0].Quantity default 0,
+	ProductID: payload[0].ProductID default "",
+	OrderID: payload[0].OrderID default "",
+	StationID: payload[0].StationID default "",
+	OrderItemID: payload[0].OrderItemID default ""
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="put:\OrderItem\(OrderItemID):application\json:order_systemapi-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="21580dcc-1f2f-4bd9-be6f-12820d77baed" variableName="original_order_item" />
+        <ee:transform doc:id="5fe22f6e-cb41-4f28-af92-68a843bae9f4">
+            <ee:variables>
+                <ee:set-variable variableName="OrderItemID"><![CDATA[attributes.uriParams.OrderItemID]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="2955fe7b-c35b-4573-b590-97fadfe99ccb" message="up;dating orderItem Id: #[vars.OrderItemID]" />
+        <db:update doc:name="Copy_of_Update" doc:id="00cb24fc-ff66-439d-a805-ede8ba87e2cf" config-ref="CoucheTard_Database_Config">
+            <db:sql>update ProductPurchaseOrderItem SET Quantity = :quantity
+where  OrderItemID = :OrderItemID</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	quantity: payload.Quantity as Number,
+	OrderItemID: vars.OrderItemID
+}]]]></db:input-parameters>
+        </db:update>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="2d9af950-283c-4f78-88bd-f362841474ba">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.original_order_item]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="delete:\OrderItem\(OrderItemID):order_systemapi-config">
+        <ee:transform>
+            <ee:variables>
+                <ee:set-variable variableName="OrderItemID">attributes.uriParams.OrderItemID</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:delete doc:name="Delete" doc:id="d29ffd46-f05a-49ad-a9b1-39924ecfb887" config-ref="CoucheTard_Database_Config">
+            <db:sql>delete from ProductPurchaseOrderItem where OrderItemID = :order_item_id</db:sql>
+            <db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	order_item_id:	vars.OrderItemID
+}]]]></db:input-parameters>
+        </db:delete>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="6cfd3f06-90e4-4e95-9db7-a1d2f459da00">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  OrderItemID: "12345",
+  Message: "Order successfuly deleted"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

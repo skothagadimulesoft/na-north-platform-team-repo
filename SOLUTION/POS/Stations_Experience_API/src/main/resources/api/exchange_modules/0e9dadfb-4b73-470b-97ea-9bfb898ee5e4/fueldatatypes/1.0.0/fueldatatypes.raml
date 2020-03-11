@@ -1,0 +1,160 @@
+#%RAML 1.0 Library
+usage:
+
+types:
+
+  PaymentType:
+    type:
+      enum: ["CC","Points","Cash"]
+  StoreType:
+    type: 
+      enum: ["CircleK","InGo","StatOil"]
+  FuelType:  
+    type:
+      enum: ["super","basic","premium", "diesel"]
+
+  OrderOrigin: 
+    type:
+      enum: ["pump","mobile","store"]
+
+  FuelVendor: 
+    type: 
+      enum: ["Shell","BP","Exxon","Iriving"]
+  
+  OrderStatus: 
+    type:
+      enum: ["closed","active"]
+
+  Currencies: 
+    type:
+      enum: ["USD","CAD","EU"]
+
+  MeasurementUnit:
+    type:
+      enum: ["Metric","Imperial"]
+
+  PaymentStatus:
+    type: 
+      enum: ["paid","processing"]
+
+
+
+  StationCoordinates:
+    type: object
+    properties:
+      Latitude: string
+      Longitude:  string
+
+    
+  Station:
+    type: object
+    properties:
+      coordinates:
+        type: StationCoordinates
+        required: false
+      StationID:  string
+      FuelVendor: string
+      StoreType:  StoreType
+      
+      
+  StationRequest:
+    type: object
+    properties:
+      request:
+        enum: ["all","specific"]
+        required: true
+      coordinates:
+        type: StationCoordinates
+        required: false
+      
+  StationResponse:
+    type: object
+    properties:
+      response: 
+        type: array
+        items: Station
+      
+  FuelOrder:
+    type: object
+    properties:
+      OrderID: string
+      CustomerID: string
+      OrderInitiation: OrderOrigin
+      OrderClosure: OrderOrigin
+      FuelVendor: FuelVendor
+      Status: OrderStatus
+      Quantity: number
+      UnitOfMeasure: MeasurementUnit
+      FuelType:  FuelType
+      PaymentType: PaymentType
+      PayOnCheckout: boolean
+      TimeStamp:  
+        type: datetime
+        required: false
+
+  FuelOrderRequest:
+    type: object
+    properties:
+      order:  FuelOrder
+      
+  FuelOrderResponse:
+    type: object
+    properties:
+      OrderID:  string
+      Customerid: string
+      PumpNuumber:  number
+      AccessCode: string
+      Sum:  number
+      Quantity: number
+      UnitOfMeasure: MeasurementUnit
+      FuelType: FuelType
+      Paid: boolean
+      
+
+  FuelPaymentRequest:
+    type: object
+    properties:
+      FuelVendor: FuelVendor
+      PayemntTpe: PaymentType
+      Sum:  number 
+      Currency: Currencies
+      FuelType: FuelType
+      Quantity: number
+      Unit: MeasurementUnit
+
+  FuelPaymentResponse:
+    type: object
+    properties:
+      PaymentStatus: PaymentStatus
+      Sum: number 
+      Currency: Currencies
+      FuelType: FuelType
+      Quantity: number
+      PumpNumber: number 
+      AccessCode: string
+
+
+  FuelRquest:
+    type: object  
+    properties:
+      StationID: string
+      Qauntity: number
+      FuelType: FuelType
+  
+  FuelResponse:
+    type: object
+    properties:
+      PumpNumber: number
+      AccessCode: string
+
+
+  FuelOrderList:
+    type: object
+    properties:
+      orders:
+        type: array
+        items: FuelOrder
+
+
+
+

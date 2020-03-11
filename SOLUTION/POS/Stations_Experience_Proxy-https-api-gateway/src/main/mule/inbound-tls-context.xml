@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+  <tls:context name="inbound-tls-context" enabledProtocols="TLSv1.2" enabledCipherSuites=""  >
+    <tls:key-store path="inbound-keystore.jks" keyPassword="${inbound.keystore.keyPassword}" password="${inbound.keystore.password}" type="JKS" alias="example"  />
+  </tls:context>
+</mule>

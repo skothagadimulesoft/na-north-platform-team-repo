@@ -1,0 +1,53 @@
+//created on: Sep 12, 2018
+package rules
+
+
+//list any import classes here.
+
+import com.promotions.model.PromotionRequest
+import com.promotions.model.PromotionRequestMultiple
+import com.promotions.model.PromotionResponse
+import com.promotions.model.OffersList
+import com.promotions.model.Offer
+import com.promotions.util.Constants
+
+import java.util.ArrayList;
+
+global ArrayList GlobalResponseList;
+
+
+//declare any global variables here
+
+dialect "mvel"
+
+rule "PromotionsRequestAppearence"
+when
+	$request: PromotionRequest()
+then
+	System.out.println("@@@@ Got a Promotion  Request for: ProductID:"+$request.productID+ ",ProductName="+$request.productName);
+end
+
+
+rule "GeneralSignlePromotionalOffer"
+salience 100
+
+    when
+    		$request: PromotionRequest()
+        $offer_list: OffersList(offerListName == "TODAY_OFFER_LIST")
+        $offer : Offer($request.productID==productID, $request.productName==productName) from $offer_list.offers 
+ 
+   then
+        System.out.println("+++Rule triggered: PromotionBOGODiscount !");
+        System.out.println("Offer: productID="+$offer.productID+",productName="+$offer.productName+",offerType="+$offer.offerType+",offerAction="+$offer.offerAction);
+        PromotionResponse resp = new PromotionResponse();
+        resp.setPromotionName("GeneralSignlePromotionalOffer");
+		resp.setProductName($offer.productName);
+    		resp.setProductID($offer.productID);
+    		resp.setOffer($offer.offerAction);
+    		resp.setOfferType($offer.offerType);
+    		resp.setOfferValue($offer.discountValue);
+        insert(resp);
+        GlobalResponseList.add(resp);
+	    retract($request);
+end
+

@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="po_response" format="json">
+      <types:shape format="weave" example="api/samples/PurchaseOrder_Sample.json"><![CDATA[%dw 2.0
+
+type po_response = {|
+  StationID: String, 
+  CustomerID: String, 
+  OrderID: String, 
+  OrderInitiation: String, 
+  OrderClosure: String, 
+  Status: String, 
+  OrderDelivery: Boolean, 
+  DeliveryAddress: String, 
+  PayOnCheckout: Boolean, 
+  PaymentType: String, 
+  Cost: Number {"typeId": "double"}, 
+  Tstamp: String, 
+  OrderItems: Array<{|    OrderItemID: String,     StationID: String,     OrderID: String,     ProductName: String,     ProductID: String,     ProductType: String,     Quantity: Number {"typeId": "int"},     UnitPrice: Number {"typeId": "double"},     Currency: String  |}>
+|} {"example": "{\"StationID\":\"333\",\"CustomerID\":\"11777\",\"OrderID\":\"12345657\",\"OrderInitiation\":\"Mobile\",\"OrderClosure\":\"POS\",\"Status\":\"Active\",\"OrderDelivery\":false,\"DeliveryAddress\":\"\",\"PayOnCheckout\":true,\"PaymentType\":\"CC\",\"Cost\":33.33,\"Tstamp\":\"2003-10-01T23:57:59-03:00\",\"OrderItems\":[{\"OrderItemID\":\"\",\"StationID\":\"333\",\"OrderID\":\"12345657\",\"ProductName\":\"Coke\",\"ProductID\":\"CK-123\",\"ProductType\":\"NonAlcoholicBeverage\",\"Quantity\":1,\"UnitPrice\":1.99,\"Currency\":\"USD\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="po_order_list" format="json">
+      <types:shape format="weave" example="api/samples/PurchaseOrderList_Sample.json"><![CDATA[%dw 2.0
+
+type po_order_list = {|
+  orders: Array<{|    StationID: String,     CustomerID: String,     OrderID: String,     OrderInitiation: String,     OrderClosure: String,     Status: String,     OrderDelivery: Boolean,     DeliveryAddress: String,     PayOnCheckout: Boolean,     PaymentType: String,     Tstamp: String,     OrderItems: Array<{|      OrderItemID: String,       StationID: String,       OrderID: String,       ProductName: String,       ProductID: String,       ProductType: String,       Quantity: Number {"typeId": "int"},       UnitPrice: Number {"typeId": "double"},       Currency: String    |}>
+  |}>
+|} {"example": "{\"orders\":[{\"StationID\":\"333\",\"CustomerID\":\"11777\",\"OrderID\":\"12345657\",\"OrderInitiation\":\"Mobile\",\"OrderClosure\":\"POS\",\"Status\":\"Active\",\"OrderDelivery\":false,\"DeliveryAddress\":\"\",\"PayOnCheckout\":true,\"PaymentType\":\"CC\",\"Tstamp\":\"2003-10-01T23:57:59-03:00\",\"OrderItems\":[{\"OrderItemID\":\"\",\"StationID\":\"333\",\"OrderID\":\"12345657\",\"ProductName\":\"Coke\",\"ProductID\":\"CK-123\",\"ProductType\":\"NonAlcoholicBeverage\",\"Quantity\":1,\"UnitPrice\":1.99,\"Currency\":\"USD\"}]}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="order_simple" format="json">
+      <types:shape format="weave" example="api/samples/OrderListSimple_Sample.json"><![CDATA[%dw 2.0
+
+type order_simple = {|
+  orders: Array<{|    StationID: String,     CustomerID: String,     OrderID: String,     OrderInitiation: String,     OrderClosure: String,     Status: String,     OrderDelivery: Boolean,     DeliveryAddress: String,     PayOnCheckout: Boolean,     PaymentType: String,     Cost: Number {"typeId": "double"},     Tstamp: String  |}>
+|} {"example": "{\"orders\":[{\"StationID\":\"333\",\"CustomerID\":\"11777\",\"OrderID\":\"12345657\",\"OrderInitiation\":\"Mobile\",\"OrderClosure\":\"POS\",\"Status\":\"Active\",\"OrderDelivery\":false,\"DeliveryAddress\":\"\",\"PayOnCheckout\":true,\"PaymentType\":\"CC\",\"Cost\":33.33,\"Tstamp\":\"2003-10-01T23:57:59-03:00\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="order_ite_set" format="json">
+      <types:shape format="weave" example="api/samples/OrderItemListSimple_Sample.json"><![CDATA[%dw 2.0
+
+type order_ite_set = {|
+  OrderItems: Array<{|    OrderItemID: String,     StationID: String,     OrderID: String,     ProductName: String,     ProductID: String,     ProductType: String,     Quantity: Number {"typeId": "int"},     UnitPrice: Number {"typeId": "double"},     Currency: String  |}>
+|} {"example": "{\"OrderItems\":[{\"OrderItemID\":\"\",\"StationID\":\"333\",\"OrderID\":\"12345657\",\"ProductName\":\"Coke\",\"ProductID\":\"CK-123\",\"ProductType\":\"NonAlcoholicBeverage\",\"Quantity\":1,\"UnitPrice\":1.99,\"Currency\":\"USD\"}]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#f20f7ad8-3c98-46d0-9595-fde475d797a5">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="po_response"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#706817a4-2d37-4182-bf3b-7c3d7a0b6347">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="po_response"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#086eea8f-57b1-4b8d-832a-e4f00be2b3a5">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="order_simple"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#631a2411-fb2b-4e24-a4da-6206d65a06db">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="order_ite_set"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="UtilFlow_getPurchaseOrders_All" doc:id="966c5b8a-5356-4ac9-aabd-b9c37cf69dc2" >
+		<db:select doc:name="Copy_of_Select" doc:id="37c9dcbf-dc15-4b40-8840-57210e54f2fa" config-ref="CoucheTard_Database_Config" >
+			<db:sql >select *  from ProductPurchaseOrder</db:sql>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="2dafadd5-65a6-44f4-9478-43033abf3668" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	orders: payload map ( payload01 , indexOfPayload01 ) -> {
+		StationID: payload01.StationID default "",
+		CustomerID: payload01.CustomerID default "",
+		OrderID: payload01.OrderID,
+		OrderInitiation: payload01.OrderInitiation default "",
+		OrderClosure: payload01.OrderClosure default "",
+		Status: payload01.Status default "",
+		OrderDelivery: payload01.OrderDelivery default true,
+		DeliveryAddress: payload01.DeliveryAddress default "",
+		PayOnCheckout: if(payload01.Status == "Active") false else true,
+		PaymentType: payload01.PaymentMethod default "",
+		Tstamp: payload01.TStamp as String default "",
+		Cost:payload01.Cost
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="9d10d73d-982b-4b3e-bc12-9e42be8bc228" variableName="product_order" />
+		<db:select doc:name="Copy_of_Select" doc:id="9954a4c7-bba1-44a9-8b8c-e968641fb400" config-ref="CoucheTard_Database_Config" >
+			<db:sql >select * from ProductPurchaseOrderItem</db:sql>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="970830ea-6bcf-4cfd-b8d9-207b5e55f2f1" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	orders: vars.product_order.orders map ( order , indexOfOrder ) -> {
+		Status: order.Status,
+		OrderDelivery: order.OrderDelivery,
+		OrderClosure: order.OrderClosure,
+		OrderItems: payload filter $.OrderID == order.OrderID map  ( payload01 , indexOfPayload01 ) -> {
+			UnitPrice: payload01.UnitPrice default 0,
+			ProductName: payload01.ProductName default "",
+			Currency: payload01.Currency default "",
+			ProductType: payload01.ProductType default "",
+			Quantity: payload01.Quantity default 0,
+			ProductID: payload01.ProductID default "",
+			OrderID: payload01.OrderID default "",
+			StationID: payload01.StationID default "",
+			OrderItemID: payload01.OrderItemID default ""
+		},
+		DeliveryAddress: order.DeliveryAddress,
+		PaymentType: order.PaymentType,
+		CustomerID: order.CustomerID,
+		OrderID: order.OrderID,
+		PayOnCheckout: order.PayOnCheckout,
+		StationID: order.StationID,
+		Cost: order.Cost,
+		OrderInitiation: order.OrderInitiation,
+		Tstamp: order.Tstamp
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Copy_of_UtilFlow_getPurchaseOrders_CustomerID" doc:id="f61d4c29-b728-4d41-b856-505494589249" >
+		<logger level="INFO" doc:name="Logger" doc:id="97c178cd-152a-46cd-ae7e-5dd130e67ea5" message="----CustomerID: #[vars.CustomerId]"/>
+		<db:select doc:name="Copy_of_Copy_of_Select" doc:id="47240861-77d7-4422-b226-b3c376db2960" config-ref="CoucheTard_Database_Config" >
+			<db:sql >select *  from ProductPurchaseOrder 
+where CustomerID = :customer_id</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	customer_id: vars.CustomerId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Copy_of_Transform Message" doc:id="f1013b86-0c9d-44da-bfc7-f463fbf38ebc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	orders: payload map ( payload01 , indexOfPayload01 ) -> {
+		StationID: payload01.StationID default "",
+		CustomerID: payload01.CustomerID default "",
+		OrderID: payload01.OrderID,
+		OrderInitiation: payload01.OrderInitiation default "",
+		OrderClosure: payload01.OrderClosure default "",
+		Status: payload01.Status default "",
+		OrderDelivery: payload01.OrderDelivery default true,
+		DeliveryAddress: payload01.DeliveryAddress default "",
+		PayOnCheckout: if(payload01.Status == "Active") false else true,
+		PaymentType: payload01.PaymentMethod default "",
+		Tstamp: payload01.TStamp as String default "",
+		Cost:payload01.Cost
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Copy_of_Copy_of_Set Variable" doc:id="9788f4d4-c1eb-408b-b0fb-caa71134d816" variableName="product_order" />
+		<db:select doc:name="Copy_of_Copy_of_Select" doc:id="23582380-197b-4672-9e50-5d59545a9aeb" config-ref="CoucheTard_Database_Config" >
+			<db:sql >select * from ProductPurchaseOrderItem</db:sql>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Copy_of_Transform Message" doc:id="4fd60f73-8d54-4827-b404-699d2a01d0f6" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	orders: vars.product_order.orders map ( order , indexOfOrder ) -> {
+		Status: order.Status,
+		OrderDelivery: order.OrderDelivery,
+		OrderClosure: order.OrderClosure,
+		OrderItems: payload filter $.OrderID == order.OrderID map  ( payload01 , indexOfPayload01 ) -> {
+			UnitPrice: payload01.UnitPrice default 0,
+			ProductName: payload01.ProductName default "",
+			Currency: payload01.Currency default "",
+			ProductType: payload01.ProductType default "",
+			Quantity: payload01.Quantity default 0,
+			ProductID: payload01.ProductID default "",
+			OrderID: payload01.OrderID default "",
+			StationID: payload01.StationID default "",
+			OrderItemID: payload01.OrderItemID default ""
+		},
+		DeliveryAddress: order.DeliveryAddress,
+		PaymentType: order.PaymentType,
+		CustomerID: order.CustomerID,
+		OrderID: order.OrderID,
+		PayOnCheckout: order.PayOnCheckout,
+		StationID: order.StationID,
+		Cost: order.Cost,
+		OrderInitiation: order.OrderInitiation,
+		Tstamp: order.Tstamp
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="UtilFlow_getAllOrders" doc:id="27b14e07-2bf9-4ada-9bdb-8355150da315" >
+		<db:select doc:name="Copy_of_Select" doc:id="609f442a-9a94-4101-9d42-6ccba67bdfa6" config-ref="CoucheTard_Database_Config" >
+			<db:sql >select * from ProductPurchaseOrder</db:sql>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="bf9decf9-7c49-45f8-861b-204dea786a38" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	orders: payload map ( payload01 , indexOfPayload01 ) -> {
+		Status: payload01.Status default "",
+		OrderDelivery: payload01.OrderDelivery default true,
+		OrderClosure: payload01.OrderClosure default "",
+		DeliveryAddress: payload01.DeliveryAddress default "",
+		PaymentType: payload01.PaymentMethod default "",
+		CustomerID: payload01.CustomerID default "",
+		OrderID: payload01.OrderID,
+		StationID: payload01.StationID default "",
+		OrderInitiation: payload01.OrderInitiation default "",
+		Cost: payload01.Cost default 0,
+		Tstamp: payload01.TStamp as String default ""
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Copy_of_UtilFlow_getOrderByCustomreId" doc:id="cd5c4c0f-129c-4edd-b91c-b2487ca3655c" >
+		<db:select doc:name="Copy_of_Copy_of_Select" doc:id="df7ae7a5-279e-4c26-be92-4a0e07ad4800" config-ref="CoucheTard_Database_Config" >
+			<db:sql >select * from ProductPurchaseOrder 
+where CustomerID = :customer_id</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	customer_id: vars.CustomerId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Copy_of_Transform Message" doc:id="aca64bd1-c9f7-4208-9aec-5bb2cf59977c" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	orders: payload map ( payload01 , indexOfPayload01 ) -> {
+		Status: payload01.Status default "",
+		OrderDelivery: payload01.OrderDelivery default true,
+		OrderClosure: payload01.OrderClosure default "",
+		DeliveryAddress: payload01.DeliveryAddress default "",
+		PaymentType: payload01.PaymentMethod default "",
+		CustomerID: payload01.CustomerID default "",
+		OrderID: payload01.OrderID,
+		StationID: payload01.StationID default "",
+		OrderInitiation: payload01.OrderInitiation default "",
+		Cost: payload01.Cost default 0,
+		Tstamp: payload01.TStamp as String default ""
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

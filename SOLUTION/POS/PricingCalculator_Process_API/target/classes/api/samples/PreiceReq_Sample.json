@@ -1,0 +1,26 @@
+{
+  "IncludeDelivery": false,
+  "IncludeTaxes": true,
+  "StationId":"123",
+  "PriceList":  [
+      
+      {
+         "ItemID": "CK-123",
+          "cost": 1.99,
+          "quantity":1
+      },
+      {
+         "ItemID": "CK-123",
+          "cost": 1.99,
+          "quantity":1
+      },
+      {
+         "ItemID": "CHIP-999",
+          "cost": 5.99,
+          "quantity":1
+      }
+
+  ]
+       
+
+}

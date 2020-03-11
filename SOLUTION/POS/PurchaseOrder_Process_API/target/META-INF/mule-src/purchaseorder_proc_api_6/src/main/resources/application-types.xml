@@ -1,0 +1,453 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="PO_REQ" format="json">
+      <types:shape format="weave" example="api/samples/PurchaseOrderReq_Sample.json"><![CDATA[%dw 2.0
+
+type PO_REQ = {|
+  order: {|
+    StationID: String, 
+    CustomerID: String, 
+    OrderID: String, 
+    OrderInitiation: String, 
+    OrderClosure: String, 
+    Status: String, 
+    OrderDelivery: Boolean, 
+    DeliveryAddress: String, 
+    PayOnCheckout: Boolean, 
+    PaymentType: String, 
+    CCType: String, 
+    Cost: Number {"typeId": "double"}, 
+    Tstamp: String, 
+    OrderItems: Array<{|      OrderItemID: String,       StationID: String,       OrderID: String,       ProductName: String,       ProductID: String,       ProductType: String,       Quantity: Number {"typeId": "int"},       UnitPrice: Number {"typeId": "double"},       Currency: String    |}>
+  |}
+|} {"example": "{\"order\":{\"StationID\":\"333\",\"CustomerID\":\"11777\",\"OrderID\":\"12345657\",\"OrderInitiation\":\"Mobile\",\"OrderClosure\":\"POS\",\"Status\":\"Active\",\"OrderDelivery\":false,\"DeliveryAddress\":\"\",\"PayOnCheckout\":true,\"PaymentType\":\"CC\",\"CCType\":\"VISA\",\"Cost\":33.33,\"Tstamp\":\"2003-10-01T23:57:59-03:00\",\"OrderItems\":[{\"OrderItemID\":\"\",\"StationID\":\"333\",\"OrderID\":\"12345657\",\"ProductName\":\"Coke\",\"ProductID\":\"CK-123\",\"ProductType\":\"NonAlcoholicBeverage\",\"Quantity\":1,\"UnitPrice\":1.99,\"Currency\":\"USD\"}]}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="pricing_req" format="json">
+      <types:shape format="weave" example="examples/PreiceReq_Sample.json"><![CDATA[%dw 2.0
+
+type pricing_req = {|
+  IncludeDelivery: Boolean, 
+  IncludeTaxes: Boolean, 
+  StationId: String, 
+  PriceList: Array<{|    ItemID: String,     cost: Number {"typeId": "double"},     quantity: Number {"typeId": "int"}  |}>
+|} {"example": "{\"IncludeDelivery\":false,\"IncludeTaxes\":true,\"StationId\":\"123\",\"PriceList\":[{\"ItemID\":\"CK-123\",\"cost\":1.99,\"quantity\":1},{\"ItemID\":\"CK-123\",\"cost\":1.99,\"quantity\":1},{\"ItemID\":\"CHIP-999\",\"cost\":5.99,\"quantity\":1}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="pricing_resp" format="json">
+      <types:shape format="weave" example="examples/PriceResp_Sample.json"><![CDATA[%dw 2.0
+
+type pricing_resp = {|
+  Cost: Number {"typeId": "double"}, 
+  Taxes: Number {"typeId": "double"}, 
+  Delivery: Number {"typeId": "int"}, 
+  TotalCost_Tax_Delivery: Number {"typeId": "double"}
+|} {"example": "{\"Cost\":9.97,\"Taxes\":1.29,\"Delivery\":0,\"TotalCost_Tax_Delivery\":11.26}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="qrcode" format="json">
+      <types:shape format="weave" example="examples/QRCodeReq-Sample.json"><![CDATA[%dw 2.0
+
+type qrcode = {| data: String |} {"example": "{\"data\":\"aaaaaaa\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="payment_tx" format="json">
+      <types:shape format="weave" example="examples/PaymentTx_Sample.json"><![CDATA[%dw 2.0
+
+type payment_tx = {|
+  PaymentTxID: String, 
+  OrderID: String, 
+  CustomerID: String, 
+  StationID: String, 
+  PaymentType: String, 
+  Sum: Number {"typeId": "double"}, 
+  Currency: String, 
+  Tstamp: String, 
+  NumPoints: Number {"typeId": "int"}, 
+  CCType: String
+|} {"example": "{\"PaymentTxID\":\"\",\"OrderID\":\"12334567\",\"CustomerID\":\"11777\",\"StationID\":\"333\",\"PaymentType\":\"CC\",\"Sum\":33.99,\"Currency\":\"USD\",\"Tstamp\":\"2019-10-01T23:57:59-03:00\",\"NumPoints\":0,\"CCType\":\"VISA\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="price_resp" format="json">
+      <types:shape format="weave" example="examples/PriceResp_Sample.json"><![CDATA[%dw 2.0
+
+type price_resp = {|
+  Cost: Number {"typeId": "double"}, 
+  Taxes: Number {"typeId": "double"}, 
+  Delivery: Number {"typeId": "int"}, 
+  TotalCost_Tax_Delivery: Number {"typeId": "double"}
+|} {"example": "{\"Cost\":9.97,\"Taxes\":1.29,\"Delivery\":0,\"TotalCost_Tax_Delivery\":11.26}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="delivery" format="json">
+      <types:shape format="weave" example="examples/DeliveryPaylaod_Sample.json"><![CDATA[%dw 2.0
+
+type delivery = {|
+  OrderID: String, 
+  Address: String, 
+  delivery_items: Array<{|    ProductName: String,     ProductID: String,     UnitCost: String,     Currency: String  |}>, 
+  Subtotal: Number {"typeId": "double"}, 
+  Taxes: Number {"typeId": "double"}, 
+  DeliveryFee: Number {"typeId": "double"}, 
+  Total: Number {"typeId": "double"}
+|} {"example": "{\"OrderID\":\"1234\",\"Address\":\"123 Main St.\",\"delivery_items\":[{\"ProductName\":\"Coke\",\"ProductID\":\"123\",\"UnitCost\":\"2.33\",\"Currency\":\"USD\"}],\"Subtotal\":22.33,\"Taxes\":33.33,\"DeliveryFee\":10.00,\"Total\":100.00}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="purchase_order" format="json">
+      <types:shape format="weave" example="api/samples/PurchaseOrder_Sample.json"><![CDATA[%dw 2.0
+
+type purchase_order = {|
+  StationID: String, 
+  CustomerID: String, 
+  OrderID: String, 
+  OrderInitiation: String, 
+  OrderClosure: String, 
+  Status: String, 
+  OrderDelivery: Boolean, 
+  DeliveryAddress: String, 
+  PayOnCheckout: Boolean, 
+  PaymentType: String, 
+  CCType: String, 
+  Cost: Number {"typeId": "double"}, 
+  Tstamp: String, 
+  OrderItems: Array<{|    OrderItemID: String,     StationID: String,     OrderID: String,     ProductName: String,     ProductID: String,     ProductType: String,     Quantity: Number {"typeId": "int"},     UnitPrice: Number {"typeId": "double"},     Currency: String  |}>
+|} {"example": "{\"StationID\":\"333\",\"CustomerID\":\"11777\",\"OrderID\":\"\",\"OrderInitiation\":\"Mobile\",\"OrderClosure\":\"POS\",\"Status\":\"Active\",\"OrderDelivery\":false,\"DeliveryAddress\":\"\",\"PayOnCheckout\":true,\"PaymentType\":\"CC\",\"CCType\":\"VISA\",\"Cost\":33.33,\"Tstamp\":\"2003-10-01T23:57:59-03:00\",\"OrderItems\":[{\"OrderItemID\":\"\",\"StationID\":\"333\",\"OrderID\":\"12345657\",\"ProductName\":\"Coke\",\"ProductID\":\"CK-123\",\"ProductType\":\"NonAlcoholicBeverage\",\"Quantity\":1,\"UnitPrice\":1.99,\"Currency\":\"USD\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="po_resp" format="json">
+      <types:shape format="weave" example="api/samples/PurchaseOrderResp_Sample.json"><![CDATA[%dw 2.0
+
+type po_resp = {|
+  StationID: String, 
+  CustomerID: String, 
+  OrderId: String, 
+  Paid: Boolean, 
+  Currency: String, 
+  Tstamp: String, 
+  Delivery: Boolean, 
+  Status: String, 
+  PaymentMethod: String, 
+  CCType: String, 
+  Cost: Number {"typeId": "double"}, 
+  "QRCode:": String
+|} {"example": "{\"StationID\":\"00001\",\"CustomerID\":\"11777\",\"OrderId\":\"12345\",\"Paid\":true,\"Currency\":\"USD\",\"Tstamp\":\"2003-10-01T23:57:59-03:00\",\"Delivery\":false,\"Status\":\"Closed\",\"PaymentMethod\":\"CC\",\"CCType\":\"VISA\",\"Cost\":33.33,\"QRCode:\":\"\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="payment_transaction_list" format="json">
+      <types:shape format="weave" example="examples/PymentTxList_Sample.json"><![CDATA[%dw 2.0
+
+type payment_transaction_list = {|
+  payment_transaction_list: Array<{|    PaymentTxID: String,     OrderID: String,     CustomerID: String,     StationID: String,     PaymentType: String,     Sum: Number {"typeId": "double"},     Currency: String,     Tstamp: String,     NumPoints: Number {"typeId": "int"},     CCType: String  |}>
+|} {"example": "{\"payment_transaction_list\":[{\"PaymentTxID\":\"\",\"OrderID\":\"12334567\",\"CustomerID\":\"11777\",\"StationID\":\"333\",\"PaymentType\":\"CC\",\"Sum\":33.99,\"Currency\":\"USD\",\"Tstamp\":\"2019-10-01T23:57:59-03:00\",\"NumPoints\":0,\"CCType\":\"VISA\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="qr_code" format="json">
+      <types:shape format="weave" example="examples/QRCodeResp_Sample.json"><![CDATA[%dw 2.0
+
+type qr_code = {|
+  result: String, 
+  qr_code: String
+|} {"example": "{\"result\":\"QR Code created Succesfully\",\"qr_code\":\"\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="qr_payload" format="json">
+      <types:shape format="weave" example="examples/QRCodeResp_Sample-1.json"><![CDATA[%dw 2.0
+
+type qr_payload = {|
+  result: String, 
+  qr_code: String
+|} {"example": "{\"result\":\"QR Code created Succesfully\",\"qr_code\":\"\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#8432dd7e-fdfe-4a78-9f32-515b9710377c">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#d5b04b55-7a86-4b6b-bf03-b05ad9a6a68d">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="pricing_req"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ebb2eae9-e25e-4420-9bda-7850d0ed9bf2">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="pricing_resp"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="OriginalPayload" type="PO_REQ"/>
+        </types:variables>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="qrcode"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#90092d2e-8a16-4e77-b9db-f90e0583b9d6">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#bf6baac5-07ee-4546-a588-ede8cd3dc839">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="POSubmit" type="PO_REQ"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0c1fec9d-dae0-490c-8e1b-c4d237d9fdf8">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="price_resp"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="payment_tx"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#54dc2e67-f903-4593-9f96-ffa2a4565401">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="pricing_req"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ceb926eb-963b-4fd2-b067-6c706645cf0b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="PoSubmitPayload" type="PO_REQ"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#07c9f48e-c44f-4dbf-8755-158fe83618c8">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="price_resp"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="payment_tx"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#9249dfe8-e386-443d-abcd-3c3e9b74098f">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="PO_REQ"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#973c9fc5-ae26-4255-be4c-2cc13cabcc4d">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="PO_REQ"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#bce2a93f-61b9-4a3d-ad7b-043004ae8d99">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="price_resp"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="delivery"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#c1a077db-154c-42af-b088-c110b1e5f9db">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#72c318c5-5f51-4925-83a1-969f4d0a85f9">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="price_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#a1424c7f-cf4b-431d-8f8c-5da96db02d3d">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="pricing_req"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#3a853520-3442-40f4-89bf-4471a516da40">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="price_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#7315a450-6353-4171-831a-1bd09e3c72c9">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="price_resp"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ca91e6b5-951f-4ad4-838c-bb9e41d86e7e">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#e91a3a87-c221-40b2-83b4-a38f1aa9afce">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="po_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0b9c5926-d66e-4e57-9066-833868394101">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#c2e4828c-f941-4ea1-aaf8-6610650a0362">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="qr_code"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="Order" type="purchase_order"/>
+          <types:variable name="Payment" type="payment_transaction_list"/>
+        </types:variables>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="po_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#adb07091-7423-4d4e-b5be-5c3c6dec7144">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#caa84cf7-9ea2-46bb-bd89-1caab0957aef">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="OriginalPayload" type="purchase_order"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#558eddfb-aaf1-4a3c-bf5f-dbbb8af3d959">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="qr_payload"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#1a1520a1-1411-40b4-b964-fb9eaadfa280">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="purchase_order"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

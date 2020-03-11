@@ -1,0 +1,45 @@
+{
+  "configs": [
+    "promotions_process_api.xml",
+    "Util.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:promotions_proc_api_2:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.2.0",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+        "com.promotions.util",
+        "com.promotions.processor",
+        "com.promotions.model"
+      ],
+      "exportedResources": [
+        "log4j2.xml",
+        "application-types.xml",
+        "promotions_process_api.xml",
+        "META-INF/kmodule.xml",
+        "META-INF/maven/pom.properties",
+        "promotions_api.properties",
+        "samples/OfferSamples.json",
+        "rules/Promotions.drl",
+        "api/promotions_processapi.raml",
+        "api/exchange_modules/2306baff-39ef-4e2f-a49b-714125dd9025/promotiondatatypes/1.0.6/exchange.json",
+        "api/exchange_modules/2306baff-39ef-4e2f-a49b-714125dd9025/promotiondatatypes/1.0.6/promotiondatatypes.raml",
+        "api/samples/EngineStateUpdate_Sample.json",
+        "api/samples/PromotionRequestMultiple_Sample.json",
+        "api/samples/EngineState_Sample.json",
+        "api/samples/PrompotionResponse_Sample.json",
+        "api/samples/PromotionRequest_Sample_1.json",
+        "api/samples/PromotionRequest_Sample.json",
+        "Util.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

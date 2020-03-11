@@ -1,0 +1,52 @@
+#%RAML 1.0 Library
+usage:
+
+types:
+
+    ProductType:
+    type: 
+      enum: ["Pastry","AlcoholicBeverage","NonAlcoholicBeverage","Produce","Chips", "Pretzels","Deli","Vaping","Cigarettes","Magaznies"]
+  
+    EngineState:
+      type: 
+        enum: ["started","enabled","disabled"]
+
+    Promotion:
+      type: object
+      properties:
+        StationID:  string
+        CustomerID: string
+        ProductID:  string
+        ProductName:  string
+        ProductType:  ProductType
+      
+
+    PromotionRequestSingle:
+      type: object
+      properties:
+        promotion:  Promotion
+      
+
+    PromotionRequest:
+      type: object
+      properties:
+        OrderProductList:
+          type: array
+          items: Promotion
+      
+
+    PromotionResponse:
+      type: object
+      properties:
+        PromotionName:  string
+        ProductName: string
+        ProductID:  string 
+        Offer: string
+        OfferType:  string
+        OfferValue: string
+
+    PromotionEngineState:
+      type: object
+      properties:
+        state: EngineState
+

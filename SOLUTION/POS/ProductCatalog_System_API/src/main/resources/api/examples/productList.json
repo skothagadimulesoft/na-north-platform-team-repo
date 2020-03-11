@@ -1,0 +1,26 @@
+[
+  {
+    "StationID": "333",
+    "ProductName":  "Lays",
+    "ProductID":  "CK-111",
+    "ProductType":  "Chips",
+    "Price":  "3.99",
+    "Currency": "CAD",
+    "QuantityAvailable": 10,
+    "LoyaltyPointsEquvalence": 400,
+    "ProductImageURL": "https://www.dropbox.com/s/7lcyavzgzmza3dy/lays.jpg?raw=1",
+    "Promotion": "BOGO 20% discount"
+    
+  },
+  {
+    "StationID": "333",
+    "ProductName":  "Coke",
+    "ProductID":  "CK-123",
+    "ProductType":  "NonAlcoholicBeverage",
+    "Price":  "1.99",
+    "Currency": "CAD",
+    "QuantityAvailable": 15,
+    "LoyaltyPointsEquvalence": 200,
+    "ProductImageURL": "https://www.dropbox.com/s/iswpfltm72gpou7/coke.jpg?raw=1"
+  }
+]

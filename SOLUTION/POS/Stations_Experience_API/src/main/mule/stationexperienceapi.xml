@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:product-catalogue-system-api="http://www.mulesoft.org/schema/mule/product-catalogue-system-api" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:stations-system-api="http://www.mulesoft.org/schema/mule/stations-system-api" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/stations-system-api http://www.mulesoft.org/schema/mule/stations-system-api/current/mule-stations-system-api.xsd
+http://www.mulesoft.org/schema/mule/product-catalogue-system-api http://www.mulesoft.org/schema/mule/product-catalogue-system-api/current/mule-product-catalogue-system-api.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="stationexperienceapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="stationexperienceapi-config" raml="stationexperienceapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <stations-system-api:config name="Stations_SystemAPI_Config" doc:name="Stations_SystemAPI Config" doc:id="cf58f2fe-b4f8-46ed-a864-c837fb06146f" property_host="stations-systemapi.us-e2.cloudhub.io" property_protocol="HTTP" property_basePath="/api" property_port="80"/>
+	<product-catalogue-system-api:config name="ProductCatalogue_SystemAPI_Config" doc:name="ProductCatalogue_SystemAPI Config" doc:id="a43f698a-5a14-48dc-837e-b998a13d7370" property_host="product-catalogue-system-api.us-e2.cloudhub.io" property_port="80" property_basePath="/api" property_protocol="HTTP" />
+	<flow name="stationexperienceapi-main">
+        <http:listener config-ref="stationexperienceapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="stationexperienceapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="stationexperienceapi-console">
+        <http:listener config-ref="stationexperienceapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="stationexperienceapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\station:stationexperienceapi-config">
+		<stations-system-api:get-stations doc:name="Get stations" doc:id="420cc42b-7603-4a95-89b4-9ee04e2ad13a" config-ref="Stations_SystemAPI_Config" lat="#[attributes.queryParams.Lat]" long="#[attributes.queryParams.Long]"/>
+    </flow>
+    <flow name="get:\station\(id):stationexperienceapi-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="77b696ae-3b5f-47e2-874c-a8c942c75d32">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.id]]></ee:set-variable>
+				<ee:set-variable variableName="promotion" ><![CDATA[attributes.queryParams.promotion]]></ee:set-variable>
+				<ee:set-variable variableName="category" ><![CDATA[attributes.queryParams.category]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="0f1421e4-2328-4344-8128-3ab07c2552ad" >
+			<route >
+				<stations-system-api:get-station-by-id doc:name="Get station by id" doc:id="7fd5e8f0-1954-4bb2-a7f1-76c74ff40a92" config-ref="Stations_SystemAPI_Config" id="#[vars.id]" />
+				<set-payload value="#[%dw 2.0
+output application/json
+---
+payload]" doc:name="Set Payload" doc:id="1f11921a-6f50-49a0-a4b3-9245817f0301" />
+			</route>
+			<route >
+				<product-catalogue-system-api:get-products doc:name="Get products" doc:id="3427f3cd-62a4-4867-949d-8d5396f0c6e4" config-ref="ProductCatalogue_SystemAPI_Config" stationid="#[vars.id]" promotion="#[vars.promotion]" category="#[vars.category]"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="f9cf584d-364d-44fc-8545-2be10e0a0c35" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	StationID: payload."0".payload.StationID,
+	StoreType: payload."0".payload.StoreType,
+	Address: payload."0".payload.Address,
+	Region: payload."0".payload.Region,
+	coordinates: {
+		lat: payload."0".payload.coordinates.Latitude,
+		lng: payload."0".payload.coordinates.Longitude
+	},
+	Currency: payload."0".payload.Currency,
+	SalesTax: payload."0".payload.SalesTax,
+	Products: payload."1".payload
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+</mule>

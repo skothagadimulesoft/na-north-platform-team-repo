@@ -1,0 +1,40 @@
+{
+   "StationID": "333",
+    "CustomerID": "11777",
+    "OrderID": "order-e8621459-7fdd-4316-ab79-24bd9a17f356",
+     "OrderInitiation": "Mobile",
+      "OrderClosure":	"POS",
+      "Status":  "Active",
+      "OrderDelivery":  false ,
+      "DeliveryAddress":  "",
+      "PayOnCheckout":  false,
+      "PaymentType":  "CC",
+      "CCType": "VISA",
+      "Cost": 33.33,
+      "Tstamp": "2019-07-15T23:57:59-03:00",
+      "OrderItems":[
+        {
+          "OrderItemID":"",
+          "StationID": "333",
+          "OrderID": "order-e8621459-7fdd-4316-ab79-24bd9a17f356",
+           "ProductName":  "Coke",
+           "ProductID":  "CK-123",
+          "ProductType":  "NonAlcoholicBeverage",
+          "Quantity": 1,
+          "UnitPrice":  1.99,
+          "Currency": "USD"
+          
+        },
+        {
+          "UnitPrice": 1.99,
+          "ProductName": "Pepsi",
+          "Currency": "USD",
+          "ProductType": "NonAlcoholicBeverage",
+          "Quantity": 1,
+          "ProductID": "PSP-123",
+          "OrderID": "order-e8621459-7fdd-4316-ab79-24bd9a17f356",
+          "StationID": "333",
+          "OrderItemID": "25"
+          }
+      ]
+}

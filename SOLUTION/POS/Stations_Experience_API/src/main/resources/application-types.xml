@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="GetStationWithProducts" format="json">
+      <types:shape format="weave" example="examples/GetStationWithProduct.json"><![CDATA[%dw 2.0
+
+type GetStationWithProducts = {|
+  StationID: String, 
+  StoreType: String, 
+  Address: String, 
+  Region: String, 
+  coordinates: {|
+    lat: String, 
+    lng: String
+  |}, 
+  Currency: String, 
+  SalesTax: String, 
+  Products: Array<{|    StatinonID: String,     ProductName: String,     ProductID: String,     ProductType: String,     Price: String,     Currency: String,     QuantityAvailable: Number {"typeId": "int"},     LoyaltyPointsEquvalence: Number {"typeId": "int"},     ProductImageURL: String,     Promotion: {|      ProductID: String,       ProductName: String,       OfferType: String,       RelatedProducts: Array<Any>, 
+      OfferAction: String, 
+      DiscountValue: String
+    |}
+  |}>
+|} {"example": "{\"StationID\":\"004\",\"StoreType\":\"Circle K\",\"Address\":\"801 W ADDISON ST\",\"Region\":\"CHICAGO\",\"coordinates\":{\"lat\":\"41.947255\",\"lng\":\"-87.649644\"},\"Currency\":\"USD\",\"SalesTax\":\"10.25\",\"Products\":[{\"StatinonID\":\"333\",\"ProductName\":\"Lays\",\"ProductID\":\"CK-111\",\"ProductType\":\"Chips\",\"Price\":\"3.99\",\"Currency\":\"CAD\",\"QuantityAvailable\":10,\"LoyaltyPointsEquvalence\":400,\"ProductImageURL\":\"https:\/\/www.dropbox.com\/s\/7lcyavzgzmza3dy\/lays.jpg?raw=1\",\"Promotion\":{\"ProductID\":\"CK-123\",\"ProductName\":\"Coke\",\"OfferType\":\"BOGO\",\"RelatedProducts\":[],\"OfferAction\":\"DISCOUNT\",\"DiscountValue\":\"20\"}},{\"StatinonID\":\"333\",\"ProductName\":\"Coke\",\"ProductID\":\"CK-123\",\"ProductType\":\"NonAlcoholicBeverage\",\"Price\":\"1.99\",\"Currency\":\"CAD\",\"QuantityAvailable\":15,\"LoyaltyPointsEquvalence\":200,\"ProductImageURL\":\"https:\/\/www.dropbox.com\/s\/iswpfltm72gpou7\/coke.jpg?raw=1\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="GetStationResponse" format="json">
+      <types:shape format="weave" example="examples/GetStationResponse-1.json"><![CDATA[%dw 2.0
+
+type GetStationResponse = {|
+  StoreType: String, 
+  coordinates: {|
+    Latitude: String, 
+    Longitude: String
+  |}, 
+  StationID: String, 
+  Address: String, 
+  Currency: String, 
+  SalesTax: Number {"typeId": "double"}, 
+  Region: String, 
+  productTypes: Array<String>
+|} {"example": "{\"StoreType\":\"Circle K\",\"coordinates\":{\"Latitude\":\"41.947255\",\"Longitude\":\"-87.649644\"},\"StationID\":\"0001\",\"Address\":\"803 E ADDISON ST\",\"Currency\":\"USD\",\"SalesTax\":10.25,\"Region\":\"CHICAGO\",\"productTypes\":[\"Coffee\",\"Polar Pop\",\"RollerGrille\"]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#f9cf584d-364d-44fc-8545-2be10e0a0c35">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="GetStationWithProducts"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#1f11921a-6f50-49a0-a4b3-9245817f0301">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="GetStationResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

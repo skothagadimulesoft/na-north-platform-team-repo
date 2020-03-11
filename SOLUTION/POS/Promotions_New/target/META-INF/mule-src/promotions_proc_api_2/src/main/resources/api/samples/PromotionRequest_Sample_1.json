@@ -1,0 +1,10 @@
+{
+    "promotion":{
+      "StationID":  "333",
+      "CustomerID": "11777",
+      "ProductID":  "PSP-123",
+      "ProductName":  "Pepsi",
+      "ProductType":  "NonAlcoholicBeverage"
+    }
+  
+}

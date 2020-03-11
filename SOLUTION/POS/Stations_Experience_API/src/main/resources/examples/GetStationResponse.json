@@ -1,0 +1,18 @@
+{
+    "StationID": "004",
+    "StoreType": "Circle K",
+    "Address": "801 W ADDISON ST",
+    "Region": "CHICAGO",
+    "coordinates": {
+      "lat": "41.947255",
+      "lng": "-87.649644"
+    },
+    "Currency": "USD",
+    "SalesTax": "10.25",
+    "productTypes": [
+      "Coffee",
+      "Polar Pop",
+      "Roller Grill"
+    ]
+ }
+  

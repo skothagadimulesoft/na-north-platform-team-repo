@@ -1,0 +1,28 @@
+#%RAML 1.0 Library
+usage:
+
+types:
+
+  Currencies:
+    type: 
+      enum: ["USD","CAD","EU"]
+  
+  ProductType:
+    type: 
+      enum: ["Pastry","AlcoholicBeverage","NonAlcoholicBeverage","Produce","Chips", "Pretzels","Deli","Vaping","Cigarettes","Magaznies", "RollerGrill", "PolarPop", "Coffee"]
+  
+  Product:
+    type: object
+    properties:
+      StationID: string
+      ProductName:  string
+      ProductID:  string
+      ProductType:  ProductType
+      Price:  string
+      Currency: Currencies
+      QuantityAvailable:  number
+      LoyaltyPointsEquvalence: number
+      ProductImageURL: string
+      Promotion:  
+        type: string
+        required: false

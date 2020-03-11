@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+
+	
+	<http:request-config name="HTTP_Request_configuration_Pricing" doc:name="HTTP Request configuration" doc:id="60c4b2bb-dd6c-4882-ab35-45ab3456bf03" >
+		<http:request-connection host="${pricing.url}" port="${pricing.port}" />
+	</http:request-config>
+	
+	<http:request-config name="HTTP_Request_configuration_QR" doc:name="HTTP Request configuration" doc:id="5d782c88-3372-41fb-9a28-96220aec8987" >
+		<http:request-connection host="${qr.code.gen.url}" port="${qr.code.gen.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_PaymentTx" doc:name="HTTP Request configuration" doc:id="1ee6a23f-6477-4990-9964-7e1437b99c76" >
+		<http:request-connection host="${payment.transaction.url}" port="${payment.transaction.port}" />
+	</http:request-config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="90b3e74c-e7ac-42e6-961f-a678ef2a1a90" />
+	<http:request-config name="HTTP_Request_configuration_Notification" doc:name="HTTP Request configuration" doc:id="a4983f6f-2d9c-4895-a140-b79d9b6358fc" >
+		<http:request-connection host="${notification.url}" port="${notification.port}" />
+	</http:request-config>
+	<flow name="qrCode" doc:id="49735b2b-abfa-4180-9e46-6a5c92f10f71" >
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="04e373ec-9352-4b95-87d5-68556771513b" variableName="OriginalPayload"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="d5b04b55-7a86-4b6b-bf03-b05ad9a6a68d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	IncludeDelivery: payload.OrderDelivery,
+	IncludeTaxes: true,
+	StationId: payload.StationID,
+	PriceList: payload.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		ItemID: orderItem.OrderItemID,
+		cost: orderItem.UnitPrice,
+		quantity: orderItem.Quantity
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="getPrice" doc:id="f5eeed03-bafa-4ac2-abba-d761e7270dcb" config-ref="HTTP_Request_configuration_Pricing" path="/api/Price"/>
+		<ee:transform doc:name="Transform Message" doc:id="ebb2eae9-e25e-4420-9bda-7850d0ed9bf2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	data: "PO # " ++ vars.OriginalPayload.OrderID ++ ", Price: " ++  payload.TotalCost_Tax_Delivery
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="c946a280-3d5e-455b-8bd7-f706fe40eef7" message="Sending to QRCode: #[payload]" />
+		<http:request method="POST" doc:name="QRGen" doc:id="9554f3e4-ff75-4626-a821-493b9f0055c5" config-ref="HTTP_Request_configuration_QR" path="/api/QRCode"/>
+		<os:store doc:name="Store" doc:id="caa84cf7-9ea2-46bb-bd89-1caab0957aef" key="#[%dw 2.0
+output application/java
+---
+vars.OriginalPayload.OrderID]" objectStore="Object_store"/>
+	</flow>
+	<flow name="updatePayment" doc:id="3c2db530-5474-4cd9-b81a-ae6699bea38b" >
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="973c9fc5-ae26-4255-be4c-2cc13cabcc4d" variableName="OrigPayload" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="54dc2e67-f903-4593-9f96-ffa2a4565401" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	IncludeDelivery: payload.OrderDelivery,
+	IncludeTaxes: true,
+	StationId: payload.StationID,
+	PriceList: (payload.OrderItems map( orderItem , indexOfOrderItem ) -> {
+		ItemID: orderItem.OrderItemID,
+		cost: orderItem.UnitPrice,
+		quantity: orderItem.Quantity
+	})
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Pricing" doc:id="0a9c0ae9-0e91-4850-bf64-8499875167de" config-ref="HTTP_Request_configuration_Pricing" path="/api/Price"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="07c9f48e-c44f-4dbf-8755-158fe83618c8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentTxID: "",
+	OrderID: vars.OrigPayload.OrderID,
+	CustomerID: vars.OrigPayload.CustomerID,
+	StationID: vars.OrigPayload.StationID,
+	PaymentType: vars.OrigPayload.PaymentType,
+	Sum: payload.TotalCost_Tax_Delivery,
+	Currency: vars.OrigPayload.OrderItems[0].Currency,
+	Tstamp: vars.OrigPayload.Tstamp,
+	NumPoints: 0,
+	CCType: vars.OrigPayload.CCType
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Payment" doc:id="a4980d2c-9bb4-4878-882a-68b45ec44405" config-ref="HTTP_Request_configuration_Payment" path="/api/Payment" />
+	</flow>
+	<flow name="UtilFlow_Proicing" doc:id="72c318c5-5f51-4925-83a1-969f4d0a85f9" >
+		<ee:transform doc:name="Copy_of_Copy_of_Copy_of_Transform Message" doc:id="a1424c7f-cf4b-431d-8f8c-5da96db02d3d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	IncludeDelivery: payload.OrderDelivery,
+	IncludeTaxes: true,
+	StationId: payload.StationID,
+	PriceList: payload.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		ItemID: orderItem.OrderItemID,
+		cost: orderItem.UnitPrice,
+		quantity: orderItem.Quantity
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Copy_of_Copy_of_Pricing" doc:id="af353f14-ba12-4a37-b31b-3e71dc733fc5" config-ref="HTTP_Request_configuration_Pricing" path="/api/Price" />
+		<ee:transform doc:name="Transform Message" doc:id="7315a450-6353-4171-831a-1bd09e3c72c9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="UtilFlow_SendNotification_to_Mobile" doc:id="de1a8698-53da-4b2c-8552-840ce5905900" >
+		<logger level="INFO" doc:name="Logger" doc:id="f04a1c23-f4f0-4de6-a23c-591b96296a3c" message=" ++++ Sending Notification to Mobile from POS +++++:  #[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="1a1520a1-1411-40b4-b964-fb9eaadfa280" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Order " ++ payload.OrderID ++ ",for Customer ID: " ++ payload.CustomerID ++ "has been submitted for payment on you Mobile device !"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="ad227429-39f2-4970-a9e6-538ceebea410" config-ref="HTTP_Request_configuration_Notification" path="/api/Notification">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"destination" : "sms"
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+	<flow name="UtilFlow_PrepareResponse" doc:id="2862ddaf-6436-4f97-8abd-a7869028e24b" >
+		<ee:transform doc:name="Transform Message" doc:id="0b9c5926-d66e-4e57-9066-833868394101" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	StationID: payload.StationID,
+	CustomerID: payload.CustomerID,
+	OrderID: payload.OrderID,
+	OrderInitiation: payload.OrderInitiation,
+	OrderClosure: payload.OrderClosure,
+	Status: payload.Status,
+	OrderDelivery: payload.OrderDelivery,
+	DeliveryAddress: payload.DeliveryAddress,
+	PayOnCheckout: payload.PayOnCheckout,
+	PaymentType: payload.PaymentType,
+	CCType: payload.CCType,
+	Cost: payload.Cost,
+	Tstamp: payload.Tstamp,
+	OrderItems: payload.OrderItems map ( orderItem , indexOfOrderItem ) -> {
+		OrderItemID: orderItem.OrderItemID,
+		StationID: orderItem.StationID,
+		OrderID: orderItem.OrderID,
+		ProductName: orderItem.ProductName,
+		ProductID: orderItem.ProductID,
+		ProductType: orderItem.ProductType,
+		Quantity: orderItem.Quantity,
+		UnitPrice: orderItem.UnitPrice,
+		Currency: orderItem.Currency
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="order_id" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.OrderID]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="GetOrder" doc:id="5aff17b8-4197-4c68-94ba-6fe909938051" config-ref="HTTP_Request_configuration_PO_System" path="/api/PurchaseOrder/{OrderID}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"OrderID" : vars.order_id
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="a5d1a9cb-1d3d-41a0-aca5-520aef6c9522" message="Prep Result for order: #[vars.order_id]" />
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="adb07091-7423-4d4e-b5be-5c3c6dec7144" variableName="Order"/>
+		<http:request method="GET" doc:name="GetPayment" doc:id="c367dc19-f79c-4ef7-93a5-62bd5297d5e8" config-ref="HTTP_Request_configuration_PaymentTx" path="/api/PaymentTransaction">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"orderId" : vars.order_id
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="86319dcb-fc81-4eab-8ce4-7054ca27edcd" message="Prep Result for order payment: #[payload]"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="c4c0de36-fbea-402f-ba35-713aebf6728b" variableName="Payment"/>
+		<os:contains doc:name="Contains" doc:id="a56f2081-6360-44c2-a6f1-46aacf6c4d7e" objectStore="Object_store" key="#[vars.order_id]"/>
+		<choice doc:name="Choice" doc:id="9bab97f7-395a-4faa-a58c-c1db6f29a52d" >
+			<when doc:id="b5c427ac-89ba-4db3-be50-1c6c906f273a" expression='#[payload == true and vars.Order.Status == "Active"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="dd9ec3a7-843c-416e-a977-4dda7ad8aa1a" message="QR Code for order #[vars.order_id] exists !"/>
+				<os:retrieve doc:name="Retrieve" doc:id="44503486-fcfe-4dbd-8aa0-3568e2972752" key="#[vars.order_id]" objectStore="Object_store" />
+				<set-payload value="#[%dw 2.0
+import * from dw::core::Binaries
+output application/octet-stream
+---
+toBase64(payload.qr_code as Binary)]" doc:name="Set Payload" doc:id="558eddfb-aaf1-4a3c-bf5f-dbbb8af3d959" mimeType="image/png"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="7ae2fe29-a4dc-4e5a-b976-aa5f7678a253" message="NO QR Code for order #[vars.order_id] exists !"/>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="c2e4828c-f941-4ea1-aaf8-6610650a0362">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::core::Binaries
+output application/json
+---
+{
+	StationID: vars.Order.StationID,
+	CustomerID: vars.Order.CustomerID,
+	OrderId: vars.Order.OrderID,
+	Paid: if(sizeOf(vars.Payment.payment_transaction_list) == 0) false else true,
+	Currency: vars.Order.OrderItems[0].Currency,
+	Tstamp: vars.Order.Tstamp,
+	Delivery: vars.Order.OrderDelivery,
+	Status: vars.Order.Status,
+	PaymentMethod: vars.Order.PaymentType,
+	CCType: vars.Order.CCType,
+	Cost:vars.Order.Cost,
+	QRCode: payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

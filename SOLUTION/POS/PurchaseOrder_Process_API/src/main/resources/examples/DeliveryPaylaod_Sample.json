@@ -1,0 +1,19 @@
+{
+	"OrderID":"1234",
+	"Address": "123 Main St.",
+	"delivery_items":[
+		{
+			"ProductName":"Coke",
+			"ProductID": "123",
+			"UnitCost":	"2.33",
+			"Currency": "USD"
+		}
+		
+	],
+	
+	"Subtotal": 22.33,
+	"Taxes": 33.33,
+	"DeliveryFee": 10.00,
+	"Total": 100.00
+	
+}

@@ -1,0 +1,641 @@
+{
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "com.mycompany",
+    "artifactId": "promotions_proc_api_2",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "jar",
+    "classifier": "mule-application"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-http-connector",
+        "version": "1.5.3",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-http-connector/1.5.3/mule-http-connector-1.5.3-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-sockets-connector",
+        "version": "1.1.5",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-sockets-connector/1.1.5/mule-sockets-connector-1.1.5-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.modules",
+        "artifactId": "mule-apikit-module",
+        "version": "1.1.9",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/modules/mule-apikit-module/1.1.9/mule-apikit-module-1.1.9-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.module",
+        "artifactId": "mule-java-module",
+        "version": "1.2.1",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/module/mule-java-module/1.2.1/mule-java-module-1.2.1-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.drools",
+        "artifactId": "drools-workbench-models-guided-dtable",
+        "version": "7.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/drools/drools-workbench-models-guided-dtable/7.0.0.Final/drools-workbench-models-guided-dtable-7.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.drools",
+        "artifactId": "drools-workbench-models-datamodel-api",
+        "version": "7.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/drools/drools-workbench-models-datamodel-api/7.0.0.Final/drools-workbench-models-datamodel-api-7.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.drools",
+        "artifactId": "drools-workbench-models-commons",
+        "version": "7.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/drools/drools-workbench-models-commons/7.0.0.Final/drools-workbench-models-commons-7.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.commons",
+        "artifactId": "commons-lang3",
+        "version": "3.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.thoughtworks.xstream",
+        "artifactId": "xstream",
+        "version": "1.4.9",
+        "type": "jar"
+      },
+      "uri": "repository/com/thoughtworks/xstream/xstream/1.4.9/xstream-1.4.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "xmlpull",
+        "artifactId": "xmlpull",
+        "version": "1.1.3.1",
+        "type": "jar"
+      },
+      "uri": "repository/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "xpp3",
+        "artifactId": "xpp3_min",
+        "version": "1.1.4c",
+        "type": "jar"
+      },
+      "uri": "repository/xpp3/xpp3_min/1.1.4c/xpp3_min-1.1.4c.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.drools",
+        "artifactId": "drools-compiler",
+        "version": "7.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/drools/drools-compiler/7.0.0.Final/drools-compiler-7.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.kie",
+        "artifactId": "kie-internal",
+        "version": "7.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/kie/kie-internal/7.0.0.Final/kie-internal-7.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.antlr",
+        "artifactId": "antlr-runtime",
+        "version": "3.5",
+        "type": "jar"
+      },
+      "uri": "repository/org/antlr/antlr-runtime/3.5/antlr-runtime-3.5.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.jdt.core.compiler",
+        "artifactId": "ecj",
+        "version": "4.4.2",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/jdt/core/compiler/ecj/4.4.2/ecj-4.4.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mvel",
+        "artifactId": "mvel2",
+        "version": "2.3.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/mvel/mvel2/2.3.0.Final/mvel2-2.3.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.protobuf",
+        "artifactId": "protobuf-java",
+        "version": "2.6.0",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/protobuf/protobuf-java/2.6.0/protobuf-java-2.6.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.slf4j",
+        "artifactId": "slf4j-api",
+        "version": "1.7.7",
+        "type": "jar"
+      },
+      "uri": "repository/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.drools",
+        "artifactId": "drools-core",
+        "version": "7.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/drools/drools-core/7.0.0.Final/drools-core-7.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-codec",
+        "artifactId": "commons-codec",
+        "version": "1.10",
+        "type": "jar"
+      },
+      "uri": "repository/commons-codec/commons-codec/1.10/commons-codec-1.10.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.kie",
+        "artifactId": "kie-api",
+        "version": "7.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/kie/kie-api/7.0.0.Final/kie-api-7.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.kie",
+        "artifactId": "kie-ci",
+        "version": "7.0.0.Final",
+        "type": "jar"
+      },
+      "uri": "repository/org/kie/kie-ci/7.0.0.Final/kie-ci-7.0.0.Final.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-artifact",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-artifact/3.3.9/maven-artifact-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-core",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-core/3.3.9/maven-core-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-repository-metadata",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-repository-metadata/3.3.9/maven-repository-metadata-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.codehaus.plexus",
+        "artifactId": "plexus-interpolation",
+        "version": "1.21",
+        "type": "jar"
+      },
+      "uri": "repository/org/codehaus/plexus/plexus-interpolation/1.21/plexus-interpolation-1.21.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.codehaus.plexus",
+        "artifactId": "plexus-component-annotations",
+        "version": "1.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/codehaus/plexus/plexus-component-annotations/1.6/plexus-component-annotations-1.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-model",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-model/3.3.9/maven-model-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-model-builder",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-model-builder/3.3.9/maven-model-builder-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-builder-support",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-builder-support/3.3.9/maven-builder-support-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.guava",
+        "artifactId": "guava",
+        "version": "18.0",
+        "type": "jar"
+      },
+      "uri": "repository/com/google/guava/guava/18.0/guava-18.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-plugin-api",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-plugin-api/3.3.9/maven-plugin-api-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-settings",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-settings/3.3.9/maven-settings-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-settings-builder",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-settings-builder/3.3.9/maven-settings-builder-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-compat",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-compat/3.3.9/maven-compat-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven",
+        "artifactId": "maven-aether-provider",
+        "version": "3.3.9",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/maven-aether-provider/3.3.9/maven-aether-provider-3.3.9.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven.wagon",
+        "artifactId": "wagon-provider-api",
+        "version": "2.10",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/wagon/wagon-provider-api/2.10/wagon-provider-api-2.10.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.sonatype.plexus",
+        "artifactId": "plexus-sec-dispatcher",
+        "version": "1.3",
+        "type": "jar"
+      },
+      "uri": "repository/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.codehaus.plexus",
+        "artifactId": "plexus-classworlds",
+        "version": "2.5.2",
+        "type": "jar"
+      },
+      "uri": "repository/org/codehaus/plexus/plexus-classworlds/2.5.2/plexus-classworlds-2.5.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.codehaus.plexus",
+        "artifactId": "plexus-utils",
+        "version": "3.0.22",
+        "type": "jar"
+      },
+      "uri": "repository/org/codehaus/plexus/plexus-utils/3.0.22/plexus-utils-3.0.22.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.aether",
+        "artifactId": "aether-api",
+        "version": "1.0.2.v20150114",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/aether/aether-api/1.0.2.v20150114/aether-api-1.0.2.v20150114.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.aether",
+        "artifactId": "aether-util",
+        "version": "1.0.2.v20150114",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/aether/aether-util/1.0.2.v20150114/aether-util-1.0.2.v20150114.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.aether",
+        "artifactId": "aether-impl",
+        "version": "1.0.2.v20150114",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/aether/aether-impl/1.0.2.v20150114/aether-impl-1.0.2.v20150114.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.aether",
+        "artifactId": "aether-connector-basic",
+        "version": "1.0.2.v20150114",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/aether/aether-connector-basic/1.0.2.v20150114/aether-connector-basic-1.0.2.v20150114.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.aether",
+        "artifactId": "aether-spi",
+        "version": "1.0.2.v20150114",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/aether/aether-spi/1.0.2.v20150114/aether-spi-1.0.2.v20150114.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.aether",
+        "artifactId": "aether-transport-wagon",
+        "version": "1.0.2.v20150114",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/aether/aether-transport-wagon/1.0.2.v20150114/aether-transport-wagon-1.0.2.v20150114.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.aether",
+        "artifactId": "aether-transport-file",
+        "version": "1.0.2.v20150114",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/aether/aether-transport-file/1.0.2.v20150114/aether-transport-file-1.0.2.v20150114.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.aether",
+        "artifactId": "aether-transport-http",
+        "version": "1.0.2.v20150114",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/aether/aether-transport-http/1.0.2.v20150114/aether-transport-http-1.0.2.v20150114.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.httpcomponents",
+        "artifactId": "httpclient",
+        "version": "4.2.6",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/httpcomponents/httpclient/4.2.6/httpclient-4.2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.sisu",
+        "artifactId": "org.eclipse.sisu.plexus",
+        "version": "0.3.2",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/sisu/org.eclipse.sisu.plexus/0.3.2/org.eclipse.sisu.plexus-0.3.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "javax.enterprise",
+        "artifactId": "cdi-api",
+        "version": "1.0",
+        "type": "jar"
+      },
+      "uri": "repository/javax/enterprise/cdi-api/1.0/cdi-api-1.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "javax.annotation",
+        "artifactId": "jsr250-api",
+        "version": "1.0",
+        "type": "jar"
+      },
+      "uri": "repository/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.eclipse.sisu",
+        "artifactId": "org.eclipse.sisu.inject",
+        "version": "0.3.2",
+        "type": "jar"
+      },
+      "uri": "repository/org/eclipse/sisu/org.eclipse.sisu.inject/0.3.2/org.eclipse.sisu.inject-0.3.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.ant",
+        "artifactId": "ant",
+        "version": "1.8.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/ant/ant/1.8.4/ant-1.8.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.ant",
+        "artifactId": "ant-launcher",
+        "version": "1.8.4",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/ant/ant-launcher/1.8.4/ant-launcher-1.8.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven.wagon",
+        "artifactId": "wagon-http",
+        "version": "2.10",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/wagon/wagon-http/2.10/wagon-http-2.10.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.maven.wagon",
+        "artifactId": "wagon-http-shared",
+        "version": "2.10",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/maven/wagon/wagon-http-shared/2.10/wagon-http-shared-2.10.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.jsoup",
+        "artifactId": "jsoup",
+        "version": "1.7.2",
+        "type": "jar"
+      },
+      "uri": "repository/org/jsoup/jsoup/1.7.2/jsoup-1.7.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-lang",
+        "artifactId": "commons-lang",
+        "version": "2.6",
+        "type": "jar"
+      },
+      "uri": "repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-io",
+        "artifactId": "commons-io",
+        "version": "2.5",
+        "type": "jar"
+      },
+      "uri": "repository/commons-io/commons-io/2.5/commons-io-2.5.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.slf4j",
+        "artifactId": "jcl-over-slf4j",
+        "version": "1.7.7",
+        "type": "jar"
+      },
+      "uri": "repository/org/slf4j/jcl-over-slf4j/1.7.7/jcl-over-slf4j-1.7.7.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.httpcomponents",
+        "artifactId": "httpcore",
+        "version": "4.4.1",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/httpcomponents/httpcore/4.4.1/httpcore-4.4.1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.sonatype.plexus",
+        "artifactId": "plexus-cipher",
+        "version": "1.7",
+        "type": "jar"
+      },
+      "uri": "repository/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.google.inject",
+        "artifactId": "guice",
+        "version": "4.0",
+        "type": "jar",
+        "classifier": "no_aop"
+      },
+      "uri": "repository/com/google/inject/guice/4.0/guice-4.0-no_aop.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "javax.inject",
+        "artifactId": "javax.inject",
+        "version": "1",
+        "type": "jar"
+      },
+      "uri": "repository/javax/inject/javax.inject/1/javax.inject-1.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "aopalliance",
+        "artifactId": "aopalliance",
+        "version": "1.0",
+        "type": "jar"
+      },
+      "uri": "repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-objectstore-connector",
+        "version": "1.1.3",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-objectstore-connector/1.1.3/mule-objectstore-connector-1.1.3-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-file-connector",
+        "version": "1.2.2",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-file-connector/1.2.2/mule-file-connector-1.2.2-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.modules",
+        "artifactId": "mule-module-file-extension-common",
+        "version": "1.2.1",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/modules/mule-module-file-extension-common/1.2.1/mule-module-file-extension-common-1.2.1-mule-plugin.jar"
+    }
+  ]
+}

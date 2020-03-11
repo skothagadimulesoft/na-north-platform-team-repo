@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="payment" format="json">
+      <types:shape format="weave" example="api/Samples/Notification_sample.json"><![CDATA[%dw 2.0
+type payment = {|
+  DebtorBank: String, 
+  DebtorAcct: String, 
+  CreditorBank: String, 
+  CreditorAcct: String, 
+  Sum: Number {"typeId": "double"}, 
+  Currency: String
+|} {"MetadataFormat": "json",
+"example": "{\"DebtorBank\":\"RBC\",\"DebtorAcct\":\"333-savings\",\"CreditorBank\":\"BOA\",\"CreditorAcct\":\"777-checking\",\"Sum\":397.00,\"Currency\":\"USD\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#bee65480-b772-45f9-8984-0cc33dfe6998"/>
+</types:mule>

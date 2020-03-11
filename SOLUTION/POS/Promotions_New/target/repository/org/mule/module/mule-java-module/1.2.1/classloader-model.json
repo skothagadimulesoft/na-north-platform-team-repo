@@ -1,0 +1,39 @@
+{
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "org.mule.module",
+    "artifactId": "mule-java-module",
+    "version": "1.2.1",
+    "type": "jar",
+    "classifier": "mule-plugin"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.apache.commons",
+        "artifactId": "commons-lang3",
+        "version": "3.7",
+        "type": "jar"
+      },
+      "uri": "repository/org/apache/commons/commons-lang3/3.7/commons-lang3-3.7.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.springframework",
+        "artifactId": "spring-core",
+        "version": "5.0.5.RELEASE",
+        "type": "jar"
+      },
+      "uri": "repository/org/springframework/spring-core/5.0.5.RELEASE/spring-core-5.0.5.RELEASE.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.springframework",
+        "artifactId": "spring-jcl",
+        "version": "5.0.5.RELEASE",
+        "type": "jar"
+      },
+      "uri": "repository/org/springframework/spring-jcl/5.0.5.RELEASE/spring-jcl-5.0.5.RELEASE.jar"
+    }
+  ]
+}

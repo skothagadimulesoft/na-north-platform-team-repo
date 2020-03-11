@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<anypoint-mq:default-subscriber-config name="Anypoint_MQ_Default_subscriber" doc:name="Anypoint MQ Default subscriber" doc:id="a612f00f-7aec-4ed0-a3eb-4f05b28b5c3e" >
+		<anypoint-mq:connection clientId="10ad1764593f4329ae9390b8d94d1df1" clientSecret="7BdB6eE6318F4DA89Dc325c69eC7B9EC" />
+	</anypoint-mq:default-subscriber-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="c118b345-ea2d-4e50-a78a-b4b8ded563e7" file="mule-delivery.properties" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="ee45cdd3-02ce-45fd-ba95-04a3159f10bb" >
+		<http:request-connection host="${notification.host}" port="${notification.port}" />
+	</http:request-config>
+	<flow name="delivery_process_apiFlow" doc:id="0c0efe8a-d96d-47a4-a016-1f3fba160370" >
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="0a508e10-9989-49a8-9055-526e7572fc2e" config-ref="Anypoint_MQ_Default_subscriber" destination="delivery.queue"/>
+		<logger level="INFO" doc:name="Logger" doc:id="491d87ab-0bdc-461e-8c85-d7692ccb61c0" message="Got Delivery Message: #[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="6357b282-be6f-48d0-aa26-76321c8b58e2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Order " ++ payload.OrderID ++ ", in the sum of " ++ payload.Total ++ ", will be delivered to address: " ++ payload.Address
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="NotificationRequest" doc:id="d799149c-4640-4e0b-b5ab-6023ae1ffa5c" config-ref="HTTP_Request_configuration" path="/api/Notification">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"destination" : "sms"
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+</mule>

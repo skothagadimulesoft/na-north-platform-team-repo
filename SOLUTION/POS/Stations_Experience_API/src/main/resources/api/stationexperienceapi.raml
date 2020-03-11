@@ -1,0 +1,76 @@
+#%RAML 1.0
+version: v1
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/34b097be-17db-43c6-9a90-56fc019642bc/ # 
+title: StationExperienceAPI
+
+uses:
+    data_types: exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/fueldatatypes/1.0.0/fueldatatypes.raml
+
+/station:
+  get:
+    queryParameters:
+      Lat:  
+        type: string
+        required: false
+      Long: 
+        type: string
+        required: false
+          
+    responses:
+       200:
+        body: 
+          application/json:
+            type: data_types.StationResponse
+            example:  !include  samples/StationResponseSample.json
+
+  /{id}:
+    get:
+      queryParameters:
+        promotion: 
+          type: boolean
+          required: false
+        category:
+          type: string
+          required: false
+
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "StationID": "0001",
+                  "StoreType": "Circle K",
+                  "Address": "803 E ADDISON ST",
+                  "Region": "CHICAGO",
+                  "coordinates": {
+                    "lat": "41.947255",
+                    "lng": "-87.649644"
+                  },
+                  "Currency": "USD",
+                  "SalesTax": 10.25,
+                  "Products": [
+                    {
+                      "ProductName": "Coke",
+                      "Price": "1.99",
+                      "StatinonID": "0001",
+                      "ProductImageURL": "https://www.dropbox.com/s/iswpfltm72gpou7/coke.jpg?raw=1",
+                      "Currency": "USD",
+                      "ProductType": "NonAlcoholicBeverage",
+                      "ProductID": "CK-123",
+                      "QuantityAvailable": 100,
+                      "LoyaltyPointsEquvalence": 200
+                    },
+                    {
+                      "ProductName": "Lays Chips",
+                      "Price": "3.99",
+                      "StatinonID": "0001",
+                      "ProductImageURL": "https://www.dropbox.com/s/7lcyavzgzmza3dy/lays.jpg?raw=1",
+                      "Currency": "USD",
+                      "ProductType": "Chips",
+                      "ProductID": "CK-001",
+                      "QuantityAvailable": 100,
+                      "LoyaltyPointsEquvalence": 400
+                    }
+                    ]
+                }

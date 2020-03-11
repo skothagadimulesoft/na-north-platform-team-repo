@@ -1,0 +1,32 @@
+{
+  "configs": [
+    "payment_processapi.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:payment_process_api:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.2.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "log4j2.xml",
+        "payment.properties",
+        "application-types.xml",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/paymentdatatypes/1.0.1/paymentdatatypes.raml",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/paymentdatatypes/1.0.5/exchange.json",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/paymentdatatypes/1.0.5/paymentdatatypes.raml",
+        "api/samples/PymentTxList_Sample.json",
+        "api/samples/PaymentTx_Sample.json",
+        "api/payment_processapi.raml",
+        "payment_processapi.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

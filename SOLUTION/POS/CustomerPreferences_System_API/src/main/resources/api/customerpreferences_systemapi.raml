@@ -1,0 +1,50 @@
+#%RAML 1.0
+version: v1
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/17b3b3bb-fdd0-4efe-9c95-2eb143f031bb/ # 
+title: CustomerPreferences_SystemAPI
+
+types:
+
+  Preferences:
+    type: object
+    properties:
+      Beverages: string
+      Snacks:  string
+      Dairy: string
+      Gas: string
+      Bread: string
+      Notifications: string
+
+  PreferencesResponse:
+    type: object
+    properties:
+      CustomerId: string
+      Preferences: Preferences
+
+
+/preferences:
+  get:
+    queryParameters:
+      customerid:  
+        type: string
+        required: true
+          
+    responses:
+       200:
+        body: 
+          application/json:
+            type: PreferencesResponse
+            example: |
+                {
+                  "CustomerId": "1234",
+                  "Preferences": {
+                  "Beverages":"Coke",
+                  "Snacks":"Lays",
+                  "Dairy":"Milk 2P",
+                  "Gas":"Regular",
+                  "Bread":"Whole Wheat",
+                  "Notifications":"SMS"
+                  }
+                }
+
+

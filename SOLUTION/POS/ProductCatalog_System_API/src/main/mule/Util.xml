@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<flow name="GeAllProducts" doc:id="dbbf5a88-573b-4e76-8755-6f45c9291114" >
+		<logger level="INFO" doc:name="Logger" doc:id="a5509ee1-9849-432f-ad6b-31c16284354f" message="Getting all records for all Stations and all Categories !" />
+		<db:select doc:name="Select" doc:id="db6cf227-b8d4-4ea6-a41a-9c4dc6206f01" config-ref="Database_Config" >
+			<db:sql >SELECT *  FROM Products;</db:sql>
+		</db:select>
+		
+		<ee:transform doc:name="Transform Message" doc:id="127eca16-5671-4762-b54a-1d932764ddeb" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ProductName: payload01.ProductName,
+	Price: payload01.ProductPrice as String,
+	StationID: payload01.ProductStId,
+	ProductImageURL: payload01.ProductImgURL,
+	Currency: payload01.ProductCurrency,
+	ProductType: payload01.ProductType,
+	ProductID: payload01.ProductID,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetAllProducts_ByStationID" doc:id="2525d22a-8537-4106-8715-3a9555056322" >
+		<logger level="INFO" doc:name="Logger" doc:id="c3948dd0-0ced-4fb0-a9c9-1c83a1bec60a" message="Get Products by Station ID !" />
+		<db:select doc:name="Select" doc:id="736dcef6-a4a4-43b0-9832-38fbeea93a48" config-ref="Database_Config">
+			<db:sql >select * from Products
+where ProductStId = :station_id;</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	station_id: vars.StationId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="a128f3a2-b5bc-4898-a665-b6f63d5ad8f7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	StationID: payload01.ProductStId,
+	ProductName: payload01.ProductName,
+	ProductID: payload01.ProductID,
+	ProductType: payload01.ProductType,
+	Price: payload01.ProductPrice as String,
+	Currency: payload01.ProductCurrency,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+	ProductImageURL: payload01.ProductImgURL
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetAllProducts_ByCategory" doc:id="933b21df-b368-4a19-adce-d4d50b960833" >
+		<logger level="INFO" doc:name="Logger" doc:id="0d7e568f-6408-481d-b696-42c858f03b82" message="Get Propducts by Category for all Stations" />
+		<db:select doc:name="Select" doc:id="41afabe1-7d9a-497b-ad27-d356a56177cf" config-ref="Database_Config" >
+			<db:sql >select * from Products
+where ProductType = :category;</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	category: vars.Category
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="0fc3338d-8dd1-4032-91f1-ed560a5064ab" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	StationID: payload01.ProductStId,
+	ProductName: payload01.ProductName,
+	ProductID: payload01.ProductID,
+	ProductType: payload01.ProductType,
+	Price: payload01.ProductPrice as String,
+	Currency: payload01.ProductCurrency,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+	ProductImageURL: payload01.ProductImgURL
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetAllProducts_ByStationID_ByCateogry" doc:id="ada6747a-8fed-4c1a-afe0-2518a5c021e7" >
+		<logger level="INFO" doc:name="Logger" doc:id="c0b808f2-e631-4e1a-b2c3-92908ef7ec8c" message="Get Products By Station ID, by Category" />
+		<db:select doc:name="Select" doc:id="013707e9-805d-4dfc-b887-ca201ca1f7aa" config-ref="Database_Config" >
+			<db:sql >select * from Products
+where ProductStId = :station_id and ProductType = :category;</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	station_id: vars.StationId,
+	category:	vars.Category
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="ccc4cb99-6dc8-4297-8d25-e5a0662fa552" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	StationID: payload01.ProductStId,
+	ProductName: payload01.ProductName,
+	ProductID: payload01.ProductID,
+	ProductType: payload01.ProductType,
+	Price: payload01.ProductPrice as String,
+	Currency: payload01.ProductCurrency,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+	ProductImageURL: payload01.ProductImgURL
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetAllProducts_ByStationID_With_Promotion" doc:id="e0eafeae-9aea-446b-8804-d9c17aea6a1a" >
+		<logger level="INFO" doc:name="Logger" doc:id="cbd80f5d-dcb1-4306-a4ff-dae6bb92c4b9" message="Get Products with Promotion by Station ID !" />
+		<db:select doc:name="Select" doc:id="5f6b1f64-0565-431d-94d5-e14be6e0ca33" config-ref="Database_Config" >
+			<db:sql >select * from Products
+where ProductStId = :station_id;</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	station_id: vars.StationId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="4b39d89d-382a-493a-a2fe-2c2b6d3338ba" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	StationID: payload01.ProductStId,
+	ProductName: payload01.ProductName,
+	ProductID: payload01.ProductID,
+	ProductType: payload01.ProductType,
+	Price: payload01.ProductPrice as String,
+	Currency: payload01.ProductCurrency,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+	ProductImageURL: payload01.ProductImgURL,
+	(Promotion: read(payload01.Promotion default "{}", "application/json")) if (payload01.Promotion != null)
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetAllProducts_ByCategory_With_Promotion" doc:id="255a92b7-c6fc-440b-a301-886e1e0c6532" >
+		<logger level="INFO" doc:name="Logger" doc:id="8689fe54-94b8-4612-9138-ffc2f45ed25e" message="Get Propducts With Promotion by Category for all Stations" />
+		<db:select doc:name="Select" doc:id="a3f75afd-cc82-41f4-8eb4-af6e1cb6e491" config-ref="Database_Config" >
+			<db:sql >select * from Products
+where ProductType = :category;</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	category: vars.Category
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="fcc03c14-9407-4ade-a06e-0e168eb7cb79" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	StationID: payload01.ProductStId,
+	ProductName: payload01.ProductName,
+	ProductID: payload01.ProductID,
+	ProductType: payload01.ProductType,
+	Price: payload01.ProductPrice as String,
+	Currency: payload01.ProductCurrency,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+	ProductImageURL: payload01.ProductImgURL,
+	(Promotion: read(payload01.Promotion default "{}", "application/json")) if (payload01.Promotion != null)
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetAllProducts_ByStationID_ByCateogry_With_Promotion" doc:id="34dad12b-8bb3-4e68-b732-dc59223946e7" >
+		<logger level="INFO" doc:name="Logger" doc:id="d70910a7-3276-4fca-be45-776a44297c1e" message="Get Products With Promotion By Station ID, by Category" />
+		<db:select doc:name="Select" doc:id="37706b61-4bde-4645-90da-065292bca0c8" config-ref="Database_Config" >
+			<db:sql >select * from Products
+where ProductStId = :station_id and ProductType = :category;</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	station_id: vars.StationId,
+	category:	vars.Category
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="0579ddb8-06fc-4d3c-acb2-c123bb21106b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	StationID: payload01.ProductStId,
+	ProductName: payload01.ProductName,
+	ProductID: payload01.ProductID,
+	ProductType: payload01.ProductType,
+	Price: payload01.ProductPrice as String,
+	Currency: payload01.ProductCurrency,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+	ProductImageURL: payload01.ProductImgURL,
+	(Promotion: read(payload01.Promotion default "{}", "application/json")) if (payload01.Promotion != null)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GeAllProducts_WIth_Promotion" doc:id="f871146f-6e4e-4176-b1a2-7dcbd57a5dd0" >
+		<logger level="INFO" doc:name="Logger" doc:id="d0004a98-d483-4815-b029-922426e2d7fc" message="Getting all records for all Stations and all Categories  with Promotion!" />
+		<db:select doc:name="Select" doc:id="c97043f9-ae75-4510-bbc1-68db6639e9a9" config-ref="Database_Config" >
+			<db:sql >SELECT *  FROM Products;</db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="059515f2-9685-4295-879a-caf2b948eb28" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ProductName: payload01.ProductName,
+	Price: payload01.ProductPrice as String,
+	StationID: payload01.ProductStId,
+	ProductImageURL: payload01.ProductImgURL,
+	Currency: payload01.ProductCurrency,
+	ProductType: payload01.ProductType,
+	ProductID: payload01.ProductID,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+	(Promotion: read(payload01.Promotion default "{}", "application/json")) if (payload01.Promotion != null)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="UtilFlow_GetByUPCCode_WithPromotions" doc:id="b6fe51a2-4c46-41e0-acd3-f5da1c157104" >
+		<logger level="INFO" doc:name="Logger" doc:id="5440d19f-d479-4d1d-a744-48e70347a69e" message="Getting Product by UPC Code With promoitions: UPCCode = #[vars.upc_code]"/>
+		<db:select doc:name="Select" doc:id="b1292c1a-3439-4637-b75c-ba5695210028" config-ref="Database_Config">
+			<db:sql >SELECT *  FROM UPCLookupTable 
+where  UPCLookupTable.UPC_CODE = :UPC_Code;</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	UPC_Code: vars.upc_code
+}]]]></db:input-parameters>
+		</db:select>
+		<db:select doc:name="Copy_of_Copy_of_Select" doc:id="26c3cbe0-c065-4c2e-98cd-f9cab50de17c" config-ref="Database_Config">
+			<db:sql>select * from Products
+where ProductID = :product_id;</db:sql>
+			<db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	product_id:	payload[0].ProductID
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="6fff821a-12f8-4d90-93ef-1e94c44254f5" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ProductName: payload01.ProductName,
+	Price: payload01.ProductPrice as String,
+	StationID: payload01.ProductStId,
+	ProductImageURL: payload01.ProductImgURL,
+	Currency: payload01.ProductCurrency,
+	ProductType: payload01.ProductType,
+	ProductID: payload01.ProductID,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+	(Promotion: read(payload01.Promotion default "{}", "application/json")) if (payload01.Promotion != null)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="UtilFlow_GetByUPCCode_NoPromotions" doc:id="c91a9df6-bb7d-4e2a-9d3a-0919cc51561c" >
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="585f687f-d5e2-4538-be5f-28815108ed8f" message="Getting Product by UPC Code With NO promoitions:  UPCCode = #[vars.upc_code]" />
+		<db:select doc:name="Copy_of_Select" doc:id="b3f7fb8f-0bbe-4269-94da-95de1d2793bd" config-ref="Database_Config" >
+			<db:sql >SELECT *  FROM UPCLookupTable
+where  UPCLookupTable.UPC_CODE =  :UPC_Code</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	UPC_Code: vars.upc_code
+}]]]></db:input-parameters>
+		</db:select>
+		<db:select doc:name="Copy_of_Select" doc:id="efcf5358-98f2-4990-b0b5-9291f531022d" config-ref="Database_Config" >
+			<db:sql >select * from Products
+where ProductID = :product_id;</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	product_id:	payload[0].ProductID
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Copy_of_Transform Message" doc:id="aa289795-8306-4880-8730-66525a5e08b0" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ProductName: payload01.ProductName,
+	Price: payload01.ProductPrice as String,
+	StationID: payload01.ProductStId,
+	ProductImageURL: payload01.ProductImgURL,
+	Currency: payload01.ProductCurrency,
+	ProductType: payload01.ProductType,
+	ProductID: payload01.ProductID,
+	QuantityAvailable: payload01.ProdctQtyAvailable,
+	LoyaltyPointsEquvalence: payload01.ProductLoyaltyPtEq,
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

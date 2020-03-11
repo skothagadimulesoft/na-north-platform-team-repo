@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="UtilFlow_getAllPayments" doc:id="090b428a-7e87-44e7-8829-ae2edd633609" >
+		<logger level="INFO" doc:name="Logger" doc:id="51b69e01-9021-481f-a257-680fe8733817" message="Getting All Payments !"/>
+		<db:select doc:name="Copy_of_Select" doc:id="e726b1c4-fff4-4fda-8020-52cacb0487a0" config-ref="Database_Config" >
+			<db:sql >select * from PaymentTransaction</db:sql>
+		</db:select>
+	</flow>
+	<flow name="UtilFlow_getPaymentsByOrderId" doc:id="a28103a0-0a4b-4a59-8a66-4cbc4fdaabb9" >
+		<logger level="INFO" doc:name="Logger" doc:id="05d7d2a9-f602-4e36-9b79-80def2f7b491" message="Getting Payments By IOrder ID !"/>
+		<db:select doc:name="Select" doc:id="61f8ee5c-7eb0-4411-a9c5-d3be68911999" config-ref="Database_Config" >
+			<db:sql >select * from PaymentTransaction where OrderID = :order_id</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	order_id:	vars.Order_ID
+}]]]></db:input-parameters>
+		</db:select>
+	</flow>
+</mule>

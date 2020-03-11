@@ -1,0 +1,112 @@
+#%RAML 1.0
+version: v1
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/21d7bc2c-cb32-4610-9978-5cdb2571d5f1/ # 
+title: Customer_ProcessAPI
+
+
+types:
+
+  Preferences:
+    type: object
+    properties:
+      Beverages: string
+      Snacks:  string
+      Dairy: string
+      Gas: string
+      Bread: string
+      Notifications: string
+
+  PreferencesResponse:
+    type: object
+    properties:
+      CustomerId: string
+      Preferences: Preferences
+
+  Address:
+      type: object
+      properties:
+        "country": string
+        "city": string
+        "countryCode": string
+        "street": string
+        "latitude": string
+        "postalCode": string
+        "geocodeAccuracy": string
+        "stateCode": string
+        "state": string
+        "longitude": string
+  
+  
+  Customer:
+      type: object
+      properties:
+        Name: string
+        Description: string
+        CustomerNumber: string
+        BillingAddress: Address
+        ShippingAddress: Address
+
+
+  CustomerProcessReponse:
+    type: object
+    properties:
+      Customer: Customer
+      Preferences: Preferences
+
+/customer:
+  get:
+    queryParameters:
+      customerid:  
+        type: string
+        required: true
+          
+    responses:
+       200:
+        body: 
+          application/json:
+            type: CustomerProcessReponse
+            example: |
+                {
+                  "Customer":{
+                     "BillingAddress": {
+                      "country": "Canada",
+                      "city": "MISSISSAUGA",
+                      "countryCode": "CA",
+                      "street": "5023 Perennial Drive",
+                      "latitude": "98.65555",
+                      "postalCode": "L5M7T2",
+                      "geocodeAccuracy": "67627",
+                      "stateCode": "ON",
+                      "state": "Ontario",
+                      "longitude": "64.53637"
+                    },
+                    "Description": "Manufactures TShirts themed with Star trek characters and movies",
+                    "ShippingAddress": {
+                      "country": "Canada",
+                      "city": "MISSISSAUGA",
+                      "countryCode": "CA",
+                      "street": "5023 Perennial Drive",
+                      "latitude": "65.33333",
+                      "postalCode": "L5M7T2",
+                      "geocodeAccuracy": "",
+                      "stateCode": "ON",
+                      "state": "Ontario",
+                      "longitude": "75.3232"
+                    },
+                    "CustomerNumber": "MULE0001",
+                    "Name": "FederationTees"
+
+                  },
+
+                  
+                  "Preferences": {
+                  "Beverages":"Coke",
+                  "Snacks":"Lays",
+                  "Dairy":"Milk 2P",
+                  "Gas":"Regular",
+                  "Bread":"Whole Wheat",
+                  "Notifications":"SMS"
+                  }
+                }
+              
+

@@ -1,0 +1,182 @@
+#%RAML 1.0 Library
+usage:
+
+types:
+
+  OrderOrigin:
+    type: 
+      enum: ["POS","Kiosk","Mobile"]
+
+  OrderStatus:
+    type: 
+      enum: ["Active","Closed"]
+
+  Currencies: 
+    type:
+      enum: ["USD","CAD","EU"]
+
+  PaymentType:
+    type: 
+      enum: ["CC","Points","Cash"]
+  
+  CreditCard:
+    type: 
+      enum: ["VISA","MC","AMEX",""]
+
+  ProductType:
+    type: 
+      enum: ["Pastry","AlcoholicBeverage","NonAlcoholicBeverage","Produce","Chips", "Pretzels","Deli","Vaping","Cigarettes","Magaznies"]
+
+
+  PurchaseOrderItem:
+    type: object
+    properties:
+      OrderItemID:  string
+      StationID:  string
+      OrderID:  string
+      ProductName:  string
+      ProductID:  string
+      ProductType:  ProductType
+      Quantity: number
+      UnitPrice:  number
+      Currency: Currencies
+      
+      
+
+  PurchaseOrder:
+    type: object
+    properties:
+      StationID:  string
+      CustomerID: string
+      OrderID: string
+      OrderInitiation: OrderOrigin
+      OrderClosure:   OrderOrigin
+      Status:  OrderStatus
+      OrderDelivery:  boolean  
+      DeliveryAddress:  string
+      PayOnCheckout:  boolean
+      PaymentType:  PaymentType
+      CCType: CreditCard
+      Cost:  
+        type: number
+        required: false
+      Tstamp: 
+        type: datetime
+        required: false
+      OrderItems: 
+        type: array
+        items:  PurchaseOrderItem
+        
+  OrderList:
+    type: object
+    properties:
+      orders: 
+        type: array
+        items: PurchaseOrder
+
+  PurchaseOrderRequest:
+    type: object
+    properties:
+      order:  PurchaseOrder
+     
+      
+  PurchaseOrderResponse:
+    type: object
+    properties:
+      StationID:  string
+      CustomerID: string
+      OrderId:  string
+      Paid: boolean
+      Currency: Currencies
+      Tstamp: datetime
+      Delivery: boolean
+      Status: OrderStatus
+      PaymentMethod:  PaymentType 
+      CCType: CreditCard
+      Cost:  
+        type: number
+        required: false
+      QRCode: 
+        type: any
+        required: false
+
+  OrderItem:
+    type: object
+    properties:
+      ProductName:  string
+      ProductID:  string
+      ProductType:  ProductType
+      Quantity: number
+      UnitPrice:  number
+      Currency: Currencies
+      
+
+  Order:
+    type: object
+    properties:
+      StationID:  string
+      CustomerID: string
+      OrderID: string
+      OrderInitiation: OrderOrigin
+      OrderClosure:   OrderOrigin
+      Status:  OrderStatus
+      OrderDelivery:  boolean  
+      DeliveryAddress:  string
+      Tstamp: datetime
+      PaymentType:  PaymentType
+      Cost:  
+        type: number
+        required: false
+      OrderItems: 
+        type: array
+        items: OrderItem
+
+
+  OrderSimple:
+    type: object
+    properties:
+      StationID:  string
+      CustomerID: string
+      OrderID: string
+      OrderInitiation: OrderOrigin
+      OrderClosure:   OrderOrigin
+      Status:  OrderStatus
+      OrderDelivery:  boolean  
+      DeliveryAddress:  string
+      Tstamp: datetime
+      PaymentType:  PaymentType
+      Cost:  
+        type: number
+        required: false
+
+  OrderSimpleList:
+    type: object
+    properties:
+      orders:
+        type: array
+        items:  OrderSimple
+
+  OrderItemSimple:
+    type: object
+    properties:
+      OrderItemID:  string
+      StationID:  string
+      OrderID:  string
+      ProductName:  string
+      ProductID:  string
+      ProductType:  ProductType
+      Quantity: number
+      UnitPrice:  number
+      Currency: Currencies
+
+  OrderItemSimpleList:
+    type: object
+    properties:
+      OrderItems:
+        type: array
+        items:  OrderItemSimple
+      
+      
+      
+
+      

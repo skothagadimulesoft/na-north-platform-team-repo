@@ -1,0 +1,49 @@
+{
+  "configs": [
+    "order_systemapi.xml",
+    "Util.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:order_system_api_3:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.2.0",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "log4j2.xml",
+        "application-types.xml",
+        "order_systemapi.xml",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.7/exchange.json",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.7/orderdatatypes.raml",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.6/exchange.json",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.6/orderdatatypes.raml",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.8/exchange.json",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.8/orderdatatypes.raml",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.13/exchange.json",
+        "api/exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.13/orderdatatypes.raml",
+        "api/samples/OrderItemSimple_Sample.json",
+        "api/samples/DeleteOrderItemResp_Sample.json",
+        "api/samples/PurchaseOrderResp_Sample.json",
+        "api/samples/OrderItemListSimple_Sample.json",
+        "api/samples/DeleteOrder_Sample.json",
+        "api/samples/PurchaseOrderPut_Sample.json",
+        "api/samples/OrderSimple_Sample.json",
+        "api/samples/PurchaseOrderList_Sample.json",
+        "api/samples/PurchaseOrder_Sample.json",
+        "api/samples/OrderListSimple_Sample.json",
+        "api/samples/PurchaseOrderReq_Sample.json",
+        "api/samples/DeleteOrderResponse_Sample.json",
+        "api/order_systemapi.raml",
+        "purchase_order.properties",
+        "Util.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

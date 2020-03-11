@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="product_list" format="json">
+      <types:shape format="weave" example="api/examples/productList.json"><![CDATA[%dw 2.0
+
+type product_list = Array<{|  StatinonID: String,   ProductName: String,   ProductID: String,   ProductType: String,   Price: String,   Currency: String,   QuantityAvailable: Number {"typeId": "int"},   LoyaltyPointsEquvalence: Number {"typeId": "int"},   ProductImageURL: String|}> {"example": "[{\"StatinonID\":\"333\",\"ProductName\":\"Lays\",\"ProductID\":\"CK-111\",\"ProductType\":\"Chips\",\"Price\":\"3.99\",\"Currency\":\"CAD\",\"QuantityAvailable\":10,\"LoyaltyPointsEquvalence\":400,\"ProductImageURL\":\"https:\/\/www.dropbox.com\/s\/7lcyavzgzmza3dy\/lays.jpg?raw=1\"},{\"StatinonID\":\"333\",\"ProductName\":\"Coke\",\"ProductID\":\"CK-123\",\"ProductType\":\"NonAlcoholicBeverage\",\"Price\":\"1.99\",\"Currency\":\"CAD\",\"QuantityAvailable\":15,\"LoyaltyPointsEquvalence\":200,\"ProductImageURL\":\"https:\/\/www.dropbox.com\/s\/iswpfltm72gpou7\/coke.jpg?raw=1\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#c765c325-2a28-44a5-aad0-a6a19f4aa42b"/>
+  <types:enrichment select="#127eca16-5671-4762-b54a-1d932764ddeb">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="product_list"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#a128f3a2-b5bc-4898-a665-b6f63d5ad8f7">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="product_list"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

@@ -1,0 +1,68 @@
+#%RAML 1.0
+title: Promotions_ProcessAPI
+
+uses:
+  data_types: exchange_modules/2306baff-39ef-4e2f-a49b-714125dd9025/promotiondatatypes/1.0.6/promotiondatatypes.raml
+
+/PromotionEngine:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.PromotionEngineState
+            example: !include samples/EngineState_Sample.json
+  post:
+    body:
+      application/json:
+        type: data_types.PromotionEngineState
+        example: !include samples/EngineState_Sample.json
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include samples/EngineStateUpdate_Sample.json
+            type: data_types.PromotionEngineState
+          
+  put:
+   body:
+     application/json:
+        type: data_types.PromotionEngineState
+        example: !include samples/EngineStateUpdate_Sample.json
+   responses:
+    200:
+      body:
+        application/json:
+          example: !include samples/EngineState_Sample.json
+          type: data_types.PromotionEngineState
+          
+     
+     
+
+/IndividualProductPromotion:
+  post:
+    body:
+      application/json:
+        type: data_types.PromotionRequestSingle
+        examples:  
+          BOGO_DISCOUNT: !include  samples/PromotionRequest_Sample.json
+          BOGO_FREE: !include samples/PromotionRequest_Sample_1.json
+         
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.PromotionResponse
+            example: !include samples/PrompotionResponse_Sample.json
+              
+
+/RelatedProductsPromotion:
+  post:
+    body:
+      application/json:
+        type: data_types.PromotionRequest
+        example: !include samples/PromotionRequestMultiple_Sample.json
+          
+
+            
+        

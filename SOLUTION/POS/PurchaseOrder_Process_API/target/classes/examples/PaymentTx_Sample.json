@@ -1,0 +1,14 @@
+{
+   "PaymentTxID": "",
+    "OrderID":  "12334567",
+    "CustomerID": "11777",
+    "StationID":  "333",
+    "PaymentType": "CC",
+    "Sum":  33.99,
+    "Currency": "USD",
+    "Tstamp": "2019-10-01T23:57:59-03:00",
+    "NumPoints":0,
+     "CCType": "VISA"
+}
+
+  

@@ -1,0 +1,16 @@
+{
+    "OrderItems":[
+        {
+          "OrderItemID":"",
+           "StationID": "333",
+           "OrderID": "12345657",
+           "ProductName":  "Coke",
+           "ProductID":  "CK-123",
+          "ProductType":  "NonAlcoholicBeverage",
+          "Quantity": 1,
+          "UnitPrice":  1.99,
+          "Currency": "USD"
+          
+        }
+    ]
+}

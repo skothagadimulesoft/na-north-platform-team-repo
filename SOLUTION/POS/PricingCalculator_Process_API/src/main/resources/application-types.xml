@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="tax_result" format="json">
+      <types:shape format="weave" example="examples/TaxResponse_Sample.json"><![CDATA[%dw 2.0
+
+type tax_result = {|
+  Country: String, 
+  Province: String, 
+  Tax: Number {"typeId": "double"}
+|} {"example": "{\"Country\":\"CA\",\"Province\":\"ON\",\"Tax\":0.15}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#145fdc79-140d-4922-923b-099b0044cb49">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="tax_result"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

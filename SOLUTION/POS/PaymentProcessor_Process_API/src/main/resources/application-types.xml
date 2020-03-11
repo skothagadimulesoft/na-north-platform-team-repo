@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="payment_processor_resp" format="json">
+      <types:shape format="weave" example="api/samples/PaymnetResp_Sample.json"><![CDATA[%dw 2.0
+
+type payment_processor_resp = {|
+  PaymentProcessorTxId: String, 
+  PaymentTxID: String, 
+  StationID: String, 
+  OrderID: String, 
+  CustomerID: String, 
+  Sum: Number {"typeId": "double"}, 
+  Currency: String, 
+  CCType: String
+|} {"example": "{\"PaymentProcessorTxId\":\"2141512\",\"PaymentTxID\":\"1\",\"StationID\":\"333\",\"OrderID\":\"123456\",\"CustomerID\":\"11777\",\"Sum\":33.33,\"Currency\":\"USD\",\"CCType\":\"VISA\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#93b03c92-ca8c-4e1b-a4e6-a5743d277e10">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="payment_processor_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ba80ad1f-dd47-4408-a3c5-65722d615331">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="payment_processor_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

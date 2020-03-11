@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:product-catalogue-system-api="http://www.mulesoft.org/schema/mule/product-catalogue-system-api" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/product-catalogue-system-api http://www.mulesoft.org/schema/mule/product-catalogue-system-api/current/mule-product-catalogue-system-api.xsd">
+    <http:listener-config name="stations_systemapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="stations_systemapi-config" raml="stations_systemapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="6c822a90-dcbc-422f-a44c-ba834880cf38" >
+		<db:my-sql-connection host="mysql.shared.demos.mulesoft.com" port="3306" user="mule" password="Mule1379" database="Couche-Tard" />
+	</db:config>
+	<flow name="stations_systemapi-main">
+        <http:listener config-ref="stations_systemapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="stations_systemapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed Absolutely"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="stations_systemapi-console">
+        <http:listener config-ref="stations_systemapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="stations_systemapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\station:stations_systemapi-config">
+		<set-variable value="#[(attributes.queryParams.Lat) as Number - 2]" doc:name="Set Lat High" doc:id="e4de7a73-b0fa-4951-ab76-4d5c8e4c3c2e" variableName="latlow"/>
+		<set-variable value="#[(attributes.queryParams.Lat as Number) + 2]" doc:name="Set Lat Low" doc:id="0fe52968-de5b-4d83-9a1e-d8d890365ce0" variableName="lathigh"/>
+		<set-variable value="#[(attributes.queryParams.Long as Number) + 2]" doc:name="Set Long High" doc:id="7370c69b-e7f6-4421-9b07-5500407b51dc" variableName="longhigh"/>
+		<set-variable value="#[(attributes.queryParams.Long as Number) - 2]" doc:name="Set Long Low" doc:id="e14e32ed-7d7a-4b43-ad13-975a4b491123" variableName="longlow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="825af9e6-5f7d-4505-a1a9-c9532353e1ab" message='#["Lat boundaries are -&gt; " ++ vars.lathigh as String ++ "--" ++ vars.latlow as String ++ "Long -&gt;  " ++ vars.longlow as String ++ "--" ++ vars.longhigh as String]'/>
+		<db:select doc:name="Select" doc:id="07ee4f8c-c019-4322-b98a-fee1e8905db5" config-ref="Database_Config">
+			<db:sql > SELECT * FROM Stations where ((Latitude&gt;=:latlow) AND (Latitude&lt;=:lathigh)) AND ((Longitude&gt;=:longlow) AND (Longitude&lt;=:longhigh))</db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"latlow":vars.latlow,
+	"lathigh":vars.lathigh,
+	"longlow":vars.longlow,
+	"longhigh":vars.longhigh
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="dc352ad5-9b90-41ea-a856-a1e1a843106d">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+
+	payload map ( payload01 , indexOfPayload01 ) -> {
+		StoreType: payload01.StoreType,
+		coordinates: {
+			Latitude: payload01.Latitude as String,
+			Longitude: payload01.Longitude as String
+		},
+		StationID: payload01.StationID,
+		Address:payload01.Address,
+		Currency:payload01.Currency,
+		SalesTax:payload01.SalesTax,
+		Region:payload01.Region,
+		productTypes: payload01.ProductTypes default "test" splitBy "," map (
+			$ as String
+
+)
+   }
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ef018bb4-edfc-48fa-a087-172b3700d451" >
+				<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+  "response":[
+    {
+          "coordinates":{
+          "Latitude": "",
+          "Longitude":  ""
+        },
+        "StationID":"",
+        "FuelVendor":"",
+        "StoreType":""
+      }
+
+    ]
+    
+  
+
+}]' doc:name="Set Payload" doc:id="7fc9d28f-bbff-4a9c-9953-7383797cfe02" />
+			</on-error-continue>
+		</error-handler>
+    </flow>
+	<flow name="get:\station\(id):stations_systemapi-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="02d96312-e7ac-4a3b-bc3b-f91c80afad6b">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.id]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<db:select doc:name="Select" doc:id="9d2c8d29-6bde-4404-98d8-218611640f28" config-ref="Database_Config">
+			<db:sql>SELECT * FROM `Couche-Tard`.`Stations` WHERE StationID=:stnid</db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"stnid" : vars.id
+}]]]></db:input-parameters>
+			
+		</db:select>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="fc786014-49d5-4d44-9d96-100fe6aed803">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+
+	{
+		StoreType: payload[0].StoreType,
+		coordinates: {
+			Latitude: payload[0].Latitude as String,
+			Longitude: payload[0].Longitude as String
+		},
+		StationID: payload[0].StationID,
+		Address:payload[0].Address,
+		Currency:payload[0].Currency,
+		SalesTax:payload[0].SalesTax,
+		Region:payload[0].Region,
+		productTypes: payload[0].ProductTypes default "test" splitBy "," map (
+			$ as String )
+   }
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c61b559c-d70d-4e86-b431-59225a6e0293">
+				<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+    "coordinates":{
+          "Latitude": "",
+          "Longitude":  ""
+        },
+        "StationID":"",
+        "FuelVendor":"",
+        "StoreType":""
+  
+  }]' doc:name="Set Payload" doc:id="0adea4d7-c209-4b1d-b1ef-b34a60b2f017" />
+			</on-error-continue>
+		</error-handler>
+    </flow>
+</mule>

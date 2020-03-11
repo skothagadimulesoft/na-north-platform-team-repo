@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="trasnaxctionList" format="json">
+      <types:shape format="weave" example="api/samples/PymentTxList_Sample.json"><![CDATA[%dw 2.0
+
+type trasnaxctionList = {|
+  payment_transaction_list: Array<{|    PaymentTxID: String,     OrderID: String,     CustomerID: String,     StationID: String,     PaymentType: String,     Sum: Number {"typeId": "double"},     Currency: String,     Tstamp: String,     NumPoints: Number {"typeId": "int"},     CCType: String  |}>
+|} {"example": "{\"payment_transaction_list\":[{\"PaymentTxID\":\"\",\"OrderID\":\"12334567\",\"CustomerID\":\"11777\",\"StationID\":\"333\",\"PaymentType\":\"CC\",\"Sum\":33.99,\"Currency\":\"USD\",\"Tstamp\":\"2019-10-01T23:57:59-03:00\",\"NumPoints\":0,\"CCType\":\"VISA\"}]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#67cde99d-2a9a-4a30-81b3-c2824f0f5a15">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="trasnaxctionList"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

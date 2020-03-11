@@ -1,0 +1,182 @@
+#%RAML 1.0
+version: v1
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/b8768dca-6566-4bf7-83b7-82a0d11ae356/ # 
+title: Order_SystemAPI
+
+uses:
+  data_types: exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/orderdatatypes/1.0.13/orderdatatypes.raml
+
+
+/PurchaseOrder:
+  get:
+    queryParameters:
+      customerId: 
+        type: string
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.OrderList
+            example:  !include  samples/PurchaseOrderList_Sample.json
+
+  post:
+    body:
+      application/json:
+        type: data_types.PurchaseOrder
+        example:  !include  samples/PurchaseOrder_Sample.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.PurchaseOrder
+            example:  !include  samples/PurchaseOrder_Sample.json 
+          
+
+
+  /{PurchaseOrderID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: data_types.PurchaseOrder
+              example:  !include  samples/PurchaseOrder_Sample.json
+              
+    put:
+      body:
+        application/json:
+          type: data_types.PurchaseOrder
+          example:  !include  samples/PurchaseOrder_Sample.json
+
+      responses:
+        200:
+          body:
+            application/json:
+              type: data_types.PurchaseOrder
+              example:  !include  samples/PurchaseOrder_Sample.json
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include samples/DeleteOrderResponse_Sample.json
+
+              
+/Order:
+  get:
+    queryParameters:
+      customerId: 
+        type: string
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            type:  data_types.OrderSimpleList
+            example:  !include  samples/OrderListSimple_Sample.json
+
+  post:
+    body:
+      application/json:
+        type: data_types.OrderSimple
+        example:  !include  samples/OrderSimple_Sample.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.OrderSimple
+            example:  !include  samples/OrderSimple_Sample.json 
+
+          
+  /{OrderID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type:   data_types.OrderSimple
+              example:  !include  samples/OrderSimple_Sample.json 
+              
+    put:
+      body:
+        application/json:
+          type:   data_types.OrderSimple
+          example:  !include  samples/OrderSimple_Sample.json
+
+      responses:
+        200:
+          body:
+            application/json:
+              type:   data_types.OrderSimple
+              example:  !include  samples/OrderSimple_Sample.json
+              
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include samples/DeleteOrderResponse_Sample.json
+                
+
+/OrderItem:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.OrderItemSimpleList
+            example:  !include samples/OrderItemListSimple_Sample.json
+  post:
+    body:
+      application/json:
+        type: data_types.OrderItemSimple
+        example: !include samples/OrderItemSimple_Sample.json
+
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.OrderItemSimple
+            example: !include samples/OrderItemSimple_Sample.json
+            
+      
+
+  /{OrderItemID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: data_types.OrderItemSimple
+              example:  !include samples/OrderItemSimple_Sample.json
+                
+    put:
+      body:
+        application/json:
+          type: data_types.OrderItemSimple
+          example:  !include samples/OrderItemSimple_Sample.json
+      responses:
+        200:
+          body:
+            application/json:
+              type: data_types.OrderItemSimple
+              example:  !include samples/OrderItemSimple_Sample.json
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include samples/DeleteOrderItemResp_Sample.json
+      
+         
+
+           
+      
+      
+
+
+    
+

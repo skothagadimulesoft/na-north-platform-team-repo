@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:proxy="http://www.mulesoft.org/schema/mule/proxy"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+        http://www.mulesoft.org/schema/mule/proxy http://www.mulesoft.org/schema/mule/proxy/current/mule-proxy.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <configuration-properties file="config.properties"/>
+
+    <configuration defaultResponseTimeout="${proxy.responseTimeout}"/>
+
+    <proxy:config name="proxy-config"/>
+
+    <api-gateway:autodiscovery apiId="${api.id}" flowRef="proxy"/>
+
+    <flow name="proxy">
+        <http:listener config-ref="http-listener-config" path="${proxy.path}" responseStreamingMode="AUTO">
+            <http:response statusCode="#[attributes.statusCode]" reasonPhrase="#[attributes.reasonPhrase]">
+                <http:headers>#[if (vars.proxyResponseHeaders?) vars.proxyResponseHeaders else {}]</http:headers>
+            </http:response>
+        </http:listener>
+
+        <proxy:request-headers config-ref="proxy-config" target="proxyRequestHeaders"/>
+
+        <http:request config-ref="http-request-config" method="#[attributes.method]" path="#[attributes.maskedRequestPath]">
+            <http:headers>#[vars.proxyRequestHeaders]</http:headers>
+            <http:uri-params>#[attributes.uriParams]</http:uri-params>
+            <http:query-params>#[attributes.queryParams]</http:query-params>
+            <http:response-validator>
+                <http:success-status-code-validator values="0..599"/>
+            </http:response-validator>
+        </http:request>
+
+        <proxy:response-headers config-ref="proxy-config" target="proxyResponseHeaders"/>
+
+        <error-handler>
+            <on-error-continue type="HTTP:TIMEOUT" logException="false">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-attributes>
+                            {
+                                statusCode: 504
+                            }
+                        </ee:set-attributes>
+                    </ee:message>
+                </ee:transform>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+</mule>

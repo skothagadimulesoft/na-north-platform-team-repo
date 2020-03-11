@@ -1,0 +1,9 @@
+{
+    "PaymentTxID": "1",
+    "StationID":  "333",
+    "OrderID":  "123456",
+    "CustomerID": "11777" ,
+    "Sum":  33.33,
+    "Currency": "USD",
+    "CCType": "VISA"
+}

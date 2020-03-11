@@ -1,0 +1,9 @@
+{
+  "PromotionName":  "Discount Coke",
+  "ProductName": "Coke",
+  "ProductID":  "CK-123", 
+  "Offer": "20% off next Coke",
+  "OfferType":  "BOGO",
+  "OfferValue":"20"
+
+}

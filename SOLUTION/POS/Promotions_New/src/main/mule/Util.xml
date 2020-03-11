@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+	<flow name="invokeRules" doc:id="41ea6d2f-1253-4a4b-af12-b28589654c3a" >
+		<java:invoke-static doc:name="Invoke static" doc:id="2c4b12e2-6bec-4ce3-81d9-865468a5d9bf" class="com.promotions.processor.PromotionsProcessor" method="getPromotionSingleProduct(PromotionRequest)">
+			<java:args ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	pReq: {
+		customerID: payload.customerID,
+		productID: payload.productID,
+		productName: payload.productName,
+		productType: payload.productType,
+		stationID: payload.stationID
+	}
+}]]]></java:args>
+		</java:invoke-static>
+	</flow>
+</mule>

@@ -1,0 +1,67 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/1e02ed7e-6a9d-4d94-90ec-0006664cc920/ # 
+version: v1
+title: PaymentTx_SystemAPI
+
+uses:
+  data_types: exchange_modules/0e9dadfb-4b73-470b-97ea-9bfb898ee5e4/paymentdatatypes/1.0.3/paymentdatatypes.raml
+
+/PaymentTransaction:
+  post:
+    body:
+      application/json:
+        type: data_types.PaymentTransacation
+        example: !include samples/PaymentTx_Sample.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.PaymentTransacation
+            example: !include samples/PaymentTx_Sample.json
+            
+          
+  get:
+    queryParameters:
+      orderId:  
+        type: string
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            type: data_types.PaymentTransacationList
+            example:  !include  samples/PymentTxList_Sample.json
+
+  /{PaymentTransactionID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: data_types.PaymentTransacation
+              example: !include samples/PaymentTx_Sample.json
+    put:
+      body:
+          application/json:
+            type: data_types.PaymentTransacation
+            example: !include samples/PaymentTx_Sample.json
+      responses:
+        200:
+          body:
+            application/json:
+              type: data_types.PaymentTransacation
+              example: !include samples/PaymentTx_Sample.json
+      
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:  !include samples/DeletePaymentTxSample_Resp.json
+
+                
+              
+
+
+              
+
