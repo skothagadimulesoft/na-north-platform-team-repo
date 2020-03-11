@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:kafka="http://www.mulesoft.org/schema/mule/kafka" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd">
+	<os:object-store name="CEP_Object_store_UC2" doc:name="Object store" doc:id="9fd21498-258a-4e8a-aba4-81096a72701a" maxEntries="10" />
+	<http:listener-config name="HTTP_Listener_config2" doc:name="HTTP Listener config" doc:id="cfc76790-3341-4726-bfaf-3c0cccb4da2e" >
+		<http:listener-connection host="0.0.0.0" port="8083" />
+	</http:listener-config>
+	<flow name="eventwindowing_UC2Flow" doc:id="149381ca-3a2d-4244-ac12-683a8cf877c4" maxConcurrency="1">
+		<http:listener doc:name="Listener" doc:id="739dc137-373d-43e7-a93f-3b099de6713a" config-ref="HTTP_Listener_config2" path="/api/detectwindoweventUC2" responseStreamingMode="NEVER"/>
+		<logger level="INFO" doc:name="Logger" doc:id="eb1138c8-8a10-43f6-9e00-efa5c040be5b" message="#[payload]"/>
+		<os:store doc:name="Store Transaction - Use timestamp as Key" doc:id="80abe168-1976-4bf9-a76c-3bf5fa66716d" key="#[now()]" objectStore="CEP_Object_store_UC2">
+			<os:value ><![CDATA[#[payload.MessageType]]]></os:value>
+		</os:store>
+		<flow-ref doc:name="Call event window check Flow Reference" doc:id="b3195c20-ad58-4ebf-99c4-1903fadcfd62" name="checkforeventwindow_UC2"/>
+	</flow>
+	<sub-flow name="checkforeventwindow_UC2" doc:id="d458b4fb-6b07-46e2-8f9f-857335fb9d12" >
+		<os:retrieve-all-keys doc:name="Retrieve all cached keys/timestamps" doc:id="4de5eb54-595c-42fe-9c3e-d1e5031b11ac" objectStore="CEP_Object_store_UC2" />
+		<ee:transform doc:name="Order all keys by ASC" doc:id="b244366e-399b-4534-8fd7-8e8e8ebfb191">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+
+payload orderBy $]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload[0]]" doc:name="Set Payload 0 Key Variable" doc:id="a226f9a3-cf01-4b50-9f58-fda879cbe272" variableName="key0"/>
+		<logger level="INFO" doc:name="Logger" doc:id="bab925a7-b25d-473c-bb10-6651c6a7180e" message="#[payload]"/>
+		<os:retrieve doc:name="Retrieve value for message type at key 0" doc:id="095d12a6-8bed-40c5-8b69-982837a6e855" key='#[payload[0] default "test"]' target="payload0" targetValue="#[payload as String]" objectStore="CEP_Object_store_UC2">
+		</os:retrieve>
+		<logger level="INFO" doc:name="Logger" doc:id="111df819-d060-4979-b8b3-3e4e23f8f5b4" message='#[vars.payload0 default "Not found Payload0"]'/>
+		<os:retrieve doc:name="Retrieve value for message type at key 1" doc:id="d2918d5b-2f8b-4aa5-acdd-c1f319f2ae44" key='#[payload[1] default "test"]' target="payload1" targetValue="#[payload as String]" objectStore="CEP_Object_store_UC2">
+			<os:default-value ><![CDATA[#["test"]]]></os:default-value>
+		</os:retrieve>
+		<logger level="INFO" doc:name="Logger" doc:id="0dad7515-7462-41cd-8f6b-ceef62fc348d" message='#[vars.payload1 default "Not found payload 1"]'/>
+		<set-variable value='#[if((sizeOf(payload) == 2) and (!(vars.payload0 as String  == vars.payload1 as String )))  true else false]' doc:name="Are message types different" doc:id="7959f920-ffca-49d3-9c4b-fdc1438144ec" variableName="diffmessagetypes"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e05717cb-c741-4461-b17e-2570bbeddf7e" message='#["Are message types different = " ++ vars.diffmessagetypes]'/>
+		<choice doc:name="Check if window event detected" doc:id="36e16d81-0e9e-4572-873c-ff9a0fc67a25" >
+			<when expression="#[vars.diffmessagetypes == true]">
+				<flow-ref doc:name="Process WIndow Event" doc:id="5e2d84a0-c648-4c4f-a135-57bc0834baad" name="ProcessWindowedEvents"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="6cd76f80-a0ec-4b7c-bd2d-5795df495ed0" message="#['Payload Entries -&gt; ' ++ sizeOf(payload)]"/>
+			</otherwise>
+		</choice>
+		<choice doc:name="Cleanup 1st entry if payload == 2" doc:id="517465c5-bb9f-4245-a38f-eb0c38755773">
+					<when expression="#[sizeOf(payload) &gt; 1]" >
+				<os:remove doc:name="Remove oldest entry from the cache" doc:id="97508036-1b55-4d87-b932-4401fb2feefa" key="#[vars.key0]" objectStore="CEP_Object_store_UC2" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="56c9547c-fdeb-4a7f-bd25-b35e8450c48f" message='#["Finished processing window events"]'/>
+			</otherwise>
+				</choice>
+	</sub-flow>
+	<sub-flow name="ProcessWindowedEvents" doc:id="bb18b1ec-4dd0-412a-a254-e4bf782cdbe7" >
+		<logger level="INFO" doc:name="Logger" doc:id="f96168ee-8e9a-4f31-b19d-5575f1ce0f06" message="#['Payload Entries == 2. Time to check interval']" />
+		<os:retrieve-all-keys doc:name="Retrieve all cached keys/timestamps" doc:id="4164b433-7e48-4259-a7ab-b8a9e6f2d9f8" objectStore="CEP_Object_store_UC2" />
+		<ee:transform doc:name="Order all keys by ASC" doc:id="d77161e2-03c0-4c4e-966c-668bef13b0f1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+
+payload orderBy $]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ac6c3d00-40bf-460c-b691-e3ee5e7a4e98" message="#[payload]"/>
+		<set-variable value="#[(payload[1] as DateTime - payload[0] as DateTime).seconds]" doc:name="DIff between newest entry and oldest entry" doc:id="345781d6-3922-4d5e-a33b-23ecc435e7a6" variableName="diff" />
+		<choice doc:name="Check if the the transactions were received in a 10 sec window" doc:id="1e17f09e-0f5a-495e-9c4d-312fe687a902" >
+			<when expression="#[vars.diff &lt;= 10]" >
+				<logger level="INFO" doc:name="Logger" doc:id="4743484b-fd29-46c1-8719-63859ed0adc8" message="#['Detected Window Transactions -&gt; Diff = ' ++ vars.diff]" />
+				<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"MessageId": uuid(),
+	"MessageType": "C",
+	"Amount": 100
+}]' doc:name="Create Message C" doc:id="41f76711-4657-4c3c-afc2-24c1c7f50b7d" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="16dc7b3c-22ef-4ba2-917e-03d81a9cdce8" message="#['No Window Events detected']" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<flow name="eventwindowing_clearcache" doc:id="fdaea375-6c17-4601-b097-016c70d7c9da" >
+		<http:listener doc:name="Listener" doc:id="79548e5e-f22e-4aaa-b08f-32a4aa1ffc1e" config-ref="HTTP_Listener_config2" path="/api/clearcache"/>
+		<os:clear doc:name="Clear the object cache" doc:id="c8464b1a-c011-4d4f-bc6d-93f363180c12" objectStore="CEP_Object_store_UC2"/>
+	</flow>
+</mule>
