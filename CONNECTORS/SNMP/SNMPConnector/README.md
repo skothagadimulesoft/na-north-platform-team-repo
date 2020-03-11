@@ -6,6 +6,19 @@ NOTE: This is not a production ready artifact. It is a POC that can be used to t
 
 In order to use this follow the following steps:
 
+1) copy the current project into your Mule Studio Workspace
+
+2) Import the Project into Studio
+  Note: do not import it as an Anypoint project but rather as a Eclipse project (Import -> General -> Existing Projet into 
+  workspace)
+
+3) Install the Connector project into the local Maven repo
+
+   Got to the root of the Mule Connector project (i.e. SNMPConnector), where the POM file exists and execute
+
+    mvn clean install -DskipTests
+
+
 
 
 
