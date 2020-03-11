@@ -1,0 +1,15 @@
+{
+	"name": "TMF Customer Documentation API Spec",
+	"description": "Description of the document",
+	"type": "Invoice",
+	"Attachment": {
+		"size": "123.0",
+		"sizeUnit": "bytes",
+		"mimeType": "application/pdf",
+		"URL": "/ documentManagement / document /document.pdf "
+		},
+    "documentCharacteristic": [{
+				"name": "Title",
+				"value": "Document from API"
+			}]
+}

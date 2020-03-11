@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+    <http:listener-config name="tmf_customer_mgmt1-httpListenerConfig">
+    
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="tmf_customer_mgmt1-config" api="resource::9be0b2dd-a5cd-4497-aeb4-1674a4f5a4b5:tmf_customer_mgmt1:1.0.1:raml:zip:tmf_customer_mgmt1.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" raml="api/tmf_customer_mgmt1.raml"/>
+    <configuration-properties doc:name="Configuration properties" doc:id="766849b0-3d71-4f61-8680-6ebdeab0864a" file="config/config.yaml" />
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="10c92832-0ab6-4c14-94fe-ca5ca2ab9c22" >
+		<salesforce:basic-connection username="${sfdc.username}" password="${sfdc.password}" securityToken="${sfdc.token}" />
+	</salesforce:sfdc-config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="c9d50190-8352-449b-b556-9776db84c420" maxEntries="200" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="0135046a-8ca0-4421-ab16-379ac9824b2d" >
+		<http:request-connection host="#[payload[2]]" port="8089" />
+	</http:request-config>
+	<api-gateway:autodiscovery apiId="15682299" doc:name="API Autodiscovery" doc:id="50f4d77f-75d9-4710-b044-de48c1f1190f" flowRef="tmf_customer_mgmt1-main" />
+	<flow name="tmf_customer_mgmt1-main">
+        <http:listener config-ref="tmf_customer_mgmt1-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="tmf_customer_mgmt1-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="tmf_customer_mgmt1-console">
+        <http:listener config-ref="tmf_customer_mgmt1-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="tmf_customer_mgmt1-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="delete:\customer\(id):tmf_customer_mgmt1-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="095a6258-2600-44da-af6a-11b13a06c0b2">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.id]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<salesforce:query doc:name="Copy_of_Query" doc:id="90dfe6b1-c7e7-46ed-a69e-9529535f58b8" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query>SELECT id from TMF_Credit_Profile__c 
+where TMF_Credit_Profile__c = ':id' </salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	id : vars.id
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<choice doc:name="Choice" doc:id="ead0d15c-5b19-4bbf-b5ac-e5d530ab4a01" >
+			<when expression="(payload.Id != null)">
+				<ee:transform doc:name="Transform Message" doc:id="0fb73aa0-a590-41bf-9820-000d2f0d490a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload.Id]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<salesforce:delete doc:name="Delete" doc:id="135dcb47-9738-4e80-bba9-51127986b15e" config-ref="Salesforce_Config">
+		</salesforce:delete>
+			</when>
+		</choice>
+		<salesforce:delete doc:name="Delete" doc:id="ee0a8f26-d78a-4e4d-a1d1-cda3d90605ca" config-ref="Salesforce_Config">
+			<salesforce:delete-ids ><![CDATA[#[[vars.id]]]]></salesforce:delete-ids>
+		</salesforce:delete>
+		<ee:transform doc:name="Transform Message" doc:id="6c579585-0df5-40c2-8548-39cf40f743b0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="delete:\customer\(id):tmf_customer_mgmt1-config" />
+    </flow>
+    <flow name="patch:\customer\(id):application\json:tmf_customer_mgmt1-config">
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="76b6ab05-6202-4097-8148-52a74abc4ca2" variableName="savedCustomer" />
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="c1bf2681-6a3b-491d-ae39-4f12c0651f1c">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.id]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<set-variable value="#[vars.id]" doc:name="Set Variable" doc:id="1e95293f-7087-4d5b-9ecc-193295aa8c5a" variableName="customerIdLookUp" />
+		<choice doc:name="Choice" doc:id="f60593be-abbe-4978-8f6b-467860709863">
+			<when expression="(vars.savedCustomer.creditProfile != null)">
+				<salesforce:query doc:name="Query" doc:id="57f8d28f-a18e-419d-aa74-a6ee37bbc341" config-ref="Salesforce_Config">
+					<salesforce:salesforce-query>SELECT id from TMF_Credit_Profile__c 
+where TMF_Credit_Profile__c = ':id' </salesforce:salesforce-query>
+					<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	id : vars.id
+}]]]></salesforce:parameters>
+				</salesforce:query>
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="b92b5c53-7f7d-42f0-b3e1-bc04d626ee9c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+
+	vars.savedCustomer.creditProfile map(item, index) ->{
+		
+	(id: payload.Id[index]) if (payload.Id[index] != null),
+	TMF_credit_profile__c: vars.id,
+	
+	(TMF_creditProfileDate__c: item.creditProfileDate as DateTime) if (item.creditProfileDate != null),
+	(TMF_creditRiskRating__c: item.creditRiskRating) if(item.creditRiskRating != null),
+	(TMF_creditScore__c: item.creditScore) if(item.creditScore != null),
+	(TMF_validFor_startDateTime__c: item.validFor.startDateTime as DateTime) if(item.validFor.startDateTime.validFor.startDateTime  != null),
+	(TMF_validFor_endDateTime__c: item.validFor.endDateTime as DateTime) if(item.validFor.endDateTime != null)
+} ]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<salesforce:upsert type="TMF_Credit_Profile__c" doc:name="Upsert" doc:id="d2c0ed14-3289-4d02-ad17-baab9ea98214" config-ref="Salesforce_Config" externalIdFieldName="id" />
+				<ee:transform doc:name="Transform Message" doc:id="ee924394-8284-40f5-824a-f1e401b2f94a">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="7cdb9fa2-069c-43fa-b92f-4abbfccd7acd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+var nameSplit = if(vars.savedCustomer.name != null) vars.savedCustomer.name splitBy(' ') else ""
+---
+{
+	Id: vars.id,
+	(AccountId: vars.savedCustomer.account.id[0]) if (vars.savedCustomer.account.id[0] != null),
+	(LastName: nameSplit[1]) if (nameSplit[1] != null),
+	(FirstName: nameSplit[0]) if (nameSplit[0] != null),
+	(Email: vars.savedCustomer.contactMedium.characteristic.emailAddress[0]) if (vars.savedCustomer.contactMedium.characteristic.emailAddress[0] != null),
+	(Phone: vars.savedCustomer.contactMedium.characteristic.phoneNumber[0]) if (vars.savedCustomer.contactMedium.characteristic.phoneNumber[0] != null),
+	(MailingPostalCode: vars.savedCustomer.contactMedium.characteristic[0].postCode) if (vars.savedCustomer.contactMedium.characteristic.postCode != null),
+	(MailingCountry: vars.savedCustomer.contactMedium.characteristic.country[0]) if (vars.savedCustomer.contactMedium.characteristic.country[0] != null),
+	(MailingState: vars.savedCustomer.contactMedium.characteristic.stateOrProvince[0]) if (vars.savedCustomer.contactMedium.characteristic.stateOrProvince[0] != null),
+	(MailingStreet: vars.savedCustomer.contactMedium.characteristic.street1[0]) if (vars.savedCustomer.contactMedium.characteristic.street1[0] != null),
+	(MailingCity: vars.savedCustomer.contactMedium.characteristic.city[0]) if (vars.savedCustomer.contactMedium.characteristic.city[0] !=null),
+	(TMF_startDateTime__c: vars.savedCustomer.validFor.startDateTime as DateTime) if (vars.savedCustomer.validFor.startDateTime != null),
+	(TMF_Status__c: vars.savedCustomer.status) if (vars.savedCustomer.status != null),
+	(TMF_StatusReason__c: vars.savedCustomer.statusReason) if (vars.savedCustomer.statusReason != null)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:update-single doc:name="Update single" doc:id="2c586909-0998-421e-bd80-9e62df35dcb3" config-ref="Salesforce_Config" type="Contact" />
+		<ee:transform doc:name="Transform Message" doc:id="d8c41179-880d-462a-9640-0a611fef70a4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="c6ef57fd-5b28-4fea-aefd-04d23505d8e7" name="QueryCustomer" />
+		<logger level="INFO" message="patch:\customer\(id):application\json:tmf_customer_mgmt1-config" />
+    </flow>
+	<flow name="get:\customer:tmf_customer_mgmt1-config">
+        <ee:transform doc:name="Transform Message" doc:id="8ce3a69a-bd77-4a4c-9e59-d5df87703ed4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="get:\customer:tmf_customer_mgmt1-config" />
+		<salesforce:query doc:name="Copy_of_Query" doc:id="4caefbae-b0cf-4fa8-9eca-fb2751c9b19c" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query>SELECT c.Name, c.Email,  c.id, c.Account.Id, c.Account.Name, c.TMF_startDateTime__c, c.TMF_endDateTime__c, c.MailingCity, c.MailingState, c.MailingStreet, c.MailingPostalCode, c.MailingCountry, c.TMF_StatusReason__c, c.Account.TMF_Description__c,  (
+    SELECT TMF_creditProfileDate__c,TMF_creditRiskRating__c,TMF_creditScore__c,TMF_credit_profile__c,TMF_validFor_endDateTime__c,TMF_validFor_startDateTime__c
+    FROM Credit_Profiles__r
+  )
+FROM Contact c, c.Account
+</salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="33b6d78b-7092-40aa-b7cd-c46a32ff4a0e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var accountURL = "https://na91.lightning.force.com/lightning/r/Account/" ++ payload[0].Account.Id ++"/view"
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	
+	id: payload01.Id,
+	name: payload01.Name default "",
+	statusReason: payload01.TMF_StatusReason__c default "",
+	contactMedium: [{
+		validFor: {
+			startDateTime: payload01.TMF_endDateTime__c as String default "",
+			endDateTime: payload01.TMF_startDateTime__c as String default ""
+		},
+
+		characteristic: {
+			country: payload01.MailingCountry default "",
+			emailAddress: payload01.Email default "",
+			city: payload01.MailingCity default "",
+			state: payload01.MailingState default "",
+			postCode: payload01.MailingPostalCode default "",
+			street1: payload01.MailingStreet default ""
+		}
+	}],
+	creditProfile: payload01.Credit_Profiles__r map ( item , index ) -> {
+		creditProfileDate: item.TMF_creditProfileDate__c default "",
+		creditRiskRating: item.TMF_creditRiskRating__c default "",
+		creditScore: item.TMF_creditScore__c default "",
+		validFor: {
+			startDateTime: item.TMF_validFor_startDateTime__c default "",
+			endDateTime: item.TMF_validFor_endDateTime__c default ""
+		}
+	},
+
+	paymentMethod: [{
+		name: payload01.Account.Name default "",
+		href: accountURL,
+		id: payload01.Account.Id default ""
+	}],
+	
+	engagedParty: {
+		name: payload01.Account.Name default "",
+		href: accountURL,
+		id: payload01.Account.Id default ""
+	},
+	account: [{
+		name: payload01.Account.Name default "",
+		description: payload01.Account.TMF_Description__c default "",
+		href: accountURL,
+		id: payload01.Account.Id default ""
+	}]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+	<flow name="get:\customer\(id):tmf_customer_mgmt1-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="151f3933-caf9-4a4d-b91f-08ae84e787af">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.id]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\customer\(id):tmf_customer_mgmt1-config" />
+		<set-variable value="#[vars.id]" doc:name="Set Variable" doc:id="ec5b8af8-1c1a-492a-9498-d2d5722aaf95" variableName="customerIdLookUp"/>
+		<flow-ref doc:name="Flow Reference" doc:id="7ad08b54-293a-4e3d-8652-25a289a7f3df" name="QueryCustomer"/>
+    </flow>
+    <flow name="post:\customer:application\json:tmf_customer_mgmt1-config">
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="bb7f7989-f2cd-40a6-904c-2594a8c15a09" variableName="savedCustomer" />
+		<ee:transform doc:name="Transform Message" doc:id="7c428af7-1cd7-479d-b7e6-4ab2debb084e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+var nameSplit = payload.name splitBy(' ')
+---
+{
+	
+	(AccountId: payload.account.id[0]) if (payload.account.id[0] != null),
+	LastName: nameSplit[1],
+	FirstName: nameSplit[0],
+	(Email: payload.contactMedium.characteristic.emailAddress[0]) if (payload.contactMedium.characteristic.emailAddress[0] != null),
+	(Phone: payload.contactMedium.characteristic.phoneNumber[0]) if (payload.contactMedium.characteristic.phoneNumber[0] != null),
+	(MailingPostalCode: payload.contactMedium.characteristic[0].postCode) if (payload.contactMedium.characteristic.postCode != null),
+	(MailingCountry: payload.contactMedium.characteristic.country[0]) if (payload.contactMedium.characteristic.country[0] != null),
+	(MailingState: payload.contactMedium.characteristic.stateOrProvince[0]) if (payload.contactMedium.characteristic.stateOrProvince[0] != null),
+	(MailingStreet: payload.contactMedium.characteristic.street1[0]) if (payload.contactMedium.characteristic.street1[0] != null),
+	(MailingCity: payload.contactMedium.characteristic.city[0]) if (payload.contactMedium.characteristic.city[0] !=null),
+	(TMF_startDateTime__c: payload.validFor.startDateTime as DateTime) if (payload.validFor.startDateTime != null),
+	(TMF_Status__c: payload.status) if (payload.status != null),
+	(TMF_StatusReason__c: payload.statusReason) if (payload.statusReason != null)
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables />
+		</ee:transform>
+		<salesforce:create-single type="Contact" doc:name="Create Contact" doc:id="2a30bf0a-3eeb-4eac-934a-d26e1105e4db" config-ref="Salesforce_Config" />
+		<ee:transform doc:name="Transform Message" doc:id="13acb606-0085-4df4-ae25-249935e460cd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="47f0820b-e62f-44aa-9c5f-cf766db7a210">
+			<when doc:id="6d06eb6e-d560-4877-a942-4b0505d03fe5" expression="#[(payload.success == true) and (vars.savedCustomer.creditProfile != null)]">
+				<set-variable value="#[payload.id]" doc:name="Set Variable" doc:id="da8a56a3-7c15-4535-a525-5f33d49728e7" variableName="createdContactId" />
+				<ee:transform doc:name="Transform Message" doc:id="4543da70-977d-47ac-83f4-f8564c5a6cb6">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+
+	vars.savedCustomer.creditProfile map(item, index) ->{
+		
+	
+	TMF_credit_profile__c: payload.id,
+	
+	(TMF_creditProfileDate__c: item.creditProfileDate as DateTime) if (item.creditProfileDate != null),
+	(TMF_creditRiskRating__c: item.creditRiskRating) if(item.creditRiskRating != null),
+	(TMF_creditScore__c: item.creditScore) if(item.creditScore != null),
+	(TMF_validFor_startDateTime__c: item.validFor.startDateTime as DateTime) if(item.validFor.startDateTime.validFor.startDateTime  != null),
+	(TMF_validFor_endDateTime__c: item.validFor.endDateTime as DateTime) if(item.validFor.endDateTime != null)
+} ]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<salesforce:create type="TMF_Credit_Profile__c" doc:name="Create Credit Profile" doc:id="630a36b5-51fd-4158-bb96-510fb10c7fc6" config-ref="Salesforce_Config" />
+				<ee:transform doc:name="Transform Message" doc:id="ca5a7e4d-ad6c-4302-8f92-7c5c92d5bf26">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.savedCustomer ++ {"id": vars.createdContactId}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[(payload.success == true)]">
+				<set-variable value="#[payload.id]" doc:name="Set Variable" doc:id="168af2ab-d937-4f2e-a4da-c592d5918303" variableName="createdContactId" />
+				<ee:transform doc:name="Transform Message" doc:id="42cf5475-08d5-42a2-8863-ba1ba8e720a6">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.savedCustomer ++ {"id": vars.createdContactId}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="bf006638-c7e4-4790-968c-683b769be7e9" message="Error: #[payload]" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" message="post:\customer:application\json:tmf_customer_mgmt1-config" />
+    </flow>
+	<flow name="tmf_customer_managementFlow" doc:id="c17f467c-f2aa-46e3-8035-3b0d68208765" initialState="started">
+		<salesforce:subscribe-channel doc:name="Subscribe channel" doc:id="0bb03558-dbd7-44ce-8478-56ac05b10d4e" config-ref="Salesforce_Config" streamingChannel="/data/ContactChangeEvent" />
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="73256f5d-3e34-4e37-9af3-cbd7938a1e74" variableName="salesforceChange" />
+		<set-variable value="#[vars.salesforceChange.data.payload.ChangeEventHeader.recordIds[0]]" doc:name="Set Variable" doc:id="6efbd5c1-ebe3-4507-9714-ee68b2eeb180" variableName="customerIdLookUp" />
+		<choice doc:name="Choice" doc:id="9ee298e0-1b9d-44fd-b414-e806997847ae">
+			<when expression='#[(vars.salesforceChange.data.payload.ChangeEventHeader.changeType == "CREATE") or (vars.salesforceChange.data.payload.ChangeEventHeader.changeType == "UPDATE")]'>
+				<ee:transform doc:name="Transform Message" doc:id="87888224-0819-4c3d-a7df-f3c6cb53df1d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="75b2682f-6c27-4632-ae4c-a689aea09220" message="#[payload]" />
+				<flow-ref doc:name="Flow Reference" doc:id="3218133b-a894-4295-9940-9dad92ebfbeb" name="QueryCustomer" />
+				<set-variable value="#[payload]" doc:name="Save Customer Query Data" doc:id="9b87e585-06d2-4b48-a132-d170cde6910c" variableName="savedCust" />
+				<ee:transform doc:name="Transform Message" doc:id="2d847de4-4c41-45b1-8ca0-db6794c7dc7d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	eventId: vars.salesforceChange.data.event.replayId,
+	eventTime: vars.salesforceChange.data.payload.LastModifiedDate,
+
+	(eventType: "CustomerCreationNotification") if(vars.salesforceChange.data.payload.ChangeEventHeader.changeType == "CREATE")  ,
+	(eventType: "CustomerAttributeValueChangeNotification") if(vars.salesforceChange.data.payload.ChangeEventHeader.changeType == "UPDATE")  ,
+	
+	event: {
+		(vars.salesforceChange.data.payload.ChangeEventHeader.entityName as Key): vars.savedCust
+		
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<when expression='(vars.salesforceChange.data.payload.ChangeEventHeader.changeType == "DELETE")'>
+				<logger level="INFO" doc:name="Logger" doc:id="7f9ad6df-7acf-44ff-822f-52e415aa9784" message="#[vars.salesforceChange]" />
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="c9426661-6f8c-4f44-849c-a7c9e8235d92">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	eventId: vars.salesforceChange.data.event.replayId,
+	eventTime: vars.salesforceChange.data.payload.LastModifiedDate,
+
+	(eventType: "CustomerRemoveNotification"),
+
+	
+	event: {
+		(vars.salesforceChange.data.payload.ChangeEventHeader.entityName as Key): vars.salesforceChange
+		
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+		</choice>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="a441f575-1c50-4ef3-91a5-d844212358bf" variableName="eventObj" />
+		<os:retrieve-all-keys doc:name="Retrieve all keys" doc:id="879517b8-11a1-4a26-b567-525d832c9e2c" objectStore="Object_store"/>
+		<set-variable value="#[payload]" doc:name="Save call back URLs" doc:id="e2d613b3-d505-41f7-9818-18099517cbcb" variableName="callbackURLs" />
+		<foreach doc:name="For Each" doc:id="b1afb942-aeee-4ad7-83a7-5db70925c3a1" collection="vars.callbackURLs">
+			<try doc:name="Try" doc:id="35fe1689-2893-469b-ad9e-6f00bc9ef4e9">
+				<os:retrieve doc:name="Retrieve" doc:id="05121dee-b703-42e3-9c73-dcb19ee5a858" key="#[payload]" objectStore="Object_store">
+					<os:default-value ><![CDATA[#[1]]]></os:default-value>
+				</os:retrieve>
+				<ee:transform doc:name="Transform Message" doc:id="3300bda5-1efa-4de0-ad44-a106b8726a46" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<http:request method="POST" doc:name="Request" doc:id="46c93de6-361d-4f89-b45b-fb74ecd36fa4" config-ref="HTTP_Request_configuration" url="#[payload.callback]">
+					<http:body><![CDATA[#[vars.eventObj]]]></http:body>
+		</http:request>
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="225dbf31-9118-4529-9e9f-eca76dd7ae51" />
+				</error-handler>
+			</try>
+		</foreach>
+	</flow>
+	<flow name="delete:\hub\(id):tmf_customer_mgmt1-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="d56e2354-8587-468d-87fd-93c8c59e9d95">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.id]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <os:remove doc:name="Remove" doc:id="bf69891f-ef54-4b23-860a-ccbeb7ad4f02" key="#[vars.id]" objectStore="Object_store"/>
+		<logger level="INFO" message="delete:\hub\(id):tmf_customer_mgmt1-config" />
+    </flow>
+	<flow name="post:\hub:application\json:tmf_customer_mgmt1-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="81dbb578-b0e5-4039-b61e-798782f59dc0" variableName="callbackURL"/>
+		<os:retrieve-all-keys doc:name="Retrieve all keys to find new object store Id" doc:id="a83556de-0e4e-474e-85d3-10a52ad32f5b" objectStore="Object_store" />
+		<ee:transform doc:name="Transform Message" doc:id="f69148bb-5823-4de0-b8ce-8df6bfd50f92">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var lastId = (sizeOf(payload) + now() as Number)
+---
+{
+	id: (lastId + 1) default 100,
+	callback: vars.callbackURL.callback,
+	query: attributes.queryParams.query default "",
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload.id]" doc:name="Set Variable" doc:id="2e165bb8-4d26-4d6d-8025-94d7afd7bd84" variableName="objStoreId"/>
+		<os:store doc:id="ba617b77-940a-41d9-a0ff-5bf05237d67d" key="#[payload.id]" objectStore="Object_store" />
+		<os:retrieve doc:name="Retrieve" doc:id="c7ba3260-47c0-4d89-8165-1d7a31a41487" objectStore="Object_store" key="#[vars.objStoreId]">
+			<os:default-value ><![CDATA[#[1]]]></os:default-value>
+		</os:retrieve>
+		<ee:transform doc:name="Transform Message" doc:id="d860cc43-61b4-437c-bb4f-81e8f41fbdd1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="post:\hub:application\json:tmf_customer_mgmt1-config" />
+    </flow>
+	<flow name="QueryCustomer" doc:id="75f10e5f-a847-48bd-b990-78ebc3cc3a47" >
+		<salesforce:query doc:name="Get Customer with ID" doc:id="6795626e-6320-4608-9cee-0654eb5b2114" config-ref="Salesforce_Config" >
+			<salesforce:salesforce-query >SELECT c.Name, c.Email,  c.id, c.Account.Id, c.Account.Name, c.TMF_startDateTime__c, c.TMF_endDateTime__c, c.MailingCity, c.MailingState, c.MailingStreet, c.MailingPostalCode, c.MailingCountry, c.TMF_StatusReason__c, c.Account.TMF_Description__c,  (
+    SELECT TMF_creditProfileDate__c,TMF_creditRiskRating__c,TMF_creditScore__c,TMF_credit_profile__c,TMF_validFor_endDateTime__c,TMF_validFor_startDateTime__c
+    FROM Credit_Profiles__r
+  )
+FROM Contact c, c.Account
+WHERE c.Id = ':id'</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	id : vars.customerIdLookUp
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform to TMF spec" doc:id="a09ac7d2-e0fb-4fb2-9629-3390c611608a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var accountURL = "https://na91.lightning.force.com/lightning/r/Account/" ++ payload[0].Account.Id ++"/view"
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	
+	id: payload01.Id,
+	name: payload01.Name default "",
+	statusReason: payload01.TMF_StatusReason__c default "",
+	contactMedium: [{
+		Type: "Office",
+		validFor: {
+			startDateTime: payload01.TMF_endDateTime__c as String default "",
+			endDateTime: payload01.TMF_startDateTime__c as String default ""
+		},
+
+		characteristic: {
+			country: payload01.MailingCountry default "",
+			emailAddress: payload01.Email default "",
+			city: payload01.MailingCity default "",
+			postCode: payload01.MailingPostalCode default "",
+			street1: payload01.MailingStreet default ""
+		}
+	}],
+	creditProfile: payload01.Credit_Profiles__r map ( item , index ) -> {
+		creditProfileDate: item.TMF_creditProfileDate__c default "",
+		creditRiskRating: item.TMF_creditRiskRating__c default "",
+		creditScore: item.TMF_creditScore__c default "",
+		validFor: {
+			startDateTime: item.TMF_validFor_startDateTime__c default "",
+			endDateTime: item.TMF_validFor_endDateTime__c default ""
+		}
+	},
+
+	paymentMethod: [{
+		name: payload01.Account.Name default "",
+		href: accountURL,
+		id: payload01.Account.Id default ""
+	}],
+	
+	engagedParty: {
+		name: payload01.Account.Name default "",
+		href: accountURL,
+		id: payload01.Account.Id default ""
+	},
+	account: [{
+		name: payload01.Account.Name default "",
+		description: payload01.Account.TMF_Description__c default "",
+		href: accountURL,
+		id: payload01.Account.Id default ""
+	}]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

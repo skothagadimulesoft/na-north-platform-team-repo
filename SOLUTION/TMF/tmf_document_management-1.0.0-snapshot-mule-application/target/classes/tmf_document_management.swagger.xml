@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+    <http:listener-config name="tmf_document_management.swagger-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="tmf_document_management.swagger-config" api="resource::9be0b2dd-a5cd-4497-aeb4-1674a4f5a4b5:tmf_document_management:1.0.0:oas:zip:tmf_document_management.swagger.json" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" raml="api/tmf_document_management.raml"/>
+    <configuration-properties doc:name="Configuration properties" doc:id="dfdf75d5-b92f-4336-a5f5-71a6a076495a" file="config/config.yaml" />
+	<salesforce:sfdc-config name="Salesforce_Config-43" doc:name="Salesforce Config" doc:id="4dea292d-5fb3-4058-b87d-0926d48ac209" >
+		<salesforce:basic-connection username="${sfdc.username}" password="${sfdc.password}" securityToken="${sfdc.token}"/>
+	</salesforce:sfdc-config>
+	<salesforce:sfdc-config name="Salesforce_Config-39" doc:name="Salesforce Config" doc:id="b0e6a544-7927-412c-86c9-f021df82462b" >
+		<salesforce:basic-connection username="sam@cleanorg.com" password="SSBSF1990$" securityToken="vkSGcT8c47tQwZDcs8FoJ0Ur" url="https://login.salesforce.com/services/Soap/u/39.0"/>
+	</salesforce:sfdc-config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="43687246-467e-427e-b510-7e8024f0201c" maxEntries="200" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="defdcf23-a9b8-402a-8bca-d96427373986" >
+		<http:request-connection host="#[payload[2]]" port="8089" />
+	</http:request-config>
+	<flow name="tmf_document_management.swagger-main">
+        <http:listener config-ref="tmf_document_management.swagger-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="tmf_document_management.swagger-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="tmf_document_management.swagger-console">
+        <http:listener config-ref="tmf_document_management.swagger-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="tmf_document_management.swagger-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="delete:\hub\(id):tmf_document_management.swagger-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="6ebb2767-43ce-458c-8df4-7990faa3e8ef">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.id]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <os:remove doc:name="Copy_of_Copy_of_Remove" doc:id="1898c113-ff2f-468c-84ea-089c4bc85960" key="#[vars.id]" objectStore="Object_store" />
+		<logger level="INFO" message="delete:\hub\(id):tmf_document_management.swagger-config" />
+    </flow>
+    <flow name="patch:\document\(id):application\json:tmf_document_management.swagger-config">
+		<ee:transform doc:name="Transform Message" doc:id="3b521ed0-4e21-4d11-9b1d-e645bda84ce9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	Id: attributes.uriParams.'id',
+	ContentUrl: payload.attachment.URL,
+	Title: if(payload.documentCharacteristic[0].name == "Title") payload.documentCharacteristic[0].value 
+	       else "",
+	Description: payload.description,
+	TMF_Type__c: payload."type"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="689dc913-fa37-45dd-b66f-f0b43c9b2bed" message="Updateee payloaddd :--- #[payload]"/>
+		<salesforce:update-single type="ContentVersion" doc:name="Update single" doc:id="77120a53-a9f1-4102-ac92-feb3b945d0bd" config-ref="Salesforce_Config-43"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="d79ccb81-01c5-41ae-81b1-6eb820ca4204" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"success": payload.success,
+	"errors": payload.errors,
+	"id": payload.id
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="get:\document:tmf_document_management.swagger-config">
+		<salesforce:query doc:name="Query" doc:id="ac6a047d-fc64-4b80-8981-68152d6d209c" config-ref="Salesforce_Config-43">
+			<salesforce:salesforce-query >select  ContentSize, ContentUrl, CreatedById, CreatedDate, ContentDocumentId,Description, FileExtension, FileType, FirstPublishLocationId, Id, LastModifiedById, LastModifiedDate, NegativeRatingCount, Origin, OwnerId, PathOnClient, PublishStatus, RatingCount, ReasonForChange, TextPreview, Title, TMF_Type__c, VersionData, VersionNumber 
+from ContentVersion</salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="b824734a-54fb-456b-8574-78f1d98bfb7e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	id: payload01.Id default "",
+	href: "https://na91.lightning.force.com/lightning/r/ContentDocument/" ++ payload01.ContentDocumentId as String default "" ++ "/view",
+	"type": payload01.TMF_Type__c default "",
+	lifecyleState: payload01.PublishStatus default "",
+	documentSpecification: {
+		id: payload01.Id default "",
+		href: "https://na91.lightning.force.com/lightning/r/ContentDocument/" ++ payload01.ContentDocumentId as String default "" ++ "/view" 
+	},
+	documentCharacteristic: [{
+		name: "Title",
+		value: payload01.Title default ""
+	},
+	{
+		name: "VersionNumber",
+		value: payload01.VersionNumber default ""
+	},
+	{
+		name: "CreatedDate",
+		value: payload01.CreatedDate default now()
+	}],
+	documentRelationship: [{
+		"type": null,
+		document: {
+			id: payload01.Id default "",
+			href: "https://na91.lightning.force.com/lightning/r/ContentDocument/" ++ payload01.ContentDocumentId as String default "" ++ "/view"
+		}
+	}],
+	attachment: [{
+		size: payload01.ContentSize as String default "",
+		sizeUnit: "bytes",
+		mimeType: payload01.FileType default "",
+		URL: ""
+	}],
+	relatedParty: [{
+		role: null,
+		id: payload01.CreatedById,
+		href: payload01.ContentUrl default ""
+	}],
+	relatedObject: {
+		involvement: "",
+		reference: null
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="get:\document:tmf_document_management.swagger-config" />
+    </flow>
+    <flow name="get:\document\(id):tmf_document_management.swagger-config">
+        <ee:transform doc:name="Transform Message" doc:id="e821b534-e828-45a2-b099-d2640553458e" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="id" ><![CDATA[attributes.uriParams.id]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[vars.id]" doc:name="Set id" doc:id="2865649d-f76e-4459-a36d-debcae5a22a8" variableName="docId"/>
+        <salesforce:query-single doc:name="Get Document By id" doc:id="a0d72de6-15ca-4825-bb04-b82c87854f52" config-ref="Salesforce_Config-43">
+			<salesforce:salesforce-query >select  ContentSize, ContentUrl, CreatedById, CreatedDate,ContentDocumentId, Description, FileExtension, FileType, FirstPublishLocationId, Id, LastModifiedById, LastModifiedDate, NegativeRatingCount, Origin, OwnerId, PathOnClient, PublishStatus, RatingCount, ReasonForChange, TextPreview, Title, TMF_Type__c, VersionData, VersionNumber 
+from ContentVersion
+where Id = ':id'</salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	id : vars.docId
+}]]]></salesforce:parameters>
+		</salesforce:query-single>
+		<ee:transform doc:name="Transform Message" doc:id="27045784-1637-483a-9d15-16384fa67160" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var documentURL = "https://na91.lightning.force.com/lightning/r/ContentDocument/" ++ payload.ContentDocumentId as String default "" ++ "/view"
+---
+{
+	id: payload.Id default "",
+	href: payload.ContentDocumentId,
+	"type": payload.TMF_Type__c default "",
+	lifecyleState: payload.PublishStatus default "",
+	documentSpecification: {
+		id: payload.Id default "",
+		href: documentURL
+	},
+	documentCharacteristic: [{
+		name: "Title",
+		value: payload.Title default ""
+	},
+	{
+		name: "VersionNumber",
+		value: payload.VersionNumber default ""
+	},
+	{
+		name: "CreatedDate",
+		value: payload.CreatedDate default now()
+	}],
+	documentRelationship: [{
+		"type": null,
+		document: {
+			id: payload.Id default "",
+			href: documentURL
+		}
+	}],
+	attachment: [{
+		size: payload.ContentSize as String default "",
+		sizeUnit: "bytes",
+		mimeType: payload.FileType default "",
+		URL: documentURL
+	}],
+	relatedParty: [{
+		role: null,
+		id: payload.CreatedById,
+		href: payload.ContentUrl default ""
+	}],
+	relatedObject: {
+		involvement: "",
+		reference: null
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="get:\document\(id):tmf_document_management.swagger-config" />
+    </flow>
+	<flow name="post:\document:application\json:tmf_document_management.swagger-config">
+		<logger level="INFO" message="post:\document:application\json:tmf_document_management.swagger-config" />
+		<ee:transform doc:name="Transform Message" doc:id="d4f73760-7fdc-4577-ae38-5dbb417fc50b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	ContentUrl: payload.attachment.URL,
+	Title: if(payload.documentCharacteristic[0].name == "Title") payload.documentCharacteristic[0].value 
+	       else "",
+	Description: payload.description,
+	TMF_Type__c: payload."type"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="d6ebcca3-33ab-448d-b488-ef667bc938e9" message="Payload XXXXXXXXX :- #[payload]"/>
+		<salesforce:create-single doc:name="Create single" doc:id="968a49fa-bba3-423c-bd56-294a1ecb2980" config-ref="Salesforce_Config-43" type="ContentVersion"/>
+		<ee:transform doc:name="Transform Message" doc:id="a7459620-43ea-411f-987e-06d62c62fcde" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+"success": payload.success,
+"errors": payload.errors,
+"id": payload.Id
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+	<flow name="post:\hub:application\json:tmf_document_management.swagger-config">
+		<set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="7c6a847b-5c0e-45ca-9cb9-dbf2ffdb4b88" variableName="callbackURL" />
+		<os:retrieve-all-keys doc:name="Copy_of_Retrieve all keys to find new object store Id" doc:id="44e7054f-822f-4386-8475-1a7d1a573778" objectStore="Object_store" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="dbe6dc0d-b43e-4c11-bce2-6bc4773c3400">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var lastId = (sizeOf(payload) + now() as Number)
+---
+{
+	id: (lastId + 1) default 100,
+	callback: vars.callbackURL.callback,
+	query: attributes.queryParams.query default "",
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload.id]" doc:name="Copy_of_Set Variable" doc:id="5adce4da-7185-43e9-b2c8-7f35d3740e09" variableName="objStoreId" />
+		<os:store doc:name="Copy_of_Store" doc:id="00e93346-b022-46bd-bee9-f20a892643a8" key="#[payload.id]" objectStore="Object_store" />
+		<os:retrieve doc:name="Copy_of_Retrieve" doc:id="018358ef-d84c-4ceb-8a78-4c9ec89bbb7e" key="#[vars.objStoreId]" objectStore="Object_store">
+			<os:default-value><![CDATA[#[1]]]></os:default-value>
+			
+		</os:retrieve>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="117307f4-1448-4ad8-803f-a8416ea298f5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="post:\hub:application\json:tmf_document_management.swagger-config" />
+    </flow>
+	<flow name="tmf_document_management.swaggerFlow2" doc:id="9cbd11ad-eeb4-4b06-8685-a2aa7ef6a739" >
+		<salesforce:modified-object objectType="ContentVersion" doc:name="On Modified Object" doc:id="ce9869e0-fd7d-4c45-a06e-0f564493bfcf" config-ref="Salesforce_Config-43">
+			<scheduling-strategy >
+				<fixed-frequency frequency="10000"/>
+			</scheduling-strategy>
+		</salesforce:modified-object>
+		<ee:transform doc:name="Transform Message" doc:id="2e285a49-de0b-4ff1-b49c-0a9367abd8de" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="328bde92-0ad1-4a71-8401-1ae1072a939f" />
+		<flow-ref doc:name="Flow Reference" doc:id="c26b535d-05bb-4c22-a595-7303217648c3" name="tmf_document_management.swaggerFlow"/>
+	</flow>
+	<flow name="tmf_document_management.swaggerFlow" doc:id="bb310106-ef26-4679-a3b4-1ae4ba49b5c6">
+		<choice doc:name="Copy_of_Choice" doc:id="935bff69-4fce-4746-abca-5f237f6d5a9d">
+			<when expression="(payload.CreatedDate as DateTime + |PT2M| &gt;= now())">
+				<ee:transform doc:name="Document Create Event Payload" doc:id="8565c1f2-96db-4846-a909-fa4babf45a0c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	eventId: now() as Number,
+	eventTime: now(),
+
+	eventType: "DocumentCreateNotification"  ,
+	
+	
+	event: {
+		"Document": payload
+		
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="(payload.CreatedDate as DateTime + |PT2M| &lt; now())">
+				<ee:transform doc:name="Document Update Event Payload" doc:id="dd4a98dd-5806-448b-adae-bedf399e3fbc">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	eventId: now() as Number,
+	eventTime: now(),
+
+	eventType: "DocumentUpdateModicfationNotification"  ,
+	
+	
+	event: {
+		"Document": payload
+		
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+		</choice>
+		<set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="85b38c4f-2f69-42da-bf75-b3f0fb10756c" variableName="eventObj" />
+		<os:retrieve-all-keys doc:name="Copy_of_Retrieve all keys" doc:id="2585e7b5-e669-454e-9005-a39a25252b67" objectStore="Object_store" />
+		<set-variable value="#[payload]" doc:name="Copy_of_Save call back URLs" doc:id="63d2afd2-6c84-4417-a9d0-0e296668f80e" variableName="callbackURLs" />
+		<foreach doc:name="For Each" doc:id="a00eac61-4598-41dc-abf2-e29a02b1a995" collection="vars.callbackURLs">
+			<try doc:name="Try" doc:id="e57f3d17-68f9-4e82-a091-c0147264c525">
+				<os:retrieve doc:name="Copy_of_Retrieve" doc:id="4f8cd2c0-3d11-433a-b283-3faba3c0583d" key="#[payload]" objectStore="Object_store">
+					<os:default-value><![CDATA[#[1]]]></os:default-value>
+				</os:retrieve>
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="75af3f9c-0d0a-40fa-9492-933af3a76694">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<http:request method="POST" doc:name="Request" doc:id="35d1a013-9889-4d70-91b9-597ea6797bcc" config-ref="HTTP_Request_configuration" url="#[payload.callback]">
+					<http:body><![CDATA[#[vars.eventObj]]]></http:body>
+				</http:request>
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b2a9fd9b-4683-40a8-a715-8a62c7a36b9c" />
+				</error-handler>
+			</try>
+		</foreach>
+	</flow>
+</mule>

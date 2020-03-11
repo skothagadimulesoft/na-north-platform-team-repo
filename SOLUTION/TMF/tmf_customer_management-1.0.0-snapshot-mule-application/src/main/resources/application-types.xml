@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="addCustomer" format="json">
+      <types:shape format="weave" example="examples/TMF_addCustomer.json"><![CDATA[%dw 2.0
+type addCustomer = {|
+  name: String, 
+  statusReason: String, 
+  contactMedium: Array<{|
+    validFor: {|
+      startDateTime: String, 
+      endDateTime: String
+    |}, 
+    characteristic: {|
+      country: String, 
+      emailAddress: String, 
+      city: String, 
+      postCode: String, 
+      street1: String
+    |}, 
+    "type": String
+  |}>, 
+  creditProfile: Array<{|
+    creditProfileDate: String, 
+    creditRiskRating: Number {"typeId": "double"}, 
+    creditScore: Number {"typeId": "double"}, 
+    validFor: {|
+      startDateTime: String, 
+      endDateTime: String
+    |}
+  |}>, 
+  paymentMethod: Array<{|
+    name: String, 
+    href: String, 
+    id: String
+  |}>, 
+  engagedParty: {|
+    name: String, 
+    href: String, 
+    id: String
+  |}, 
+  account: Array<{|
+    name: String, 
+    description: String, 
+    href: String, 
+    id: String
+  |}>
+|} {"MetadataFormat": "json",
+"example": "{\"name\":\"Bichael Merger\",\"statusReason\":\"Test1234\",\"contactMedium\":[{\"validFor\":{\"startDateTime\":\"2018-01-01T20:00:00.000Z\",\"endDateTime\":\"2018-01-01T20:00:00.000Z\"},\"characteristic\":{\"country\":\"United Kingdom\",\"emailAddress\":\"mberger@ui.com\",\"city\":\"London\",\"postCode\":\"EC2N 4AY\",\"street1\":\"Heron Tower 110 Bishopsgate\"},\"type\":\"customer\"}],\"creditProfile\":[{\"creditProfileDate\":\"2018-01-01T20:00:00.000Z\",\"creditRiskRating\":4.0,\"creditScore\":100.0,\"validFor\":{\"startDateTime\":\"2018-01-01T20:00:00.000Z\",\"endDateTime\":\"2019-01-01T20:00:00.000Z\"}},{\"creditProfileDate\":\"2018-01-01T20:00:00.000Z\",\"creditRiskRating\":63.0,\"creditScore\":221.0,\"validFor\":{\"startDateTime\":\"2018-01-01T20:00:00.000Z\",\"endDateTime\":\"2019-01-01T20:00:00.000Z\"}}],\"paymentMethod\":[{\"name\":\"\",\"href\":\"https:\/\/na91.lightning.force.com\/lightning\/r\/Account\/0012E00001nV4GdQAK\/view\",\"id\":\"0012E00001nV4GdQAK\"}],\"engagedParty\":{\"name\":\"\",\"href\":\"https:\/\/na91.lightning.force.com\/lightning\/r\/Account\/0012E00001nV4GdQAK\/view\",\"id\":\"0012E00001nV4GdQAK\"},\"account\":[{\"name\":\"\",\"description\":\"\",\"href\":\"https:\/\/na91.lightning.force.com\/lightning\/r\/Account\/0012E00001nV4GdQAK\/view\",\"id\":\"0012E00001nV4GdQAK\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="GetCustomer" format="json">
+      <types:shape format="weave" example="examples/getCustomerTMF.json"><![CDATA[%dw 2.0
+type GetCustomer = Array<{|
+  id: String, 
+  name: String, 
+  statusReason: String, 
+  contactMedium: Array<{|
+    validFor: {|
+      startDateTime: String, 
+      endDateTime: String
+    |}, 
+    characteristic: {|
+      country: String, 
+      emailAddress: String, 
+      city: String, 
+      postCode: String, 
+      street1: String
+    |}
+  |}>, 
+  creditProfile: Array<{|
+    creditProfileDate: String, 
+    creditRiskRating: String, 
+    creditScore: String, 
+    validFor: {|
+      startDateTime: String, 
+      endDateTime: String
+    |}
+  |}>, 
+  paymentMethod: Array<{|
+    name: String, 
+    href: String, 
+    id: String
+  |}>, 
+  engagedParty: {|
+    name: String, 
+    href: String, 
+    id: String
+  |}, 
+  account: Array<{|
+    name: String, 
+    description: String, 
+    href: String, 
+    id: String
+  |}>
+|}> {"MetadataFormat": "json",
+"example": "[{\"id\":\"0032E00002Pip1eQAB\",\"name\":\"Tammer Salem\",\"statusReason\":\"Customer with active contract\",\"contactMedium\":[{\"validFor\":{\"startDateTime\":\"\",\"endDateTime\":\"\"},\"characteristic\":{\"country\":\"United Kingdom\",\"emailAddress\":\"tsalem@salesforce.com\",\"city\":\"London\",\"postCode\":\"EC2N 4AY\",\"street1\":\"Heron Tower\\n110 Bishopsgate\"}}],\"creditProfile\":[{\"creditProfileDate\":\"2018-01-01T20:00:00.000Z\",\"creditRiskRating\":\"4.0\",\"creditScore\":\"100.0\",\"validFor\":{\"startDateTime\":\"2018-01-01T20:00:00.000Z\",\"endDateTime\":\"2019-01-01T20:00:00.000Z\"}},{\"creditProfileDate\":\"2019-01-01T20:00:00.000Z\",\"creditRiskRating\":\"5.0\",\"creditScore\":\"90.0\",\"validFor\":{\"startDateTime\":\"2019-01-01T20:00:00.000Z\",\"endDateTime\":\"2020-01-01T20:00:00.000Z\"}}],\"paymentMethod\":[{\"name\":\"Tammer Salem Account\",\"href\":\"https:\/\/na91.lightning.force.com\/lightning\/r\/Account\/0012E00001nV4GdQAK\/view\",\"id\":\"0012E00001nV4GdQAK\"}],\"engagedParty\":{\"name\":\"Tammer Salem Account\",\"href\":\"https:\/\/na91.lightning.force.com\/lightning\/r\/Account\/0012E00001nV4GdQAK\/view\",\"id\":\"0012E00001nV4GdQAK\"},\"account\":[{\"name\":\"Tammer Salem Account\",\"description\":\"\",\"href\":\"https:\/\/na91.lightning.force.com\/lightning\/r\/Account\/0012E00001nV4GdQAK\/view\",\"id\":\"0012E00001nV4GdQAK\"}]}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#7c428af7-1cd7-479d-b7e6-4ab2debb084e"/>
+</types:mule>

@@ -1,0 +1,62 @@
+
+    {
+        "id": "0032E00002QSp2lQAD",
+        "name": "Bichael Merger",
+        "statusReason": "Customer with a renewing Contract",
+        "contactMedium": [
+            {
+                "type": "Office",
+                "validFor": {
+                    "startDateTime": "2018-01-01T20:00:00.000Z",
+                    "endDateTime": "2018-01-01T20:00:00.000Z"
+                },
+                "characteristic": {
+                    "country": "United Kingdom",
+                    "emailAddress": "mberger@ui.com",
+                    "city": "London",
+                    "postCode": "EC2N 4AY",
+                    "street1": "Heron Tower 110 Bishopsgate"
+                }
+            }
+        ],
+        "creditProfile": [
+            {
+                "creditProfileDate": "2018-01-01T20:00:00.000Z",
+                "creditRiskRating": 5.0,
+                "creditScore": 750.0,
+                "validFor": {
+                    "startDateTime": "2019-01-01T20:00:00.000Z",
+                    "endDateTime": "2019-01-01T20:00:00.000Z"
+                }
+            },
+            {
+                "creditProfileDate": "2018-01-01T20:00:00.000Z",
+                "creditRiskRating": 12.0,
+                "creditScore": 11.0,
+                "validFor": {
+                    "startDateTime": "2018-01-01T20:00:00.000Z",
+                    "endDateTime": "2019-01-01T20:00:00.000Z"
+                }
+            }
+        ],
+        "paymentMethod": [
+            {
+                "name": "Tammer Salem Account",
+                "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+                "id": "0012E00001nV4GdQAK"
+            }
+        ],
+        "engagedParty": {
+            "name": "Tammer Salem Account",
+            "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+            "id": "0012E00001nV4GdQAK"
+        },
+        "account": [
+            {
+                "name": "Tammer Salem Account",
+                "description": "",
+                "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+                "id": "0012E00001nV4GdQAK"
+            }
+        ]
+    }

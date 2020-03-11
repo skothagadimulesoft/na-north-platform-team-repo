@@ -1,0 +1,22 @@
+{
+    "creditProfile": [
+      {
+        "creditProfileDate": "2018-01-01T20:00:00.000Z",
+        "creditRiskRating": 5.0,
+        "creditScore": 750.0,
+        "validFor": {
+          "startDateTime": "2018-01-01T20:00:00.000Z",
+          "endDateTime": "2019-01-01T20:00:00.000Z"
+        }
+      },
+         {
+        "creditProfileDate": "2018-01-01T20:00:00.000Z",
+        "creditRiskRating": 12.0,
+        "creditScore": 11.0,
+        "validFor": {
+          "startDateTime": "2018-01-01T20:00:00.000Z",
+          "endDateTime": "2019-01-01T20:00:00.000Z"
+        }
+      }
+    ]
+  }

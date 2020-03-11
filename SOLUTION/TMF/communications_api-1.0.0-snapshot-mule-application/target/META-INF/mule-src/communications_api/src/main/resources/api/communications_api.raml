@@ -1,0 +1,31 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/0ae04976-8b87-4c07-8300-d916d640fc49/ # 
+title: Communications_API
+
+/smsNotification:
+  post:
+    displayName: Sends SMS message to phone number
+    body:
+      application/json:
+        properties:
+          phoneNo:
+            type: string 
+            example: "+11234567890"
+          message:
+            type: string  
+            example: "The PO was created"
+          orderId:
+            type: string
+            example: "123"
+        example:
+          !include examples/message.json
+    responses:
+      "200":
+        description: Sent
+        body:
+          application/json:
+            example:
+              {
+                "message": "Message sent successfully"
+              }
+            

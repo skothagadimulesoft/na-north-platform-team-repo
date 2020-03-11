@@ -1,0 +1,61 @@
+{
+    "name": "Bichael Merger",
+    "statusReason": "Customer with a renewing Contract",
+    "contactMedium": [
+        {
+            "validFor": {
+                "startDateTime": "2018-01-01T20:00:00.000Z",
+                "endDateTime": "2018-01-01T20:00:00.000Z"
+            },
+            "characteristic": {
+                "country": "United Kingdom",
+                "emailAddress": "mberger@ui.com",
+                "city": "London",
+                "postCode": "EC2N 4AY",
+                "street1": "Heron Tower 110 Bishopsgate"
+            },
+            "type": "customer"
+        }
+    ],
+    "creditProfile": [
+        {
+            "creditProfileDate": "2018-01-01T20:00:00.000Z",
+            "creditRiskRating": 4,
+            "creditScore": 100,
+            "validFor": {
+                "startDateTime": "2018-01-01T20:00:00.000Z",
+                "endDateTime": "2019-01-01T20:00:00.000Z"
+            }
+        },
+        {
+            "creditProfileDate": "2018-01-01T20:00:00.000Z",
+            "creditRiskRating": 63,
+            "creditScore": 221,
+            "validFor": {
+                "startDateTime": "2018-01-01T20:00:00.000Z",
+                "endDateTime": "2019-01-01T20:00:00.000Z"
+            }
+        }
+    ],
+    "paymentMethod": [
+        {
+            "name": "",
+            "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+            "id": "0012E00001nV4GdQAK"
+        }
+    ],
+    "engagedParty": {
+        "name": "",
+        "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+        "id": "0012E00001nV4GdQAK"
+    },
+    "account": [
+        {
+            "name": "",
+            "description": "",
+            "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+            "id": "0012E00001nV4GdQAK"
+        }
+    ],
+    "id": "0032E00002QUp89QAD"
+}

@@ -1,0 +1,4003 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/af834884-4cbc-4e8f-941f-1c3df0da0e19/ # 
+annotationTypes:
+  amf-serverDescription:
+    type: any
+  amf-exclusiveMinimum:
+    type: any
+  amf-binding:
+    type: any
+  amf-pattern:
+    type: any
+  amf-payloads:
+    type: any
+  amf-exclusiveMaximum:
+    type: any
+  amf-consumes:
+    type: any
+  amf-additionalProperties:
+    type: any
+  amf-or:
+    type: any
+  amf-url:
+    type: any
+  amf-externalDocs:
+    type: any
+  amf-flow:
+    type: any
+  amf-oasDeprecated:
+    type: any
+  amf-contact:
+    type: any
+  amf-multipleOf:
+    type: any
+  amf-xor:
+    type: any
+  amf-not:
+    type: any
+  amf-produces:
+    type: any
+  amf-format:
+    type: any
+  amf-license:
+    type: any
+  amf-summary:
+    type: any
+  amf-responses:
+    type: any
+  amf-maximum:
+    type: any
+  amf-tags:
+    type: any
+  amf-hostTempLabel:
+    type: any
+  amf-dependencies:
+    type: any
+  amf-readOnly:
+    type: any
+  amf-tuple:
+    type: any
+  amf-examples:
+    type: any
+  amf-collectionFormat:
+    type: any
+  amf-termsOfService:
+    type: any
+  amf-servers:
+    type: any
+  amf-xone:
+    type: any
+  amf-defaultResponse:
+    type: any
+  amf-baseUriParameters:
+    type: any
+  amf-parameters:
+    type: any
+  amf-basePathTempLabel:
+    type: any
+  amf-minimum:
+    type: any
+  amf-recursive:
+    type: any
+  amf-and:
+    type: any
+title: Customer Management
+description: This is Swagger UI environment generated for the TMF Customer Management specification
+version: 2.0
+protocols:
+  - HTTPS
+/customer:
+  get:
+    displayName: listCustomer
+    (amf-summary): List or find 'Customer' objects
+    (amf-tags):
+      - customer
+    queryParameters:
+      fields:
+        description: Comma separated properties to display in response
+        required: false
+        type: string
+      offset:
+        description: Requested index for start of resources to be provided in response
+        required: false
+        type: integer
+      limit:
+        description: Requested number of resources to be provided in response
+        required: false
+        type: integer
+    body: {}
+    responses:
+      "200":
+        description: Ok
+        body:
+          application/json:
+            example: !include examples/singleCustomerExample.json
+            type: array
+            items:
+              type: object
+              additionalProperties: true
+              properties:
+                "@baseType":
+                  description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                  type: string
+                  required: false
+                "@schemaLocation":
+                  description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                  type: string
+                  required: false
+                "@type":
+                  description: Generic attribute containing the name of the resource class type
+                  type: string
+                  required: false
+                href:
+                  description: Url used to reference the party role.
+                  type: string
+                  required: false
+                id:
+                  description: Unique identifier for PartyRoles
+                  type: string
+                  required: false
+                name:
+                  description: A word, term, or phrase by which the PartyRole is known and distinguished from other PartyRoles.
+                  type: string
+                  required: true
+                status:
+                  description: Used to track the lifecycle status of the party role.
+                  type: string
+                  required: false
+                statusReason:
+                  description: A string providing an explanation on the value of the status lifecycle. For instance if the status is Rejected, statusReason will provide the reason for rejection.
+                  type: string
+                  required: false
+                validFor:
+                  description: A base / value business entity used to represent a period of time between two timepoints.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    endDateTime:
+                      description: An instant of time, ending at the TimePeriod.
+                      type: datetime
+                      required: false
+                    startDateTime:
+                      description: An instant of time, starting at the TimePeriod
+                      type: datetime
+                      required: false
+                  required: false
+                engagedParty:
+                  description: Party reference. A party represents an organization or an individual.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    description:
+                      description: Text describing the referred party
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the referred party (such as a partner or any other party role).
+                      type: string
+                      required: true
+                    id:
+                      description: Unique identifier of the referred party
+                      type: string
+                      required: true
+                    name:
+                      description: Name of the referred party (such as a partner or any other party role)
+                      type: string
+                      required: false
+                  required: false
+                type:
+                  description: RoleType reference.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    name:
+                      description: The name of the role type. It uniquely identifies the role type within the partnership type.
+                      type: string
+                      required: false
+                    partnershipHref:
+                      description: Reference url of the partnership type containing the role type
+                      type: string
+                      required: false
+                    partnershipId:
+                      description: The identifier of the partnership type containing the role type
+                      type: string
+                      required: false
+                    partnershipName:
+                      description: The name of the partnership type defining this role type
+                      type: string
+                      required: false
+                  required: false
+                account:
+                  type: array
+                  items:
+                    description: Account reference. A account may be a party account or a financial account.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@referredType":
+                        description: Generic attribute indicating the name of the class type of the referred resource entity.
+                        type: string
+                        required: false
+                      description:
+                        description: Detailed description of the account
+                        type: string
+                        required: false
+                      href:
+                        description: Reference of the account
+                        type: string
+                        required: true
+                      id:
+                        description: Unique identifier of the account
+                        type: string
+                        required: true
+                      name:
+                        description: Name of the account
+                        type: string
+                        required: true
+                  required: false
+                paymentMethod:
+                  type: array
+                  items:
+                    description: PaymentMethod reference. A payment method defines a specific mean of payment (e.g direct debit).
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@referredType":
+                        description: Generic attribute indicating the name of the class type of the referred resource entity.
+                        type: string
+                        required: false
+                      href:
+                        description: Reference of the payment mean
+                        type: string
+                        required: true
+                      id:
+                        description: Unique identifier of the payment mean
+                        type: string
+                        required: true
+                      name:
+                        description: Name of the payment mean
+                        type: string
+                        required: false
+                  required: false
+                contactMedium:
+                  type: array
+                  items:
+                    description: Indicates the contact medium that could be used to contact the party.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@baseType":
+                        description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                        type: string
+                        required: false
+                      "@schemaLocation":
+                        description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                        type: string
+                        required: false
+                      "@type":
+                        description: Generic attribute containing the name of the resource class type
+                        type: string
+                        required: false
+                      preferred:
+                        description: If true, indicates that is the preferred contact medium
+                        type: boolean
+                        required: false
+                      type:
+                        description: "Type of the contact medium, such as: email address, telephone number, postal address"
+                        type: string
+                        required: true
+                      validFor:
+                        description: A base / value business entity used to represent a period of time between two timepoints.
+                        type: object
+                        additionalProperties: true
+                        properties:
+                          endDateTime:
+                            description: An instant of time, ending at the TimePeriod.
+                            type: datetime
+                            required: false
+                          startDateTime:
+                            description: An instant of time, starting at the TimePeriod
+                            type: datetime
+                            required: false
+                        required: false
+                      characteristic:
+                        description: Describes the contact medium characteristics that could be used to contact a party (an individual or an organization)
+                        type: object
+                        additionalProperties: true
+                        properties:
+                          city:
+                            description: The city
+                            type: string
+                            required: false
+                          country:
+                            description: The country
+                            type: string
+                            required: false
+                          emailAddress:
+                            description: Full email address in standard format
+                            type: string
+                            required: false
+                          faxNumber:
+                            description: The fax number of the contact
+                            type: string
+                            required: false
+                          phoneNumber:
+                            description: The primary phone number of the contact
+                            type: string
+                            required: false
+                          postCode:
+                            description: Postcode
+                            type: string
+                            required: false
+                          stateOrProvince:
+                            description: State or province
+                            type: string
+                            required: false
+                          street1:
+                            description: Describes the street
+                            type: string
+                            required: false
+                          street2:
+                            description: Complementary street description
+                            type: string
+                            required: false
+                          type:
+                            description: Type of medium (fax, mobile phone...)
+                            type: string
+                            required: false
+                        required: true
+                  required: false
+                characteristic:
+                  description: Describes the characteristic of a party role.
+                  type: array
+                  items:
+                    description: Describes a given characteristic of an object or entity through a name/value pair.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      name:
+                        description: Name of the characteristic
+                        type: string
+                        required: true
+                      value:
+                        description: The value of the characteristic provided as a string.
+                        type: string
+                        required: true
+                  required: false
+                creditProfile:
+                  type: array
+                  items:
+                    description: Credit profile for the party (containing credit scoring, ...). By default only the current credit profile  is retrieved. It can be used as a list to give the party credit profiles history, the first one in the list will be the current one.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@baseType":
+                        description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                        type: string
+                        required: false
+                      "@schemaLocation":
+                        description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                        type: string
+                        required: false
+                      "@type":
+                        description: Generic attribute containing the name of the resource class type
+                        type: string
+                        required: false
+                      creditProfileDate:
+                        description: The date the profile was established
+                        type: datetime
+                        required: true
+                      creditRiskRating:
+                        description: This is an integer whose value is used to rate the risk
+                        type: integer
+                        required: false
+                      creditScore:
+                        description: A measure of a person's or an organization's creditworthiness calculated on the basis of a combination of factors such as their income and credit history.
+                        type: integer
+                        required: false
+                      validFor:
+                        description: A base / value business entity used to represent a period of time between two timepoints.
+                        type: object
+                        additionalProperties: true
+                        properties:
+                          endDateTime:
+                            description: An instant of time, ending at the TimePeriod.
+                            type: datetime
+                            required: false
+                          startDateTime:
+                            description: An instant of time, starting at the TimePeriod
+                            type: datetime
+                            required: false
+                        required: true
+                  required: false
+                agreement:
+                  type: array
+                  items:
+                    description: Agreement reference. An agreement represents a contract or arrangement, either written or verbal and sometimes enforceable by law, such as a service level agreement or a customer price agreement. An agreement involves a number of other business entities, such as products, services, and resources and/or their specifications.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@referredType":
+                        description: Generic attribute indicating the name of the class type of the referred resource entity.
+                        type: string
+                        required: false
+                      href:
+                        description: Reference of the agreement
+                        type: string
+                        required: false
+                      id:
+                        description: Identifier of the agreement
+                        type: string
+                        required: false
+                      name:
+                        description: Name of the agreement
+                        type: string
+                        required: false
+                  required: false
+                relatedParty:
+                  type: array
+                  items:
+                    description: RelatedParty reference. A related party defines party or party role linked to a specific entity.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@referredType":
+                        description: Generic attribute indicating the name of the class type of the referred resource entity.
+                        type: string
+                        required: false
+                      href:
+                        description: Reference of the related party, could be a party reference or a party role reference
+                        type: string
+                        required: false
+                      id:
+                        description: Unique identifier of a related party
+                        type: string
+                        required: false
+                      name:
+                        description: Name of the related party
+                        type: string
+                        required: false
+                      role:
+                        description: Role of the related party.
+                        type: string
+                        required: false
+                  required: false
+      "400":
+        description: Bad Request
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "401":
+        description: Unauthorized
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "403":
+        description: Forbidden
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "404":
+        description: Not Found
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "405":
+        description: Method Not allowed
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "409":
+        description: Conflict
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "500":
+        description: Internal Server Error
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+  post:
+    displayName: createCustomer
+    (amf-summary): Creates a 'Customer'
+    (amf-tags):
+      - customer
+    body:
+      application/json:
+        
+        
+        description: |-
+
+          Skipped properties: id,href
+        
+        type: object
+        additionalProperties: true
+        properties:
+          "@baseType":
+            description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+            type: string
+            required: false
+          "@schemaLocation":
+            description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+            type: string
+            required: false
+          "@type":
+            description: Generic attribute containing the name of the resource class type
+            type: string
+            required: false
+          name:
+            description: A word, term, or phrase by which the PartyRole is known and distinguished from other PartyRoles.
+            type: string
+            required: true
+          status:
+            description: Used to track the lifecycle status of the party role.
+            type: string
+            required: false
+          statusReason:
+            description: A string providing an explanation on the value of the status lifecycle. For instance if the status is Rejected, statusReason will provide the reason for rejection.
+            type: string
+            required: false
+          validFor:
+            description: A base / value business entity used to represent a period of time between two timepoints.
+            type: object
+            additionalProperties: true
+            properties:
+              endDateTime:
+                description: An instant of time, ending at the TimePeriod.
+                type: datetime
+                required: false
+              startDateTime:
+                description: An instant of time, starting at the TimePeriod
+                type: datetime
+                required: false
+            required: false
+          engagedParty:
+            description: Party reference. A party represents an organization or an individual.
+            type: object
+            additionalProperties: true
+            properties:
+              "@referredType":
+                description: Generic attribute indicating the name of the class type of the referred resource entity.
+                type: string
+                required: false
+              description:
+                description: Text describing the referred party
+                type: string
+                required: false
+              href:
+                description: Reference of the referred party (such as a partner or any other party role).
+                type: string
+                required: true
+              id:
+                description: Unique identifier of the referred party
+                type: string
+                required: true
+              name:
+                description: Name of the referred party (such as a partner or any other party role)
+                type: string
+                required: false
+            required: false
+          type:
+            description: RoleType reference.
+            type: object
+            additionalProperties: true
+            properties:
+              "@referredType":
+                description: Generic attribute indicating the name of the class type of the referred resource entity.
+                type: string
+                required: false
+              name:
+                description: The name of the role type. It uniquely identifies the role type within the partnership type.
+                type: string
+                required: false
+              partnershipHref:
+                description: Reference url of the partnership type containing the role type
+                type: string
+                required: false
+              partnershipId:
+                description: The identifier of the partnership type containing the role type
+                type: string
+                required: false
+              partnershipName:
+                description: The name of the partnership type defining this role type
+                type: string
+                required: false
+            required: false
+          account:
+            type: array
+            items:
+              description: Account reference. A account may be a party account or a financial account.
+              type: object
+              additionalProperties: true
+              properties:
+                "@referredType":
+                  description: Generic attribute indicating the name of the class type of the referred resource entity.
+                  type: string
+                  required: false
+                description:
+                  description: Detailed description of the account
+                  type: string
+                  required: false
+                href:
+                  description: Reference of the account
+                  type: string
+                  required: true
+                id:
+                  description: Unique identifier of the account
+                  type: string
+                  required: true
+                name:
+                  description: Name of the account
+                  type: string
+                  required: true
+            required: false
+          paymentMethod:
+            type: array
+            items:
+              description: PaymentMethod reference. A payment method defines a specific mean of payment (e.g direct debit).
+              type: object
+              additionalProperties: true
+              properties:
+                "@referredType":
+                  description: Generic attribute indicating the name of the class type of the referred resource entity.
+                  type: string
+                  required: false
+                href:
+                  description: Reference of the payment mean
+                  type: string
+                  required: true
+                id:
+                  description: Unique identifier of the payment mean
+                  type: string
+                  required: true
+                name:
+                  description: Name of the payment mean
+                  type: string
+                  required: false
+            required: false
+          contactMedium:
+            type: array
+            items:
+              description: Indicates the contact medium that could be used to contact the party.
+              type: object
+              additionalProperties: true
+              properties:
+                "@baseType":
+                  description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                  type: string
+                  required: false
+                "@schemaLocation":
+                  description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                  type: string
+                  required: false
+                "@type":
+                  description: Generic attribute containing the name of the resource class type
+                  type: string
+                  required: false
+                preferred:
+                  description: If true, indicates that is the preferred contact medium
+                  type: boolean
+                  required: false
+                type:
+                  description: "Type of the contact medium, such as: email address, telephone number, postal address"
+                  type: string
+                  required: true
+                validFor:
+                  description: A base / value business entity used to represent a period of time between two timepoints.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    endDateTime:
+                      description: An instant of time, ending at the TimePeriod.
+                      type: datetime
+                      required: false
+                    startDateTime:
+                      description: An instant of time, starting at the TimePeriod
+                      type: datetime
+                      required: false
+                  required: false
+                characteristic:
+                  description: Describes the contact medium characteristics that could be used to contact a party (an individual or an organization)
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    city:
+                      description: The city
+                      type: string
+                      required: false
+                    country:
+                      description: The country
+                      type: string
+                      required: false
+                    emailAddress:
+                      description: Full email address in standard format
+                      type: string
+                      required: false
+                    faxNumber:
+                      description: The fax number of the contact
+                      type: string
+                      required: false
+                    phoneNumber:
+                      description: The primary phone number of the contact
+                      type: string
+                      required: false
+                    postCode:
+                      description: Postcode
+                      type: string
+                      required: false
+                    stateOrProvince:
+                      description: State or province
+                      type: string
+                      required: false
+                    street1:
+                      description: Describes the street
+                      type: string
+                      required: false
+                    street2:
+                      description: Complementary street description
+                      type: string
+                      required: false
+                    type:
+                      description: Type of medium (fax, mobile phone...)
+                      type: string
+                      required: false
+                  required: true
+            required: false
+          characteristic:
+            description: Describes the characteristic of a party role.
+            type: array
+            items:
+              description: Describes a given characteristic of an object or entity through a name/value pair.
+              type: object
+              additionalProperties: true
+              properties:
+                name:
+                  description: Name of the characteristic
+                  type: string
+                  required: true
+                value:
+                  description: The value of the characteristic provided as a string.
+                  type: string
+                  required: true
+            required: false
+          creditProfile:
+            type: array
+            items:
+              description: Credit profile for the party (containing credit scoring, ...). By default only the current credit profile  is retrieved. It can be used as a list to give the party credit profiles history, the first one in the list will be the current one.
+              type: object
+              additionalProperties: true
+              properties:
+                "@baseType":
+                  description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                  type: string
+                  required: false
+                "@schemaLocation":
+                  description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                  type: string
+                  required: false
+                "@type":
+                  description: Generic attribute containing the name of the resource class type
+                  type: string
+                  required: false
+                creditProfileDate:
+                  description: The date the profile was established
+                  type: datetime
+                  required: true
+                creditRiskRating:
+                  description: This is an integer whose value is used to rate the risk
+                  type: integer
+                  required: false
+                creditScore:
+                  description: A measure of a person's or an organization's creditworthiness calculated on the basis of a combination of factors such as their income and credit history.
+                  type: integer
+                  required: false
+                validFor:
+                  description: A base / value business entity used to represent a period of time between two timepoints.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    endDateTime:
+                      description: An instant of time, ending at the TimePeriod.
+                      type: datetime
+                      required: false
+                    startDateTime:
+                      description: An instant of time, starting at the TimePeriod
+                      type: datetime
+                      required: false
+                  required: true
+            required: false
+          agreement:
+            type: array
+            items:
+              description: Agreement reference. An agreement represents a contract or arrangement, either written or verbal and sometimes enforceable by law, such as a service level agreement or a customer price agreement. An agreement involves a number of other business entities, such as products, services, and resources and/or their specifications.
+              type: object
+              additionalProperties: true
+              properties:
+                "@referredType":
+                  description: Generic attribute indicating the name of the class type of the referred resource entity.
+                  type: string
+                  required: false
+                href:
+                  description: Reference of the agreement
+                  type: string
+                  required: false
+                id:
+                  description: Identifier of the agreement
+                  type: string
+                  required: false
+                name:
+                  description: Name of the agreement
+                  type: string
+                  required: false
+            required: false
+          relatedParty:
+            type: array
+            items:
+              description: RelatedParty reference. A related party defines party or party role linked to a specific entity.
+              type: object
+              additionalProperties: true
+              properties:
+                "@referredType":
+                  description: Generic attribute indicating the name of the class type of the referred resource entity.
+                  type: string
+                  required: false
+                href:
+                  description: Reference of the related party, could be a party reference or a party role reference
+                  type: string
+                  required: false
+                id:
+                  description: Unique identifier of a related party
+                  type: string
+                  required: false
+                name:
+                  description: Name of the related party
+                  type: string
+                  required: false
+                role:
+                  description: Role of the related party.
+                  type: string
+                  required: false
+            required: false
+        example: !include examples/postCustomerExample.json
+    responses:
+      "201":
+        description: Created
+        body:
+          application/json:
+            example: !include examples/postCustomerResponseExample.json
+            type: object
+            additionalProperties: true
+            properties:
+              "@baseType":
+                description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                type: string
+                required: false
+              "@type":
+                description: Generic attribute containing the name of the resource class type
+                type: string
+                required: false
+              href:
+                description: Url used to reference the party role.
+                type: string
+                required: false
+              id:
+                description: Unique identifier for PartyRoles
+                type: string
+                required: false
+              name:
+                description: A word, term, or phrase by which the PartyRole is known and distinguished from other PartyRoles.
+                type: string
+                required: true
+              status:
+                description: Used to track the lifecycle status of the party role.
+                type: string
+                required: false
+              statusReason:
+                description: A string providing an explanation on the value of the status lifecycle. For instance if the status is Rejected, statusReason will provide the reason for rejection.
+                type: string
+                required: false
+              validFor:
+                description: A base / value business entity used to represent a period of time between two timepoints.
+                type: object
+                additionalProperties: true
+                properties:
+                  endDateTime:
+                    description: An instant of time, ending at the TimePeriod.
+                    type: datetime
+                    required: false
+                  startDateTime:
+                    description: An instant of time, starting at the TimePeriod
+                    type: datetime
+                    required: false
+                required: false
+              engagedParty:
+                description: Party reference. A party represents an organization or an individual.
+                type: object
+                additionalProperties: true
+                properties:
+                  "@referredType":
+                    description: Generic attribute indicating the name of the class type of the referred resource entity.
+                    type: string
+                    required: false
+                  description:
+                    description: Text describing the referred party
+                    type: string
+                    required: false
+                  href:
+                    description: Reference of the referred party (such as a partner or any other party role).
+                    type: string
+                    required: true
+                  id:
+                    description: Unique identifier of the referred party
+                    type: string
+                    required: true
+                  name:
+                    description: Name of the referred party (such as a partner or any other party role)
+                    type: string
+                    required: false
+                required: false
+              type:
+                description: RoleType reference.
+                type: object
+                additionalProperties: true
+                properties:
+                  "@referredType":
+                    description: Generic attribute indicating the name of the class type of the referred resource entity.
+                    type: string
+                    required: false
+                  name:
+                    description: The name of the role type. It uniquely identifies the role type within the partnership type.
+                    type: string
+                    required: false
+                  partnershipHref:
+                    description: Reference url of the partnership type containing the role type
+                    type: string
+                    required: false
+                  partnershipId:
+                    description: The identifier of the partnership type containing the role type
+                    type: string
+                    required: false
+                  partnershipName:
+                    description: The name of the partnership type defining this role type
+                    type: string
+                    required: false
+                required: false
+              account:
+                type: array
+                items:
+                  description: Account reference. A account may be a party account or a financial account.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    description:
+                      description: Detailed description of the account
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the account
+                      type: string
+                      required: true
+                    id:
+                      description: Unique identifier of the account
+                      type: string
+                      required: true
+                    name:
+                      description: Name of the account
+                      type: string
+                      required: true
+                required: false
+              paymentMethod:
+                type: array
+                items:
+                  description: PaymentMethod reference. A payment method defines a specific mean of payment (e.g direct debit).
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the payment mean
+                      type: string
+                      required: true
+                    id:
+                      description: Unique identifier of the payment mean
+                      type: string
+                      required: true
+                    name:
+                      description: Name of the payment mean
+                      type: string
+                      required: false
+                required: false
+              contactMedium:
+                type: array
+                items:
+                  description: Indicates the contact medium that could be used to contact the party.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@baseType":
+                      description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                      type: string
+                      required: false
+                    "@schemaLocation":
+                      description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                      type: string
+                      required: false
+                    "@type":
+                      description: Generic attribute containing the name of the resource class type
+                      type: string
+                      required: false
+                    preferred:
+                      description: If true, indicates that is the preferred contact medium
+                      type: boolean
+                      required: false
+                    type:
+                      description: "Type of the contact medium, such as: email address, telephone number, postal address"
+                      type: string
+                      required: true
+                    validFor:
+                      description: A base / value business entity used to represent a period of time between two timepoints.
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        endDateTime:
+                          description: An instant of time, ending at the TimePeriod.
+                          type: datetime
+                          required: false
+                        startDateTime:
+                          description: An instant of time, starting at the TimePeriod
+                          type: datetime
+                          required: false
+                      required: false
+                    characteristic:
+                      description: Describes the contact medium characteristics that could be used to contact a party (an individual or an organization)
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        city:
+                          description: The city
+                          type: string
+                          required: false
+                        country:
+                          description: The country
+                          type: string
+                          required: false
+                        emailAddress:
+                          description: Full email address in standard format
+                          type: string
+                          required: false
+                        faxNumber:
+                          description: The fax number of the contact
+                          type: string
+                          required: false
+                        phoneNumber:
+                          description: The primary phone number of the contact
+                          type: string
+                          required: false
+                        postCode:
+                          description: Postcode
+                          type: string
+                          required: false
+                        stateOrProvince:
+                          description: State or province
+                          type: string
+                          required: false
+                        street1:
+                          description: Describes the street
+                          type: string
+                          required: false
+                        street2:
+                          description: Complementary street description
+                          type: string
+                          required: false
+                        type:
+                          description: Type of medium (fax, mobile phone...)
+                          type: string
+                          required: false
+                      required: true
+                required: false
+              characteristic:
+                description: Describes the characteristic of a party role.
+                type: array
+                items:
+                  description: Describes a given characteristic of an object or entity through a name/value pair.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    name:
+                      description: Name of the characteristic
+                      type: string
+                      required: true
+                    value:
+                      description: The value of the characteristic provided as a string.
+                      type: string
+                      required: true
+                required: false
+              creditProfile:
+                type: array
+                items:
+                  description: Credit profile for the party (containing credit scoring, ...). By default only the current credit profile  is retrieved. It can be used as a list to give the party credit profiles history, the first one in the list will be the current one.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@baseType":
+                      description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                      type: string
+                      required: false
+                    "@schemaLocation":
+                      description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                      type: string
+                      required: false
+                    "@type":
+                      description: Generic attribute containing the name of the resource class type
+                      type: string
+                      required: false
+                    creditProfileDate:
+                      description: The date the profile was established
+                      type: datetime
+                      required: true
+                    creditRiskRating:
+                      description: This is an integer whose value is used to rate the risk
+                      type: integer
+                      required: false
+                    creditScore:
+                      description: A measure of a person's or an organization's creditworthiness calculated on the basis of a combination of factors such as their income and credit history.
+                      type: integer
+                      required: false
+                    validFor:
+                      description: A base / value business entity used to represent a period of time between two timepoints.
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        endDateTime:
+                          description: An instant of time, ending at the TimePeriod.
+                          type: datetime
+                          required: false
+                        startDateTime:
+                          description: An instant of time, starting at the TimePeriod
+                          type: datetime
+                          required: false
+                      required: true
+                required: false
+              agreement:
+                type: array
+                items:
+                  description: Agreement reference. An agreement represents a contract or arrangement, either written or verbal and sometimes enforceable by law, such as a service level agreement or a customer price agreement. An agreement involves a number of other business entities, such as products, services, and resources and/or their specifications.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the agreement
+                      type: string
+                      required: false
+                    id:
+                      description: Identifier of the agreement
+                      type: string
+                      required: false
+                    name:
+                      description: Name of the agreement
+                      type: string
+                      required: false
+                required: false
+              relatedParty:
+                type: array
+                items:
+                  description: RelatedParty reference. A related party defines party or party role linked to a specific entity.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the related party, could be a party reference or a party role reference
+                      type: string
+                      required: false
+                    id:
+                      description: Unique identifier of a related party
+                      type: string
+                      required: false
+                    name:
+                      description: Name of the related party
+                      type: string
+                      required: false
+                    role:
+                      description: Role of the related party.
+                      type: string
+                      required: false
+                required: false
+      "400":
+        description: Bad Request
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "401":
+        description: Unauthorized
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "403":
+        description: Forbidden
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "404":
+        description: Not Found
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "405":
+        description: Method Not allowed
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "409":
+        description: Conflict
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "500":
+        description: Internal Server Error
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+/hub:
+  post:
+    displayName: registerListener
+    description: Sets the communication endpoint address the service instance must use to deliver information about its health state, execution state, failures and metrics.
+    (amf-summary): Register a listener
+    (amf-tags):
+      - events subscription
+    body:
+      application/json:
+        additionalProperties: true
+        properties:
+          callback:
+            description: The callback being registered.
+            type: string
+            required: true
+          query:
+            description: additional data to be passed
+            type: string
+            required: false
+        example: !include examples/postRegisterCallbackNotification.json
+    responses:
+      "201":
+        description: Subscribed
+        body:
+          application/json:
+            example: !include examples/postRegisterCallbackNotificationResponse.json
+            additionalProperties: true
+            properties:
+              id:
+                description: Id of the listener
+                type: string
+                required: true
+              callback:
+                description: The callback being registered.
+                type: string
+                required: true
+              query:
+                description: additional data to be passed
+                type: string
+                required: false
+      "400":
+        description: Bad Request
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "401":
+        description: Unauthorized
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "403":
+        description: Forbidden
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "404":
+        description: Not Found
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "405":
+        description: Method Not allowed
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "409":
+        description: Conflict
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "500":
+        description: Internal Server Error
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+/customer/{id}:
+  get:
+    displayName: retrieveCustomer
+    (amf-summary): Retrieves a 'Customer' by Id
+    (amf-tags):
+      - customer
+    body: {}
+    (amf-baseUriParameters):
+      id:
+        description: Identifier of the Customer
+        required: true
+        type: string
+    responses:
+      "200":
+        description: Ok
+        body:
+          application/json:
+            example: !include examples/singleCustomerExample.json
+            type: array
+            items:
+              type: object
+              additionalProperties: true
+              properties:
+                "@baseType":
+                  description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                  type: string
+                  required: false
+                "@schemaLocation":
+                  description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                  type: string
+                  required: false
+                "@type":
+                  description: Generic attribute containing the name of the resource class type
+                  type: string
+                  required: false
+                href:
+                  description: Url used to reference the party role.
+                  type: string
+                  required: false
+                id:
+                  description: Unique identifier for PartyRoles
+                  type: string
+                  required: false
+                name:
+                  description: A word, term, or phrase by which the PartyRole is known and distinguished from other PartyRoles.
+                  type: string
+                  required: true
+                status:
+                  description: Used to track the lifecycle status of the party role.
+                  type: string
+                  required: false
+                statusReason:
+                  description: A string providing an explanation on the value of the status lifecycle. For instance if the status is Rejected, statusReason will provide the reason for rejection.
+                  type: string
+                  required: false
+                validFor:
+                  description: A base / value business entity used to represent a period of time between two timepoints.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    endDateTime:
+                      description: An instant of time, ending at the TimePeriod.
+                      type: datetime
+                      required: false
+                    startDateTime:
+                      description: An instant of time, starting at the TimePeriod
+                      type: datetime
+                      required: false
+                  required: false
+                engagedParty:
+                  description: Party reference. A party represents an organization or an individual.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    description:
+                      description: Text describing the referred party
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the referred party (such as a partner or any other party role).
+                      type: string
+                      required: true
+                    id:
+                      description: Unique identifier of the referred party
+                      type: string
+                      required: true
+                    name:
+                      description: Name of the referred party (such as a partner or any other party role)
+                      type: string
+                      required: false
+                  required: false
+                type:
+                  description: RoleType reference.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    name:
+                      description: The name of the role type. It uniquely identifies the role type within the partnership type.
+                      type: string
+                      required: false
+                    partnershipHref:
+                      description: Reference url of the partnership type containing the role type
+                      type: string
+                      required: false
+                    partnershipId:
+                      description: The identifier of the partnership type containing the role type
+                      type: string
+                      required: false
+                    partnershipName:
+                      description: The name of the partnership type defining this role type
+                      type: string
+                      required: false
+                  required: false
+                account:
+                  type: array
+                  items:
+                    description: Account reference. A account may be a party account or a financial account.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@referredType":
+                        description: Generic attribute indicating the name of the class type of the referred resource entity.
+                        type: string
+                        required: false
+                      description:
+                        description: Detailed description of the account
+                        type: string
+                        required: false
+                      href:
+                        description: Reference of the account
+                        type: string
+                        required: true
+                      id:
+                        description: Unique identifier of the account
+                        type: string
+                        required: true
+                      name:
+                        description: Name of the account
+                        type: string
+                        required: true
+                  required: false
+                paymentMethod:
+                  type: array
+                  items:
+                    description: PaymentMethod reference. A payment method defines a specific mean of payment (e.g direct debit).
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@referredType":
+                        description: Generic attribute indicating the name of the class type of the referred resource entity.
+                        type: string
+                        required: false
+                      href:
+                        description: Reference of the payment mean
+                        type: string
+                        required: true
+                      id:
+                        description: Unique identifier of the payment mean
+                        type: string
+                        required: true
+                      name:
+                        description: Name of the payment mean
+                        type: string
+                        required: false
+                  required: false
+                contactMedium:
+                  type: array
+                  items:
+                    description: Indicates the contact medium that could be used to contact the party.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@baseType":
+                        description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                        type: string
+                        required: false
+                      "@schemaLocation":
+                        description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                        type: string
+                        required: false
+                      "@type":
+                        description: Generic attribute containing the name of the resource class type
+                        type: string
+                        required: false
+                      preferred:
+                        description: If true, indicates that is the preferred contact medium
+                        type: boolean
+                        required: false
+                      type:
+                        description: "Type of the contact medium, such as: email address, telephone number, postal address"
+                        type: string
+                        required: true
+                      validFor:
+                        description: A base / value business entity used to represent a period of time between two timepoints.
+                        type: object
+                        additionalProperties: true
+                        properties:
+                          endDateTime:
+                            description: An instant of time, ending at the TimePeriod.
+                            type: datetime
+                            required: false
+                          startDateTime:
+                            description: An instant of time, starting at the TimePeriod
+                            type: datetime
+                            required: false
+                        required: false
+                      characteristic:
+                        description: Describes the contact medium characteristics that could be used to contact a party (an individual or an organization)
+                        type: object
+                        additionalProperties: true
+                        properties:
+                          city:
+                            description: The city
+                            type: string
+                            required: false
+                          country:
+                            description: The country
+                            type: string
+                            required: false
+                          emailAddress:
+                            description: Full email address in standard format
+                            type: string
+                            required: false
+                          faxNumber:
+                            description: The fax number of the contact
+                            type: string
+                            required: false
+                          phoneNumber:
+                            description: The primary phone number of the contact
+                            type: string
+                            required: false
+                          postCode:
+                            description: Postcode
+                            type: string
+                            required: false
+                          stateOrProvince:
+                            description: State or province
+                            type: string
+                            required: false
+                          street1:
+                            description: Describes the street
+                            type: string
+                            required: false
+                          street2:
+                            description: Complementary street description
+                            type: string
+                            required: false
+                          type:
+                            description: Type of medium (fax, mobile phone...)
+                            type: string
+                            required: false
+                        required: true
+                  required: false
+                characteristic:
+                  description: Describes the characteristic of a party role.
+                  type: array
+                  items:
+                    description: Describes a given characteristic of an object or entity through a name/value pair.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      name:
+                        description: Name of the characteristic
+                        type: string
+                        required: true
+                      value:
+                        description: The value of the characteristic provided as a string.
+                        type: string
+                        required: true
+                  required: false
+                creditProfile:
+                  type: array
+                  items:
+                    description: Credit profile for the party (containing credit scoring, ...). By default only the current credit profile  is retrieved. It can be used as a list to give the party credit profiles history, the first one in the list will be the current one.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@baseType":
+                        description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                        type: string
+                        required: false
+                      "@schemaLocation":
+                        description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                        type: string
+                        required: false
+                      "@type":
+                        description: Generic attribute containing the name of the resource class type
+                        type: string
+                        required: false
+                      creditProfileDate:
+                        description: The date the profile was established
+                        type: datetime
+                        required: true
+                      creditRiskRating:
+                        description: This is an integer whose value is used to rate the risk
+                        type: integer
+                        required: false
+                      creditScore:
+                        description: A measure of a person's or an organization's creditworthiness calculated on the basis of a combination of factors such as their income and credit history.
+                        type: integer
+                        required: false
+                      validFor:
+                        description: A base / value business entity used to represent a period of time between two timepoints.
+                        type: object
+                        additionalProperties: true
+                        properties:
+                          endDateTime:
+                            description: An instant of time, ending at the TimePeriod.
+                            type: datetime
+                            required: false
+                          startDateTime:
+                            description: An instant of time, starting at the TimePeriod
+                            type: datetime
+                            required: false
+                        required: true
+                  required: false
+                agreement:
+                  type: array
+                  items:
+                    description: Agreement reference. An agreement represents a contract or arrangement, either written or verbal and sometimes enforceable by law, such as a service level agreement or a customer price agreement. An agreement involves a number of other business entities, such as products, services, and resources and/or their specifications.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@referredType":
+                        description: Generic attribute indicating the name of the class type of the referred resource entity.
+                        type: string
+                        required: false
+                      href:
+                        description: Reference of the agreement
+                        type: string
+                        required: false
+                      id:
+                        description: Identifier of the agreement
+                        type: string
+                        required: false
+                      name:
+                        description: Name of the agreement
+                        type: string
+                        required: false
+                  required: false
+                relatedParty:
+                  type: array
+                  items:
+                    description: RelatedParty reference. A related party defines party or party role linked to a specific entity.
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      "@referredType":
+                        description: Generic attribute indicating the name of the class type of the referred resource entity.
+                        type: string
+                        required: false
+                      href:
+                        description: Reference of the related party, could be a party reference or a party role reference
+                        type: string
+                        required: false
+                      id:
+                        description: Unique identifier of a related party
+                        type: string
+                        required: false
+                      name:
+                        description: Name of the related party
+                        type: string
+                        required: false
+                      role:
+                        description: Role of the related party.
+                        type: string
+                        required: false
+                  required: false
+      "400":
+        description: Bad Request
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "401":
+        description: Unauthorized
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "403":
+        description: Forbidden
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "404":
+        description: Not Found
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "405":
+        description: Method Not allowed
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "409":
+        description: Conflict
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "500":
+        description: Internal Server Error
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+  patch:
+    displayName: patchCustomer
+    (amf-summary): Updates partially a 'Customer' by Id
+    (amf-tags):
+      - customer
+    body:
+      application/json:
+        example: !include examples/patchCustomerExampleRequest.json
+        description: |-
+
+          Skipped properties: id,href,id,href
+        type: object
+        additionalProperties: true
+        properties:
+          "@baseType":
+            description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+            type: string
+            required: false
+          "@schemaLocation":
+            description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+            type: string
+            required: false
+          "@type":
+            description: Generic attribute containing the name of the resource class type
+            type: string
+            required: false
+          name:
+            description: A word, term, or phrase by which the PartyRole is known and distinguished from other PartyRoles.
+            type: string
+            required: false
+          status:
+            description: Used to track the lifecycle status of the party role.
+            type: string
+            required: false
+          statusReason:
+            description: A string providing an explanation on the value of the status lifecycle. For instance if the status is Rejected, statusReason will provide the reason for rejection.
+            type: string
+            required: false
+          validFor:
+            description: A base / value business entity used to represent a period of time between two timepoints.
+            type: object
+            additionalProperties: true
+            properties:
+              endDateTime:
+                description: An instant of time, ending at the TimePeriod.
+                type: datetime
+                required: false
+              startDateTime:
+                description: An instant of time, starting at the TimePeriod
+                type: datetime
+                required: false
+            required: false
+          engagedParty:
+            description: Party reference. A party represents an organization or an individual.
+            type: object
+            additionalProperties: true
+            properties:
+              "@referredType":
+                description: Generic attribute indicating the name of the class type of the referred resource entity.
+                type: string
+                required: false
+              description:
+                description: Text describing the referred party
+                type: string
+                required: false
+              href:
+                description: Reference of the referred party (such as a partner or any other party role).
+                type: string
+                required: true
+              id:
+                description: Unique identifier of the referred party
+                type: string
+                required: true
+              name:
+                description: Name of the referred party (such as a partner or any other party role)
+                type: string
+                required: false
+            required: false
+          type:
+            description: RoleType reference.
+            type: object
+            additionalProperties: true
+            properties:
+              "@referredType":
+                description: Generic attribute indicating the name of the class type of the referred resource entity.
+                type: string
+                required: false
+              name:
+                description: The name of the role type. It uniquely identifies the role type within the partnership type.
+                type: string
+                required: false
+              partnershipHref:
+                description: Reference url of the partnership type containing the role type
+                type: string
+                required: false
+              partnershipId:
+                description: The identifier of the partnership type containing the role type
+                type: string
+                required: false
+              partnershipName:
+                description: The name of the partnership type defining this role type
+                type: string
+                required: false
+            required: false
+          account:
+            type: array
+            items:
+              description: Account reference. A account may be a party account or a financial account.
+              type: object
+              additionalProperties: true
+              properties:
+                "@referredType":
+                  description: Generic attribute indicating the name of the class type of the referred resource entity.
+                  type: string
+                  required: false
+                description:
+                  description: Detailed description of the account
+                  type: string
+                  required: false
+                href:
+                  description: Reference of the account
+                  type: string
+                  required: true
+                id:
+                  description: Unique identifier of the account
+                  type: string
+                  required: true
+                name:
+                  description: Name of the account
+                  type: string
+                  required: true
+            required: false
+          paymentMethod:
+            type: array
+            items:
+              description: PaymentMethod reference. A payment method defines a specific mean of payment (e.g direct debit).
+              type: object
+              additionalProperties: true
+              properties:
+                "@referredType":
+                  description: Generic attribute indicating the name of the class type of the referred resource entity.
+                  type: string
+                  required: false
+                href:
+                  description: Reference of the payment mean
+                  type: string
+                  required: true
+                id:
+                  description: Unique identifier of the payment mean
+                  type: string
+                  required: true
+                name:
+                  description: Name of the payment mean
+                  type: string
+                  required: false
+            required: false
+          contactMedium:
+            type: array
+            items:
+              description: Indicates the contact medium that could be used to contact the party.
+              type: object
+              additionalProperties: true
+              properties:
+                "@baseType":
+                  description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                  type: string
+                  required: false
+                "@schemaLocation":
+                  description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                  type: string
+                  required: false
+                "@type":
+                  description: Generic attribute containing the name of the resource class type
+                  type: string
+                  required: false
+                preferred:
+                  description: If true, indicates that is the preferred contact medium
+                  type: boolean
+                  required: false
+                type:
+                  description: "Type of the contact medium, such as: email address, telephone number, postal address"
+                  type: string
+                  required: true
+                validFor:
+                  description: A base / value business entity used to represent a period of time between two timepoints.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    endDateTime:
+                      description: An instant of time, ending at the TimePeriod.
+                      type: datetime
+                      required: false
+                    startDateTime:
+                      description: An instant of time, starting at the TimePeriod
+                      type: datetime
+                      required: false
+                  required: false
+                characteristic:
+                  description: Describes the contact medium characteristics that could be used to contact a party (an individual or an organization)
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    city:
+                      description: The city
+                      type: string
+                      required: false
+                    country:
+                      description: The country
+                      type: string
+                      required: false
+                    emailAddress:
+                      description: Full email address in standard format
+                      type: string
+                      required: false
+                    faxNumber:
+                      description: The fax number of the contact
+                      type: string
+                      required: false
+                    phoneNumber:
+                      description: The primary phone number of the contact
+                      type: string
+                      required: false
+                    postCode:
+                      description: Postcode
+                      type: string
+                      required: false
+                    stateOrProvince:
+                      description: State or province
+                      type: string
+                      required: false
+                    street1:
+                      description: Describes the street
+                      type: string
+                      required: false
+                    street2:
+                      description: Complementary street description
+                      type: string
+                      required: false
+                    type:
+                      description: Type of medium (fax, mobile phone...)
+                      type: string
+                      required: false
+                  required: true
+            required: false
+          characteristic:
+            description: Describes the characteristic of a party role.
+            type: array
+            items:
+              description: Describes a given characteristic of an object or entity through a name/value pair.
+              type: object
+              additionalProperties: true
+              properties:
+                name:
+                  description: Name of the characteristic
+                  type: string
+                  required: true
+                value:
+                  description: The value of the characteristic provided as a string.
+                  type: string
+                  required: true
+            required: false
+          creditProfile:
+            type: array
+            items:
+              description: Credit profile for the party (containing credit scoring, ...). By default only the current credit profile  is retrieved. It can be used as a list to give the party credit profiles history, the first one in the list will be the current one.
+              type: object
+              additionalProperties: true
+              properties:
+                "@baseType":
+                  description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                  type: string
+                  required: false
+                "@schemaLocation":
+                  description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                  type: string
+                  required: false
+                "@type":
+                  description: Generic attribute containing the name of the resource class type
+                  type: string
+                  required: false
+                creditProfileDate:
+                  description: The date the profile was established
+                  type: datetime
+                  required: true
+                creditRiskRating:
+                  description: This is an integer whose value is used to rate the risk
+                  type: integer
+                  required: false
+                creditScore:
+                  description: A measure of a person's or an organization's creditworthiness calculated on the basis of a combination of factors such as their income and credit history.
+                  type: integer
+                  required: false
+                validFor:
+                  description: A base / value business entity used to represent a period of time between two timepoints.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    endDateTime:
+                      description: An instant of time, ending at the TimePeriod.
+                      type: datetime
+                      required: false
+                    startDateTime:
+                      description: An instant of time, starting at the TimePeriod
+                      type: datetime
+                      required: false
+                  required: true
+            required: false
+          agreement:
+            type: array
+            items:
+              description: Agreement reference. An agreement represents a contract or arrangement, either written or verbal and sometimes enforceable by law, such as a service level agreement or a customer price agreement. An agreement involves a number of other business entities, such as products, services, and resources and/or their specifications.
+              type: object
+              additionalProperties: true
+              properties:
+                "@referredType":
+                  description: Generic attribute indicating the name of the class type of the referred resource entity.
+                  type: string
+                  required: false
+                href:
+                  description: Reference of the agreement
+                  type: string
+                  required: false
+                id:
+                  description: Identifier of the agreement
+                  type: string
+                  required: false
+                name:
+                  description: Name of the agreement
+                  type: string
+                  required: false
+            required: false
+          relatedParty:
+            type: array
+            items:
+              description: RelatedParty reference. A related party defines party or party role linked to a specific entity.
+              type: object
+              additionalProperties: true
+              properties:
+                "@referredType":
+                  description: Generic attribute indicating the name of the class type of the referred resource entity.
+                  type: string
+                  required: false
+                href:
+                  description: Reference of the related party, could be a party reference or a party role reference
+                  type: string
+                  required: false
+                id:
+                  description: Unique identifier of a related party
+                  type: string
+                  required: false
+                name:
+                  description: Name of the related party
+                  type: string
+                  required: false
+                role:
+                  description: Role of the related party.
+                  type: string
+                  required: false
+            required: false
+    (amf-baseUriParameters):
+      id:
+        description: Identifier of the Customer
+        required: true
+        type: string
+    responses:
+      "200":
+        description: Updated
+        body:
+          application/json:
+            example: !include examples/patchCustomerExample.json
+            type: object
+            additionalProperties: true
+            properties:
+              "@baseType":
+                description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                type: string
+                required: false
+              "@type":
+                description: Generic attribute containing the name of the resource class type
+                type: string
+                required: false
+              href:
+                description: Url used to reference the party role.
+                type: string
+                required: false
+              id:
+                description: Unique identifier for PartyRoles
+                type: string
+                required: false
+              name:
+                description: A word, term, or phrase by which the PartyRole is known and distinguished from other PartyRoles.
+                type: string
+                required: true
+              status:
+                description: Used to track the lifecycle status of the party role.
+                type: string
+                required: false
+              statusReason:
+                description: A string providing an explanation on the value of the status lifecycle. For instance if the status is Rejected, statusReason will provide the reason for rejection.
+                type: string
+                required: false
+              validFor:
+                description: A base / value business entity used to represent a period of time between two timepoints.
+                type: object
+                additionalProperties: true
+                properties:
+                  endDateTime:
+                    description: An instant of time, ending at the TimePeriod.
+                    type: datetime
+                    required: false
+                  startDateTime:
+                    description: An instant of time, starting at the TimePeriod
+                    type: datetime
+                    required: false
+                required: false
+              engagedParty:
+                description: Party reference. A party represents an organization or an individual.
+                type: object
+                additionalProperties: true
+                properties:
+                  "@referredType":
+                    description: Generic attribute indicating the name of the class type of the referred resource entity.
+                    type: string
+                    required: false
+                  description:
+                    description: Text describing the referred party
+                    type: string
+                    required: false
+                  href:
+                    description: Reference of the referred party (such as a partner or any other party role).
+                    type: string
+                    required: true
+                  id:
+                    description: Unique identifier of the referred party
+                    type: string
+                    required: true
+                  name:
+                    description: Name of the referred party (such as a partner or any other party role)
+                    type: string
+                    required: false
+                required: false
+              type:
+                description: RoleType reference.
+                type: object
+                additionalProperties: true
+                properties:
+                  "@referredType":
+                    description: Generic attribute indicating the name of the class type of the referred resource entity.
+                    type: string
+                    required: false
+                  name:
+                    description: The name of the role type. It uniquely identifies the role type within the partnership type.
+                    type: string
+                    required: false
+                  partnershipHref:
+                    description: Reference url of the partnership type containing the role type
+                    type: string
+                    required: false
+                  partnershipId:
+                    description: The identifier of the partnership type containing the role type
+                    type: string
+                    required: false
+                  partnershipName:
+                    description: The name of the partnership type defining this role type
+                    type: string
+                    required: false
+                required: false
+              account:
+                type: array
+                items:
+                  description: Account reference. A account may be a party account or a financial account.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    description:
+                      description: Detailed description of the account
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the account
+                      type: string
+                      required: true
+                    id:
+                      description: Unique identifier of the account
+                      type: string
+                      required: true
+                    name:
+                      description: Name of the account
+                      type: string
+                      required: true
+                required: false
+              paymentMethod:
+                type: array
+                items:
+                  description: PaymentMethod reference. A payment method defines a specific mean of payment (e.g direct debit).
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the payment mean
+                      type: string
+                      required: true
+                    id:
+                      description: Unique identifier of the payment mean
+                      type: string
+                      required: true
+                    name:
+                      description: Name of the payment mean
+                      type: string
+                      required: false
+                required: false
+              contactMedium:
+                type: array
+                items:
+                  description: Indicates the contact medium that could be used to contact the party.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@baseType":
+                      description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                      type: string
+                      required: false
+                    "@schemaLocation":
+                      description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                      type: string
+                      required: false
+                    "@type":
+                      description: Generic attribute containing the name of the resource class type
+                      type: string
+                      required: false
+                    preferred:
+                      description: If true, indicates that is the preferred contact medium
+                      type: boolean
+                      required: false
+                    type:
+                      description: "Type of the contact medium, such as: email address, telephone number, postal address"
+                      type: string
+                      required: true
+                    validFor:
+                      description: A base / value business entity used to represent a period of time between two timepoints.
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        endDateTime:
+                          description: An instant of time, ending at the TimePeriod.
+                          type: datetime
+                          required: false
+                        startDateTime:
+                          description: An instant of time, starting at the TimePeriod
+                          type: datetime
+                          required: false
+                      required: false
+                    characteristic:
+                      description: Describes the contact medium characteristics that could be used to contact a party (an individual or an organization)
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        city:
+                          description: The city
+                          type: string
+                          required: false
+                        country:
+                          description: The country
+                          type: string
+                          required: false
+                        emailAddress:
+                          description: Full email address in standard format
+                          type: string
+                          required: false
+                        faxNumber:
+                          description: The fax number of the contact
+                          type: string
+                          required: false
+                        phoneNumber:
+                          description: The primary phone number of the contact
+                          type: string
+                          required: false
+                        postCode:
+                          description: Postcode
+                          type: string
+                          required: false
+                        stateOrProvince:
+                          description: State or province
+                          type: string
+                          required: false
+                        street1:
+                          description: Describes the street
+                          type: string
+                          required: false
+                        street2:
+                          description: Complementary street description
+                          type: string
+                          required: false
+                        type:
+                          description: Type of medium (fax, mobile phone...)
+                          type: string
+                          required: false
+                      required: true
+                required: false
+              characteristic:
+                description: Describes the characteristic of a party role.
+                type: array
+                items:
+                  description: Describes a given characteristic of an object or entity through a name/value pair.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    name:
+                      description: Name of the characteristic
+                      type: string
+                      required: true
+                    value:
+                      description: The value of the characteristic provided as a string.
+                      type: string
+                      required: true
+                required: false
+              creditProfile:
+                type: array
+                items:
+                  description: Credit profile for the party (containing credit scoring, ...). By default only the current credit profile  is retrieved. It can be used as a list to give the party credit profiles history, the first one in the list will be the current one.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@baseType":
+                      description: Generic attribute indicating the base class type of the extension class of the current object. Useful only when the class type of the current  object is unknown to the implementation.
+                      type: string
+                      required: false
+                    "@schemaLocation":
+                      description: Generic attribute containing the link to the schema that defines the structure of the class type of the current object.
+                      type: string
+                      required: false
+                    "@type":
+                      description: Generic attribute containing the name of the resource class type
+                      type: string
+                      required: false
+                    creditProfileDate:
+                      description: The date the profile was established
+                      type: datetime
+                      required: true
+                    creditRiskRating:
+                      description: This is an integer whose value is used to rate the risk
+                      type: integer
+                      required: false
+                    creditScore:
+                      description: A measure of a person's or an organization's creditworthiness calculated on the basis of a combination of factors such as their income and credit history.
+                      type: integer
+                      required: false
+                    validFor:
+                      description: A base / value business entity used to represent a period of time between two timepoints.
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        endDateTime:
+                          description: An instant of time, ending at the TimePeriod.
+                          type: datetime
+                          required: false
+                        startDateTime:
+                          description: An instant of time, starting at the TimePeriod
+                          type: datetime
+                          required: false
+                      required: true
+                required: false
+              agreement:
+                type: array
+                items:
+                  description: Agreement reference. An agreement represents a contract or arrangement, either written or verbal and sometimes enforceable by law, such as a service level agreement or a customer price agreement. An agreement involves a number of other business entities, such as products, services, and resources and/or their specifications.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the agreement
+                      type: string
+                      required: false
+                    id:
+                      description: Identifier of the agreement
+                      type: string
+                      required: false
+                    name:
+                      description: Name of the agreement
+                      type: string
+                      required: false
+                required: false
+              relatedParty:
+                type: array
+                items:
+                  description: RelatedParty reference. A related party defines party or party role linked to a specific entity.
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    "@referredType":
+                      description: Generic attribute indicating the name of the class type of the referred resource entity.
+                      type: string
+                      required: false
+                    href:
+                      description: Reference of the related party, could be a party reference or a party role reference
+                      type: string
+                      required: false
+                    id:
+                      description: Unique identifier of a related party
+                      type: string
+                      required: false
+                    name:
+                      description: Name of the related party
+                      type: string
+                      required: false
+                    role:
+                      description: Role of the related party.
+                      type: string
+                      required: false
+                required: false
+      "400":
+        description: Bad Request
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "401":
+        description: Unauthorized
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "403":
+        description: Forbidden
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "404":
+        description: Not Found
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "405":
+        description: Method Not allowed
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "409":
+        description: Conflict
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "500":
+        description: Internal Server Error
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+  delete:
+    displayName: deleteCustomer
+    (amf-summary): Deletes a 'Customer' by Id
+    (amf-tags):
+      - customer
+    body: {}
+    (amf-baseUriParameters):
+      id:
+        description: Identifier of the Customer
+        required: true
+        type: string
+    responses:
+      "204":
+        description: Deleted
+        body: {}
+      "400":
+        description: Bad Request
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "401":
+        description: Unauthorized
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "403":
+        description: Forbidden
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "404":
+        description: Not Found
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "405":
+        description: Method Not allowed
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "409":
+        description: Conflict
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "500":
+        description: Internal Server Error
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+/hub/{id}:
+  delete:
+    displayName: unregisterListener
+    description: Resets the communication endpoint address the service instance must use to deliver information about its health state, execution state, failures and metrics.
+    (amf-summary): Unregister a listener
+    (amf-tags):
+      - events subscription
+    body: {}
+    responses:
+      "204":
+        description: Deleted
+        body: {}
+      "400":
+        description: Bad request
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "401":
+        description: Unauthorized
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "403":
+        description: Forbidden
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "404":
+        description: Not Found
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "405":
+        description: Method not allowed
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+      "500":
+        description: Internal Server Error
+        body:
+          application/json:
+            additionalProperties: true
+            properties:
+              code:
+                description: Application related code.
+                type: integer
+                required: true
+              reason:
+                description: Text that explains the reason for error.
+                type: integer
+                required: true
+              message:
+                description: (optional) Text that provide more details and corrective actions related to the error.
+                type: string
+                required: false
+              status:
+                description: (optional) http error code extension like 400-2
+                type: integer
+                required: false
+              referenceError:
+                description: (optional) A URL to online documentation that provides more information about the error.
+                type: string
+                required: false
+              "@type":
+                description: (optional) The class type of a REST resource.
+                type: string
+                required: false
+              "@schemaLocation":
+                description: (optional) A link to the schema describing a REST resource.
+                type: string
+                required: false
+  uriParameters:
+    id:
+      description: The id of the registered listener
+      type: string
+(amf-hostTempLabel): serverRoot
+(amf-basePathTempLabel): /tmf-api/customerManagement/v3/

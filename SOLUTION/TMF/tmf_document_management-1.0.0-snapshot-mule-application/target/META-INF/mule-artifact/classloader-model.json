@@ -1,0 +1,72 @@
+{
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "com.mycompany",
+    "artifactId": "tmf_document_management",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "jar",
+    "classifier": "mule-application"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "9be0b2dd-a5cd-4497-aeb4-1674a4f5a4b5",
+        "artifactId": "tmf_document_management",
+        "version": "1.0.0",
+        "type": "zip",
+        "classifier": "oas"
+      },
+      "uri": "repository/9be0b2dd-a5cd-4497-aeb4-1674a4f5a4b5/tmf_document_management/1.0.0/tmf_document_management-1.0.0-oas.zip"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.modules",
+        "artifactId": "mule-apikit-module",
+        "version": "1.2.4",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/modules/mule-apikit-module/1.2.4/mule-apikit-module-1.2.4-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-http-connector",
+        "version": "1.5.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-http-connector/1.5.0/mule-http-connector-1.5.0-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-sockets-connector",
+        "version": "1.1.4",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-sockets-connector/1.1.4/mule-sockets-connector-1.1.4-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "com.mulesoft.connectors",
+        "artifactId": "mule-salesforce-connector",
+        "version": "9.4.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/com/mulesoft/connectors/mule-salesforce-connector/9.4.0/mule-salesforce-connector-9.4.0-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-objectstore-connector",
+        "version": "1.0.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-objectstore-connector/1.0.0/mule-objectstore-connector-1.0.0-mule-plugin.jar"
+    }
+  ]
+}

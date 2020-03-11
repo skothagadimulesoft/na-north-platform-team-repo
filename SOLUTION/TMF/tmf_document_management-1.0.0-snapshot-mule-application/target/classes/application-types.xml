@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="DocumentArrayResponse" format="json">
+      <types:shape format="weave" example="examples/GetDocumentArrayResponse.json"><![CDATA[%dw 2.0
+type DocumentArrayResponse = Array<{|
+  id: String, 
+  href: String, 
+  "type": String, 
+  lifecyleState: String, 
+  documentSpecification: {|
+    id: String, 
+    href: String
+  |}, 
+  documentCharacteristic: Array<{|
+    name: String, 
+    value: String
+  |}>, 
+  documentRelationship: Array<{|
+    "type": String, 
+    document: {|
+      id: String, 
+      href: String
+    |}
+  |}>, 
+  attachment: Array<{|
+    size: String, 
+    sizeUnit: String, 
+    mimeType: String, 
+    URL: String
+  |}>, 
+  relatedParty: Array<{|
+    role: String, 
+    id: String, 
+    href: String
+  |}>, 
+  relatedObject: {|
+    involvement: String, 
+    reference: String
+  |}
+|}> {"MetadataFormat": "json",
+"example": "[{\"id\":\"42\",\"href\":\"http:\/\/server:port\/documentManagement\/document\/42\",\"type\":\"Invoice\",\"lifecyleState\":\"Active \",\"documentSpecification\":{\"id\":\"4\",\"href\":\" http:\/\/server:port\/documentManagement\/documentSpecification\/4\"},\"documentCharacteristic\":[{\"name\":\"name of the characteristic\",\"value\":\"value of the characteristic\"}],\"documentRelationship\":[{\"type\":\"contains\",\"document\":{\"id\":\"44\",\"href\":\" http:\/\/server:port\/documentManagement\/document\/44\"}}],\"attachment\":[{\"size\":\"123.0\",\"sizeUnit\":\"bytes\",\"mimeType\":\"application\/pdf\",\"URL\":\"\/ documentManagement \/ document \/document.pdf \"}],\"relatedParty\":[{\"role\":\"customer\",\"id\":\"42\",\"href\":\"http:\/\/serverlocation:port\/customerManagement\/customer\/42\"}],\"relatedObject\":{\"involvement\":\"related\",\"reference\":\"http: \/\/serverlocation:port\/billingManagement\/customerBill\/42\"}},{\"id\":\"43\",\"href\":\"http:\/\/server:port\/documentManagement\/document\/43\",\"type\":\"Invoice\",\"lifecyleState\":\"Active \",\"documentSpecification\":{\"id\":\"5\",\"href\":\" http:\/\/server:port\/documentManagement\/documentSpecification\/4\"},\"documentCharacteristic\":[{\"name\":\"name of the characteristic\",\"value\":\"value of the characteristic\"}],\"documentRelationship\":[{\"type\":\"contains\",\"document\":{\"id\":\"44\",\"href\":\" http:\/\/server:port\/documentManagement\/document\/44\"}}],\"attachment\":[{\"size\":\"128.0\",\"sizeUnit\":\"bytes\",\"mimeType\":\"application\/pdf\",\"URL\":\"\/ documentManagement \/ document \/document.pdf \"}],\"relatedParty\":[{\"role\":\"customer\",\"id\":\"43\",\"href\":\"http:\/\/serverlocation:port\/customerManagement\/customer\/42\"}],\"relatedObject\":{\"involvement\":\"related\",\"reference\":\"http: \/\/serverlocation:port\/billingManagement\/customerBill\/42\"}}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="DocumentCreateRequest" format="json">
+      <types:shape format="weave" example="examples/CreateDocumentRequest.json"><![CDATA[%dw 2.0
+type DocumentCreateRequest = {|
+  name: String, 
+  description: String, 
+  "type": String, 
+  Attachment: {|
+    size: String, 
+    sizeUnit: String, 
+    mimeType: String, 
+    URL: String
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"name\":\"TMF Customer Documentation API Spec\",\"description\":\"Description of the document\",\"type\":\"Type of the document\",\"Attachment\":{\"size\":\"123.0\",\"sizeUnit\":\"bytes\",\"mimeType\":\"application\/pdf\",\"URL\":\"\/ documentManagement \/ document \/document.pdf \"}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="DocumentSingleResponse" format="json">
+      <types:shape format="weave" example="examples/GetDocumentResponse.json"><![CDATA[%dw 2.0
+type DocumentSingleResponse = {|
+  id: String, 
+  href: String, 
+  "type": String, 
+  lifecyleState: String, 
+  documentSpecification: {|
+    id: String, 
+    href: String
+  |}, 
+  documentCharacteristic: Array<{|
+    name: String, 
+    value: String
+  |}>, 
+  documentRelationship: Array<{|
+    "type": String, 
+    document: {|
+      id: String, 
+      href: String
+    |}
+  |}>, 
+  attachment: Array<{|
+    size: String, 
+    sizeUnit: String, 
+    mimeType: String, 
+    URL: String
+  |}>, 
+  relatedParty: Array<{|
+    role: String, 
+    id: String, 
+    href: String
+  |}>, 
+  relatedObject: {|
+    involvement: String, 
+    reference: String
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"id\":\"42\",\"href\":\"http:\/\/server:port\/documentManagement\/document\/42\",\"type\":\"Invoice\",\"lifecyleState\":\"Active \",\"documentSpecification\":{\"id\":\"4\",\"href\":\" http:\/\/server:port\/documentManagement\/documentSpecification\/4\"},\"documentCharacteristic\":[{\"name\":\"name of the characteristic\",\"value\":\"value of the characteristic\"}],\"documentRelationship\":[{\"type\":\"contains\",\"document\":{\"id\":\"44\",\"href\":\" http:\/\/server:port\/documentManagement\/document\/44\"}}],\"attachment\":[{\"size\":\"123.0\",\"sizeUnit\":\"bytes\",\"mimeType\":\"application\/pdf\",\"URL\":\"\/ documentManagement \/ document \/document.pdf \"}],\"relatedParty\":[{\"role\":\"customer\",\"id\":\"42\",\"href\":\"http:\/\/serverlocation:port\/customerManagement\/customer\/42\"}],\"relatedObject\":{\"involvement\":\"related\",\"reference\":\"http: \/\/serverlocation:port\/billingManagement\/customerBill\/42\"}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="DocumentCreate" format="json">
+      <types:shape format="weave" example="examples/DocumentCreate.json"><![CDATA[%dw 2.0
+type DocumentCreate = {|
+  name: String, 
+  description: String, 
+  "type": String, 
+  lifecyleState: String, 
+  documentCharacteristic: Array<{|
+    name: String, 
+    value: String
+  |}>, 
+  documentRelationship: Array<{|
+    "type": Null, 
+    document: {|
+      id: String, 
+      href: String
+    |}
+  |}>, 
+  attachment: Array<{|
+    mimeType: String, 
+    URL: String
+  |}>, 
+  relatedParty: Array<{|
+    role: Null, 
+    id: String, 
+    href: String
+  |}>, 
+  relatedObject: {|
+    involvement: String, 
+    reference: Null
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"name\":\"TMF Customer Documentation API Spec\",\"description\":\"Description of the document\",\"type\":\"Invoice\",\"lifecyleState\":\"P\",\"documentCharacteristic\":[{\"name\":\"Title\",\"value\":\"Screenshot\"},{\"name\":\"VersionNumber\",\"value\":\"1\"},{\"name\":\"CreatedDate\",\"value\":\"2019-04-29T16:08:59.000Z\"}],\"documentRelationship\":[{\"type\":null,\"document\":{\"id\":\"0682E000004TN2KQAW\",\"href\":\"https:\/\/na91.lightning.force.com\/lightning\/r\/Account\/0682E000004TN2KQAW\/view\"}}],\"attachment\":[{\"mimeType\":\"PNG\",\"URL\":\"https:\/\/docs.google.com\/document\/d\/1rkMug4csCW8PVA14kn73mLnRSymJQdryiJ8to0O89AM\/edit\"}],\"relatedParty\":[{\"role\":null,\"id\":\"0052E00000HxYVvQAN\",\"href\":\"\"}],\"relatedObject\":{\"involvement\":\"\",\"reference\":null}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#b824734a-54fb-456b-8574-78f1d98bfb7e">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="DocumentArrayResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#27045784-1637-483a-9d15-16384fa67160">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="DocumentSingleResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#a3ee8b9d-0268-4687-8821-e0cde9c8f4e9">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:attributes type="DocumentCreateRequest"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#e821b534-e828-45a2-b099-d2640553458e"/>
+  <types:enrichment select="#d4f73760-7fdc-4577-ae38-5dbb417fc50b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="DocumentCreate"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#3b521ed0-4e21-4d11-9b1d-e645bda84ce9">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="DocumentCreate"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

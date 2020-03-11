@@ -1,0 +1,63 @@
+[
+    {
+        "id": "0032E00002Pip1eQAB",
+        "name": "Tammer Salem",
+        "statusReason": "Customer with active contract",
+        "contactMedium": [
+            {
+                "type": "Office",
+                "validFor": {
+                    "startDateTime": "2018-01-01T20:00:00.000Z",
+                    "endDateTime": "2018-01-01T20:00:00.000Z"
+                },
+                "characteristic": {
+                    "country": "United Kingdom",
+                    "emailAddress": "tsalem@salesforce.com",
+                    "city": "London",
+                    "postCode": "EC2N 4AY",
+                    "street1": "Heron Tower\n110 Bishopsgate"
+                }
+            }
+        ],
+        "creditProfile": [
+            {
+                "creditProfileDate": "2018-01-01T20:00:00.000Z",
+                "creditRiskRating": 4,
+                "creditScore": 100,
+                "validFor": {
+                    "startDateTime": "2018-01-01T20:00:00.000Z",
+                    "endDateTime": "2019-01-01T20:00:00.000Z"
+                }
+            },
+            {
+                "creditProfileDate": "2019-01-01T20:00:00.000Z",
+                "creditRiskRating": 5,
+                "creditScore": 90,
+                "validFor": {
+                    "startDateTime": "2019-01-01T20:00:00.000Z",
+                    "endDateTime": "2020-01-01T20:00:00.000Z"
+                }
+            }
+        ],
+        "paymentMethod": [
+            {
+                "name": "Tammer Salem Account",
+                "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+                "id": "0012E00001nV4GdQAK"
+            }
+        ],
+        "engagedParty": {
+            "name": "Tammer Salem Account",
+            "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+            "id": "0012E00001nV4GdQAK"
+        },
+        "account": [
+            {
+                "name": "Tammer Salem Account",
+                "description": "",
+                "href": "https://na91.lightning.force.com/lightning/r/Account/0012E00001nV4GdQAK/view",
+                "id": "0012E00001nV4GdQAK"
+            }
+        ]
+    }
+]

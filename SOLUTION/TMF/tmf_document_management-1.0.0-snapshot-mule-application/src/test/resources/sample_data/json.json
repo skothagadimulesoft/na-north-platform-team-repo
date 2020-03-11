@@ -1,0 +1,40 @@
+{
+	
+	"name": "TMF Customer Documentation API Spec",
+	"description": "Description of the document",
+	"type": "Invoice",
+	"lifecyleState": "P",
+	"documentCharacteristic": [{
+			"name": "Title",
+			"value": "Screenshot"
+		},
+		{
+			"name": "VersionNumber",
+			"value": "1"
+		},
+		{
+			"name": "CreatedDate",
+			"value": "2019-04-29T16:08:59.000Z"
+		}
+	],
+	"documentRelationship": [{
+		"type": null,
+		"document": {
+			"id": "0682E000004TN2KQAW",
+			"href": "https://na91.lightning.force.com/lightning/r/Account/0682E000004TN2KQAW/view"
+		}
+	}],
+	"attachment": [{
+		"mimeType": "PNG",
+		"URL": "https://docs.google.com/document/d/1rkMug4csCW8PVA14kn73mLnRSymJQdryiJ8to0O89AM/edit"
+	}],
+	"relatedParty": [{
+		"role": null,
+		"id": "0052E00000HxYVvQAN",
+		"href": ""
+	}],
+	"relatedObject": {
+		"involvement": "",
+		"reference": null
+	}
+}

@@ -1,0 +1,36 @@
+{
+	"id": "42",
+	"href": "http://server:port/documentManagement/document/42",
+	"type": "Invoice",
+	"lifecyleState": "Active ",
+	"documentSpecification": {
+		"id": "4",
+		"href": " http://server:port/documentManagement/documentSpecification/4"
+	},
+	"documentCharacteristic": [{
+		"name": "name of the characteristic",
+		"value": "value of the characteristic"
+	}],
+	"documentRelationship": [{
+		"type": "contains",
+		"document": {
+			"id": "44",
+			"href": " http://server:port/documentManagement/document/44"
+		}
+	}],
+	"attachment": [{
+		"size": "123.0",
+		"sizeUnit": "bytes",
+		"mimeType": "application/pdf",
+		"URL": "/ documentManagement / document /document.pdf "
+	}],
+	"relatedParty": [{
+		"role": "customer",
+		"id": "42",
+		"href": "http://serverlocation:port/customerManagement/customer/42"
+	}],
+	"relatedObject": {
+		"involvement": "related",
+		"reference": "http: //serverlocation:port/billingManagement/customerBill/42"
+	}
+}

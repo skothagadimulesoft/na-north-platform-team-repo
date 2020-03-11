@@ -1,0 +1,36 @@
+{
+  "configs": [
+    "tmf_customer_management.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:tmf_customer_management:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.1.5",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "log4j2.xml",
+        "config/config.yaml",
+        "application-types.xml",
+        "examples/TMF_addCustomer.json",
+        "examples/getCustomerTMF.json",
+        "api/tmf_customer_mgmt1.raml",
+        "api/examples/postRegisterCallbackNotificationResponse.json",
+        "api/examples/patchCustomerExample.json",
+        "api/examples/singleCustomerExample.json",
+        "api/examples/postRegisterCallbackNotification.json",
+        "api/examples/patchCustomerExampleRequest.json",
+        "api/examples/postCustomerResponseExample.json",
+        "api/examples/postCustomerExample.json",
+        "tmf_customer_management.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}
