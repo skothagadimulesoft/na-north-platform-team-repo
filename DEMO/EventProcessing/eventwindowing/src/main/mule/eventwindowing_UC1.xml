@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="db669f3d-1078-48d9-b301-637e1b6b1606" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<os:object-store name="CEP_Object_store_UC1" doc:name="Object store" doc:id="9fd21498-258a-4e8a-aba4-81096a72701a" maxEntries="10" />
+	<flow name="eventwindowing_UC1Flow" doc:id="149381ca-3a2d-4244-ac12-683a8cf877c4" >
+		<http:listener doc:name="Listener" doc:id="7dd89e29-2c61-46e2-98c3-58db84d5cfef" config-ref="HTTP_Listener_config" path="/api/detectwindoweventUC1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="eb1138c8-8a10-43f6-9e00-efa5c040be5b" message="#['Got Transaction']"/>
+		<os:store doc:name="Store Transaction - Use timestamp as Key" doc:id="80abe168-1976-4bf9-a76c-3bf5fa66716d" key="#[now()]" objectStore="CEP_Object_store_UC1"/>
+		<flow-ref doc:name="Call event window check Flow Reference" doc:id="b3195c20-ad58-4ebf-99c4-1903fadcfd62" name="checkforeventwindow_UC1"/>
+		<logger level="INFO" doc:name="Do Something with the response" doc:id="2baa2516-f720-44d6-b22c-5f97db6da811" message="#[payload]"/>
+	</flow>
+	<sub-flow name="checkforeventwindow_UC1" doc:id="d458b4fb-6b07-46e2-8f9f-857335fb9d12" >
+		<os:retrieve-all-keys doc:name="Retrieve all cached keys/timestamps" doc:id="4164b433-7e48-4259-a7ab-b8a9e6f2d9f8" objectStore="CEP_Object_store_UC1" />
+		<set-variable value="#[(sizeOf(payload) )as Number]" doc:name="Capture Events count in WIndow" doc:id="024288b8-bd68-48b0-a418-91f523fc4404" variableName="payloadsize"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e9e43d38-cf02-46cc-a9f2-cf22b36788f1" message="#[vars.payloadsize]"/>
+		<choice doc:name="Check if there are more than 5 events in the window" doc:id="36e16d81-0e9e-4572-873c-ff9a0fc67a25" >
+			<when expression="#[vars.payloadsize &gt; 5]">
+				<logger level="INFO" doc:name="Logger" doc:id="51e2d374-26ed-44d4-8a37-075d48462c96" message="#['Payload Entries == 5. Time to check interval']"/>
+				<ee:transform doc:name="Order all keys by ASC" doc:id="45dad727-cd53-418f-b1f1-d83524baac53" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+
+payload orderBy $]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[(payload[vars.payloadsize - 1] as DateTime - payload[0] as DateTime).seconds]" doc:name="Time DIff between newest entry and oldest entry" doc:id="baaf409b-5302-45b2-967b-c3153a2d0d64" variableName="diff" />
+				<choice doc:name="Check if the the transactions were received in a 10 sec window" doc:id="1ff3e2cd-e5a3-4b03-ba45-7bdf84f33f69" >
+					<when expression="#[vars.diff &lt; 10]">
+						<logger level="INFO" doc:name="Logger" doc:id="f011f3ae-4216-4e91-9a7c-450a97d34f75" message="#['Detected Fraud Transaction -&gt; Diff = ' ++ vars.diff]"/>
+						<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"Event":"Fraud Detected"
+}]' doc:name="Set Payload to Fraud Detected" doc:id="5e52396a-2ad9-4ab2-9fe0-4557cd1de5cd" />
+					</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="26756914-fcee-4057-992b-05aef943bc4e" message="#['No fraud detected']"/>
+						<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"Event":"No Fraud Detected"
+}]' doc:name="Set Payload No Fraud Detected" doc:id="b5393349-4623-4c63-9610-d9ca22fe3493" />
+					</otherwise>
+				</choice>
+				<os:remove doc:name="Remove oldest entry from the cache" doc:id="efdd22f6-a783-48c5-82b5-2adfe624e29c" key="#[payload[0]]" objectStore="CEP_Object_store_UC1" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="6cd76f80-a0ec-4b7c-bd2d-5795df495ed0" message="#['Payload Entries -&gt; ' ++ sizeOf(payload)]"/>
+				<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"Event":"No Fraud Detected"
+}]' doc:name="Set Payload No Fraud Detected" doc:id="9b83bc5c-fe43-4ea4-8dc8-38a26e8ecffa" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>
