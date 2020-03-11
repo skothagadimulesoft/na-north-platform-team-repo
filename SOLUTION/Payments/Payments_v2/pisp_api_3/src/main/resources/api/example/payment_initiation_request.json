@@ -1,0 +1,30 @@
+{
+  "PISPPaymentReqData": {
+      "Amount": {
+        "Amount": "20.00",
+        "Currency": "GBP"
+      },
+       "DebtorAgency":{
+         "Identification":"Bank ABC",
+         "Code":"123",
+         "AgencyType": "RetailBank"
+      },
+      "DebtorAccount": {
+        "Identification": "11280001234567",
+        "AccountType":"Savings",
+        "Name": "Andrea Smith"
+      },
+     "CreditorAgency":{
+         "Identification":"Bank XYZ",
+         "Code":"456",
+         "AgencyType": "RetailBank"
+      },
+      "CreditorAccount": {
+        "Identification": "08080021325698",
+        "AccountType":  "Checking",
+        "Name": "ACME Inc",
+        "SecondaryIdentification": "0002"
+      }
+    
+  }
+}

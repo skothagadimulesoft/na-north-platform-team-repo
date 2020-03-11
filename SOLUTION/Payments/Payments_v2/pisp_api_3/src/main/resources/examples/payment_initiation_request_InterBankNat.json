@@ -1,0 +1,31 @@
+{
+  "PISPPaymentReqData": {
+      "Amount": {
+        "Amount": 20.00,
+        "Currency": "USD"
+      },
+       "DebtorAgency":{
+         "Identification":"BOFAUS3N",
+         "Code":"123",
+         "AgencyType": "RetailBank"
+      },
+      "DebtorAccount": {
+        "Identification": "33378923-CHQK",
+        "AccountType":"Checking",
+        "Name": "Andrea Smith"
+      },
+     "CreditorAgency":{
+         "Identification":"CITIUS33",
+         "Code":"456",
+         "AgencyType": "RetailBank"
+      },
+      "CreditorAccount": {
+        "Identification": "7678334-SVG",
+        "AccountType":  "Savings",
+        "Name": "ACME Inc",
+        "SecondaryIdentification": "0002"
+      },
+      "TransferAction": "CREDIT_TRANSFER"
+    
+  }
+}

@@ -1,0 +1,34 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/aecddb59-9c3c-4f99-90ae-dc4a9913b4a8 # 
+version: v1
+title: PISP
+
+uses: 
+  data_types:  exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/payment_ob_pisp_datatypes/1.0.2/payment_ob_pisp_datatypes.raml
+  
+/payment_initiation:
+  get:
+
+  /{id}:
+    get:
+    put:
+
+  post:
+    body: 
+      application/json:
+        type: data_types.PISPPaymentInitiationRequest
+        examples:
+          IntraBankNat: !include example/payment_initiation_request_IntraBankNat.json
+          IntraBankInter: !include  example/payment_initiation_request_IntraBankInt.json
+          InterBankNat: !include  example/payment_initiation_request_InterBankNat.json
+          InternBankInter:  !include  example//payment_initiation_request_InterBankInt.json
+          Remittance: !include  example/paymen_initiation_request_Remittance.json
+         
+
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: data_types.PISPPaymentInitiationResponse
+            example:  !include  example/payment_initiation_response.json
+    

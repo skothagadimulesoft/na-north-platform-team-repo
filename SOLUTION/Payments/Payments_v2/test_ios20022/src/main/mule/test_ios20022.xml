@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="test_ios20022Flow" doc:id="f5638042-32e3-4542-a4f6-8f602ef03a72" >
+		<ee:transform doc:name="Transform Message" doc:id="ae00aa18-339d-4610-8a1f-1b6b1cf6522b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10
+---
+{
+	ns0#Document: {
+		ns0#FIToFIPmtStsRpt: {
+			ns0#GrpHdr: {
+				ns0#MsgId: payload.Data.Initiation.InstructionIdentification,
+				ns0#InstgAgt: {
+					ns0#FinInstnId: {
+						ns0#ClrSysMmbId: {
+							ns0#ClrSysId: payload.Data.Initiation.CreditorAgent.Identification
+						}
+					}
+				},
+				ns0#InstdAgt: {
+					ns0#FinInstnId: {
+						ns0#ClrSysMmbId: {
+							ns0#ClrSysId: payload.Data.Initiation.DebtorAgent.Identification
+						}
+					}
+				}
+			},
+			ns0#TxInfAndSts: {
+				ns0#OrgnlTxRef: {
+					ns0#Amt: payload.Data.Initiation.InstructedAmount.Amount
+				}
+			}
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	
+	  <http:request-config name="HTTP_Request_configuration_Volante" doc:name="HTTP Request configuration" doc:id="92ce7b6b-5579-48ee-bbb0-7214351002ff" >
+		<http:request-connection protocol="HTTPS" host="volmsg.cloud.volantetech.net" port="443" connectionIdleTimeout="300000"/>
+	</http:request-config>
+	
+	
+	<anypoint-mq:default-subscriber-config name="Anypoint_MQ_Default_subscriber" doc:name="Anypoint MQ Default subscriber" doc:id="e72ffc30-6517-472e-9086-1017ec2d04f5" pollingTime="5000">
+		<anypoint-mq:connection clientId="e819657f885d45b5a5b023812196e4ca" clientSecret="00157F55C8ae4B92A893f1a58C4a76a8" />
+	</anypoint-mq:default-subscriber-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="30fb40a5-3507-4ef5-9f3b-c5e63fc36904" file="mule-custom-app-msgc.properties" />
+	<flow name="messagingcenter_ReceiveingBank_Flow" doc:id="1ecc547f-693b-4acc-a949-8809197b3585" initialState="started">
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="dd4a961f-43c6-4cbc-9c70-04f287c05252" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.pub.queue}">
+		</anypoint-mq:subscriber>
+		<logger level="INFO" doc:name="Logger" doc:id="71f7be40-0586-481b-afe7-1e4ff458c1c1" message="Rcv Bank Got SWIFT Payment Message  #[payload]"/>
+		<!--  
+		<flow-ref doc:name="Flow Reference" doc:id="2e8f3a54-ff48-416d-8e7e-4ca9aa4a4910" name="volante_transformFlow_outbound"/>
+		-->
+		<flow-ref doc:name="Flow Reference" doc:id="0977247d-e428-4295-91fd-999582ea448f" name="messagingcenterFlow_common"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="c7ee0519-9630-4533-8122-c7764c94a846" variableName="origPayload"/>
+		<anypoint-mq:publish doc:name="Publish" doc:id="3f7d144f-e938-4f76-a3c0-c56331ef5a2c" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.sub.queue}" outputMimeType="application/xml"/>
+		<set-payload value="#[vars.origPayload]" doc:name="Set Payload" doc:id="86320a56-58ba-4d23-9d4d-98548ccd8742" />
+		<ee:transform doc:name="Xform to Payment resp JSON" doc:id="af96a4c6-9123-4f42-b83b-f539899ec4cb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 urn:iso:std:iso:20022:tech:xsd:pacs.002.001.02
+---
+{
+	PaymentId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlEndToEndId default "",
+	Amount: {
+		Amount: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#IntrBkSttlmAmt,
+		Currency: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#IntrBkSttlmAmt.@Ccy default ""
+	},
+	TransasctionCost: 10.00,
+	TransferProtocol: "SWIFT",
+	PaymentPath: "INTER_BANK_NATIONAL",
+	PaymentStatus: "PROCESSED",
+	Debtor: {
+		Account: {
+			AccountId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#DbtrAcct.ns0#Id.ns0#PrtryAcct.ns0#Id default "",
+			AccountType: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#Dbtr.ns0#Nm default "",
+			BankId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#DbtrAgt.ns0#FinInstnId.ns0#BIC default "",
+			// BankName: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#InstgAgt.ns0#FinInstnId.ns0#NmAndAdr.ns0#Nm default ""
+			BankName: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts[0].ns0#OrgnlTxRef.ns0#DbtrAgt.ns0#FinInstnId.ns0#BIC[0 to 3]
+		}
+	},
+	Creditor: {
+		Account: {
+			AccountId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#CdtrAcct.ns0#Id.ns0#PrtryAcct.ns0#Id default "",
+			AccountType: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#Cdtr.ns0#Nm default "",
+			BankId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#CdtrAgt.ns0#FinInstnId.ns0#BIC default "",
+			// BankName: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#InstdAgt.ns0#FinInstnId.ns0#NmAndAdr.ns0#Nm default ""
+			BankName: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts[0].ns0#OrgnlTxRef.ns0#CdtrAgt.ns0#FinInstnId.ns0#BIC[0 to 3]
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<anypoint-mq:publish doc:name="Publish to Reconciliation Exchange" doc:id="a311a8a9-2d3f-426d-85fa-6f22416bc3fa" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.exchange.ch}" />
+	</flow>
+	<flow name="messagingcenter_ClearingHouse_Flow" doc:id="9ce12386-2e54-4fe5-b18f-9cf42be6c49c" >
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="f4967b9d-39cf-4842-8815-2cbf21358846" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.pub.queue.ch}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7a870316-f197-4845-b3af-021f8acdd0e3" message="====&gt;GOT Clearing House message #[payload]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="d918bfb7-aec7-4e19-a1bd-d66a7d8bfa89" name="messagingcenterFlow_common"/>
+		<ee:transform doc:name="Transform Message" doc:id="503bd921-27ee-4514-905d-86345b8e9b47" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 urn:iso:std:iso:20022:tech:xsd:pacs.002.001.02
+---
+{
+	PaymentId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlEndToEndId default "",
+	Amount: {
+		Amount: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#IntrBkSttlmAmt,
+		Currency: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#IntrBkSttlmAmt.@Ccy default ""
+	},
+	TransasctionCost: 10.00,
+	TransferProtocol: "SWIFT",
+	PaymentPath: "INTER_BANK_NATIONAL",
+	PaymentStatus: "PROCESSED",
+	Debtor: {
+		Account: {
+			AccountId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#DbtrAcct.ns0#Id.ns0#PrtryAcct.ns0#Id default "",
+			AccountType: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#Dbtr.ns0#Nm default "",
+			BankId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#DbtrAgt.ns0#FinInstnId.ns0#BIC default "",
+			// BankName: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#InstgAgt.ns0#FinInstnId.ns0#NmAndAdr.ns0#Nm default ""
+			BankName: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts[0].ns0#OrgnlTxRef.ns0#DbtrAgt.ns0#FinInstnId.ns0#BIC[0 to 3]
+		}
+	},
+	Creditor: {
+		Account: {
+			AccountId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#CdtrAcct.ns0#Id.ns0#PrtryAcct.ns0#Id default "",
+			AccountType: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#Cdtr.ns0#Nm default "",
+			BankId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#CdtrAgt.ns0#FinInstnId.ns0#BIC default "",
+			// BankName: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#InstdAgt.ns0#FinInstnId.ns0#NmAndAdr.ns0#Nm default ""
+			BankName: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts[0].ns0#OrgnlTxRef.ns0#CdtrAgt.ns0#FinInstnId.ns0#BIC[0 to 3]
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<anypoint-mq:publish doc:name="Publish" doc:id="d56e76c5-f3cd-4f23-b4a0-9fe0c323e757" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.exchange.ch}"/>
+	</flow>
+	<flow name="messagingcenterFlow_common" doc:id="44285083-6319-4a69-991a-ff9888e8a70f" >
+		<flow-ref doc:name="Copy_of_Flow Reference" doc:id="15fcc7cc-e7e1-45aa-9b5f-c89d75c1c7c9" name="volante_transformFlow_inbound" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="897debcf-a437-4d9a-aadb-b33717858c0f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:iso:std:iso:20022:tech:xsd:pacs.002.001.02
+ns ns01 urn:iso:std:iso:20022:tech:xsd:pacs.008.001.02
+---
+{
+	ns0#Document: {
+		ns0#"pacs.002.001.02": {
+			(payload.ns01#Document.ns01#FIToFICstmrCdtTrf.*ns01#CdtTrfTxInf map ( cdtTrfTxInf , indexOfCdtTrfTxInf ) -> {
+				ns0#GrpHdr: {
+					ns0#MsgId: uuid(),
+					ns0#CreDtTm: now()
+				},
+				ns0#OrgnlGrpInfAndSts: {
+					ns0#OrgnlMsgId: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#MsgId,
+					ns0#OrgnlCreDtTm: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#CreDtTm,
+					ns0#OrgnlNbOfTxs: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#NbOfTxs
+				},
+				ns0#TxInfAndSts: {
+					ns0#OrgnlEndToEndId: cdtTrfTxInf.ns01#PmtId.ns01#EndToEndId,
+					ns0#OrgnlTxId: cdtTrfTxInf.ns01#PmtId.ns01#TxId,
+					ns0#TxSts: "RJCT",
+					ns0#StsRsnInf: {
+						ns0#StsRsn: {
+							ns0#Cd: "RJCT"
+						}
+					},
+					ns0#AccptncDtTm: now(),
+					ns0#InstgAgt: {
+						ns0#FinInstnId: {
+							ns0#BIC: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#InstgAgt.ns01#FinInstnId.ns01#BIC,
+							ns0#NmAndAdr: {
+								ns0#Nm: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#InstgAgt.ns01#FinInstnId.ns01#Nm
+							}
+						}
+					},
+					ns0#InstdAgt: {
+						ns0#FinInstnId: {
+							ns0#BIC: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#InstdAgt.ns01#FinInstnId.ns01#BIC,
+							ns0#NmAndAdr: {
+								ns0#Nm: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#InstdAgt.ns01#FinInstnId.ns01#Nm
+							}
+						}
+					},
+					ns0#OrgnlTxRef: {
+						ns0#IntrBkSttlmAmt @(Ccy: cdtTrfTxInf.ns01#InstdAmt.@Ccy): cdtTrfTxInf.ns01#InstdAmt,
+						ns0#Amt: {
+							ns0#InstdAmt @(Ccy: cdtTrfTxInf.ns01#InstdAmt.@Ccy): cdtTrfTxInf.ns01#InstdAmt,
+							ns0#EqvtAmt: {
+								ns0#Amt: cdtTrfTxInf.ns01#InstdAmt
+							}
+						},
+						ns0#Dbtr: {
+							ns0#Nm: cdtTrfTxInf.ns01#Dbtr.ns01#Nm
+						},
+						ns0#DbtrAcct: {
+							ns0#Id: {
+								ns0#IBAN: cdtTrfTxInf.ns01#DbtrAcct.ns01#Id.ns01#IBAN,
+								ns0#PrtryAcct: {
+									ns0#Id: cdtTrfTxInf.ns01#DbtrAcct.ns01#Id.ns01#Othr.ns01#Id
+								}
+							},
+							ns0#Nm: cdtTrfTxInf.ns01#DbtrAcct.ns01#Nm
+						},
+						ns0#DbtrAgt: {
+							ns0#FinInstnId: {
+								ns0#BIC: cdtTrfTxInf.ns01#DbtrAgt.ns01#FinInstnId.ns01#BIC,
+								ns0#NmAndAdr: {
+									ns0#Nm: cdtTrfTxInf.ns01#DbtrAgt.ns01#FinInstnId.ns01#Nm
+								}
+							}
+						},
+						ns0#CdtrAgt: {
+							ns0#FinInstnId: {
+								ns0#BIC: cdtTrfTxInf.ns01#CdtrAgt.ns01#FinInstnId.ns01#BIC,
+								ns0#NmAndAdr: {
+									ns0#Nm: cdtTrfTxInf.ns01#CdtrAgt.ns01#FinInstnId.ns01#Nm
+								}
+							}
+						},
+						ns0#Cdtr: {
+							ns0#Nm: cdtTrfTxInf.ns01#Cdtr.ns01#Nm
+						},
+						ns0#CdtrAcct: {
+							ns0#Id: {
+								ns0#IBAN: cdtTrfTxInf.ns01#CdtrAcct.ns01#Id.ns01#IBAN,
+								ns0#PrtryAcct: {
+									ns0#Id: cdtTrfTxInf.ns01#CdtrAcct.ns01#Id.ns01#Othr.ns01#Id
+								}
+							},
+							ns0#Nm: cdtTrfTxInf.ns01#CdtrAcct.ns01#Nm
+						}
+					}
+				}
+			})
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="686275fd-6bb1-4298-ac91-c084df5c21b2" message="------Rcv Bank unmarshalled to XML: #[payload]" />
+	</flow>
+</mule>

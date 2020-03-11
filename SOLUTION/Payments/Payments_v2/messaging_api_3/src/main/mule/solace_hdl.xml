@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="solace_hdlFlow" doc:id="c8488b3c-c18f-4ccb-afce-d42383264925" >
+		<logger level="INFO" doc:name="Logger" doc:id="067ffd5a-1a1e-46a8-b6b7-29d7cea17754" message="handling SOLACE !"/>
+	</flow>
+</mule>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="account_list" format="json">
+      <types:shape format="weave" example="api/samples/AccountDataList_Response.json"><![CDATA[%dw 2.0
+
+type account_list = Array<{|  account_id: String,   bban: String,   iban: String,   account_name: String,   bank_num: String,   upic: String,   bank_name: String,   country: String,   account_balance: String,   currency: String,   open_date: String|}> {"example": "[{\"account_id\":\"12345\",\"bban\":\"abc123\",\"iban\":\"xyz123\",\"account_name\":\"checking\",\"bank_num\":\"67800\",\"upic\":\"77777\",\"bank_name\":\"BoA\",\"country\":\"US\",\"account_balance\":\"33.33\",\"currency\":\"USD\",\"open_date\":\"2019-08-26T13:32:10.64-07:00\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#9f579cdd-826f-4543-bb29-f4fd0ae49273">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="account_list"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

@@ -1,0 +1,14 @@
+{ 
+   "PaymentID":  "1234567",
+       "DebtorAgent": {
+        "SchemeName": "SortCodeAccountNumber",
+        "Identification": "11280001234567"
+       
+      },
+      "DebtorAccount": {
+        "SchemeName": "SortCodeAccountNumber",
+        "Identification": "33378923-CHQK",
+        "Name": "John Smith"
+      },
+      "Status": "PaymentAuthorized"
+}

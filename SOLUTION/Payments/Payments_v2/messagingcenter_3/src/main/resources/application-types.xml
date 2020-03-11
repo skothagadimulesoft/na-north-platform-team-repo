@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="payment_messge" format="xml">
+      <types:shape format="xml-schema" element="{urn:iso:std:iso:20022:tech:xsd:pacs.008.001.02}Document" location="schemas/pacs.008.001.02.xsd"/>
+    </types:type>
+    <types:type name="payment_response" format="xml">
+      <types:shape format="xml-schema" element="{urn:iso:std:iso:20022:tech:xsd:pacs.002.001.02}Document" location="schemas/pacs.002.001.02.xsd"/>
+    </types:type>
+    <types:type name="pacs-oo8-raw" format="json">
+      <types:example format="json" location="examples/pacs.008.raw.json"/>
+    </types:type>
+    <types:type name="payment_response_json" format="json">
+      <types:shape format="weave" example="examples/PaymentResponse_sample.json"><![CDATA[%dw 2.0
+type payment_response_json = {|
+  PaymentId: String, 
+  Amount: {|
+    Amount: Number {"typeId": "double"}, 
+    Currency: String
+  |}, 
+  TransasctionCost: Number {"typeId": "double"}, 
+  TransferProtocol: String, 
+  PaymentPath: String, 
+  PaymentStatus: String, 
+  Debtor: {|
+    Account: {|
+      AccountId: String, 
+      AccountType: String, 
+      BankId: String, 
+      BankName: String
+    |}
+  |}, 
+  Creditor: {|
+    Account: {|
+      AccountId: String, 
+      AccountType: String, 
+      BankId: String, 
+      BankName: String
+    |}
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"PaymentId\":\"end-to-end-number\",\"Amount\":{\"Amount\":333.33,\"Currency\":\"USD\"},\"TransasctionCost\":10.00,\"TransferProtocol\":\"SWIFT\",\"PaymentPath\":\"XFER_INTER_BANK_INT\",\"PaymentStatus\":\"PROCESSED\",\"Debtor\":{\"Account\":{\"AccountId\":\"123456\",\"AccountType\":\"CHECKING\",\"BankId\":\"IBAN_NUM\",\"BankName\":\"BOA\"}},\"Creditor\":{\"Account\":{\"AccountId\":\"123456\",\"AccountType\":\"CHECKING\",\"BankId\":\"IBAN_NUM\",\"BankName\":\"BOA\"}}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#897debcf-a437-4d9a-aadb-b33717858c0f">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="payment_messge"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="payment_response"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#503bd921-27ee-4514-905d-86345b8e9b47">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="payment_response_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#af96a4c6-9123-4f42-b83b-f539899ec4cb">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="payment_response"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="payment_response_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#b62be3e2-2fa3-4030-b2ac-de526250802b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="payment_messge"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

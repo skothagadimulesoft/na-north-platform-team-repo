@@ -1,0 +1,215 @@
+#%RAML 1.0 Library
+usage: Data strutures for Open Banking
+
+types:
+
+  ActionType: 
+    enum: ["CREDIT_TRANSFER","DEBIT_TRANSFER","REMITTANCE"]
+
+  TransactionStatus:
+    enum: ["Pending", "AcceptedTechnicalValidatio","Rejected","AceptedCustomerProfile","AcceptedSettlementInProcess","AceptedSettlementCompleted"]
+
+  PaymentContextCode:
+    enum: ["EcommerceGoods", "PersonToPerson"]
+
+  AuthorizationStatus:
+    enum: ["PaymentAuthorized","PaymentRejected","PaymentRequestInvalid"]
+
+  SchemeName:
+    enum: ["SortCodeAccountNumber","RetailBank","InvestmentBank",]
+
+  InstructedAmount:
+    type: object
+    properties:
+      Amount: number
+      Currency: string
+     
+  DebtorAgent:
+    type: object
+    properties:
+      SchemeName: SchemeName
+      Identification : string
+     
+  DebtorAccount:
+    type: object
+    properties:
+      SchemeName: SchemeName
+      Identification: string
+      Name: string
+
+  CreditorAgent:
+    type: object
+    properties:
+      SchemeName: SchemeName
+      Identification : string
+  
+  CreditorAccount:
+    type: object
+    properties:
+      SchemeName: SchemeName
+      Identification: string
+      Name: string
+      SecondaryIdentification: 
+        type: string
+        required: false
+
+  RemittanceInformation:
+    type: object
+    properties:
+      Reference: string
+      Unstructured: string
+
+  Initiation:
+    type:  object
+    properties:
+      InstructionIdentification: ActionType
+      EndToEndIdentification: string
+      InstructedAmount: InstructedAmount
+      DebtorAgent:  
+        type: DebtorAgent
+        required: false
+      DebtorAccount:
+        type: DebtorAccount
+        required: false
+      CreditorAgent:  
+        type: CreditorAgent
+        required: false
+      CreditorAccount:  
+        type: CreditorAccount
+        required: false
+      RemittanceInformation:  RemittanceInformation
+
+  DeliveryAddress:
+    type: object  
+    properties: 
+      AddressLine:
+        type: array
+        items: string
+      StreetName: string
+      BuildingNumber: string
+      PostCode: string
+      TownName: string
+      CountySubDivision: 
+        type: array
+        items:  string
+      Country: string
+      
+  Risk:
+    type: object
+    properties:
+      PaymentContextCode: PaymentContextCode
+      MerchantCategoryCode: 
+        type: string
+        required: false
+      MerchantCustomerIdentification: 
+        type: string
+        required: false
+      DeliveryAddress: 
+        type: DeliveryAddress
+        required: false
+
+  RequestData:
+    type: object
+    properties: 
+      Initiation: Initiation
+
+  RequestDataSubmission:
+    type: object
+    properties: 
+      PaymentId: string
+      Initiation: Initiation
+
+  ResponseData:
+    type: object
+    properties: 
+      PaymentId: string
+      Status: string
+      CreationDateTime: datetime
+      Initiation: Initiation
+
+  Links: 
+    type: object
+    properties:
+        Self: string
+
+  Meta:
+    type: object
+
+
+  ResponseDataSubmission:
+    type: object
+    properties: 
+      PaymentSubmissionId: string
+      PaymentId: string
+      Status: TransactionStatus
+      CreationDateTime : datetime
+    
+  PaymentInitiationRequest:
+    type: object
+    properties:
+        Data: RequestData
+        Risk: Risk
+
+  PaymentInitiationResponse:
+    type: object
+    properties: 
+      Data: ResponseData
+      Risk: Risk
+      Links: Links
+      Meta: Meta
+
+  PaymentSubmissionRequest:
+    type: object
+    properties: 
+      Data: RequestDataSubmission
+      Risk: Risk
+
+  PaymentSubmissionResponse:
+    type: object
+    properties: 
+      Data: ResponseDataSubmission
+      Links: Links
+      Meta: Meta
+
+  PaymentAuthorizationRequest:
+    type: object
+    properties: 
+      PaymentID:  string
+      InstructedAmount: InstructedAmount
+      DebtorAgent:  
+        type: DebtorAgent
+        required: true
+      DebtorAccount:
+        type: DebtorAccount
+        required: true
+      
+
+  PaymentAuthorizationResponse:
+    type: object 
+    properties:
+      PaymentID:  string
+      DebtorAgent:  
+        type: DebtorAgent
+        required: true
+      DebtorAccount:
+        type: DebtorAccount
+        required: true
+      Status: AuthorizationStatus
+      ExtendedStatusMessage:  
+        type: string
+        required: false
+      ExtendedStatusCode:
+        type: string
+        required: false
+      ExtendedStatusData:
+        type: object
+        required: false
+
+
+
+
+
+
+
+
+ 

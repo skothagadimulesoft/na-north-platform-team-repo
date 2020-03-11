@@ -1,0 +1,43 @@
+#%RAML 1.0
+title: ForEx
+description: This is the forex API which helps to convert currencies
+version: '0.7'
+mediaType: application/json
+protocols:
+  - HTTPS
+baseUri: ''
+/rate:
+  get:
+    responses:
+      '200':
+        body:
+          application/json:
+            example:
+              conversion_rate: 0.86
+              conversion_amount: 8.6
+            type: object
+    queryParameters:
+      from:
+        minLength: 2
+        maxLength: 3
+        example: EUR
+        description: |-
+          The currency which you need to convert
+          For example if you want to how much a USD cost in CAD the from would be USD
+        default: EUR
+        type: string
+      to:
+        minLength: 2
+        maxLength: 3
+        example: USD
+        description: |-
+          The base currency In which you need the value. 
+          For example if you want to how much a USD cost in CAD the to would be CAD
+        default: USD
+        type: string
+      amount:
+        format: double
+        example: 10
+        description: amount of currency which has to be converted
+        default: 10
+        type: number

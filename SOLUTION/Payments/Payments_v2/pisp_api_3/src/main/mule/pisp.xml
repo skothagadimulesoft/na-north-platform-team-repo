@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+    <http:listener-config name="pisp-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="pisp-config" raml="pisp.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:request-config name="HTTP_Request_configuration_aspsp" doc:name="HTTP Request configuration" doc:id="339ba6d7-2469-4a3a-8a19-05ef07f0f4ee" >
+		<http:request-connection host="${aspsp.host}" port="${aspsp.port}" connectionIdleTimeout="3000000"/>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="9f70e846-fa95-43cb-ab88-08ca3e33fccb" />
+	<configuration-properties doc:name="Configuration properties" doc:id="05ab05b3-da92-4eb6-91b1-102ac32d7548" file="mule-custom-app.properties" />
+	<flow name="pisp-main">
+        <http:listener config-ref="pisp-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+		<apikit:router config-ref="pisp-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="pisp-console">
+        <http:listener config-ref="pisp-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="pisp-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\payment_initiation\(id):pisp-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.id</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="put:\payment_initiation\(id):pisp-config" />
+    </flow>
+    <flow name="get:\payment_initiation:pisp-config">
+        <logger level="INFO" message="get:\payment_initiation:pisp-config" />
+    </flow>
+    <flow name="get:\payment_initiation\(id):pisp-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.id</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\payment_initiation\(id):pisp-config" />
+    </flow>
+	<flow name="post:\payment_initiation:application\json:pisp-config">
+        <logger level="INFO" doc:name="Logger" doc:id="d19e62f9-8c13-4dac-b911-f0126973c815" message="---1) PISP - got PaymentInitiation : #[payload]"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="e91c53ce-52b5-483f-8db2-1e9900bf1511" variableName="payment_init_Req"/>
+		<java:invoke-static doc:name="Invoke static" doc:id="4e268849-16dc-4003-aaa4-c5f42e64d041" class="mulesoft.payments.util.PaymentTxGenerator" method="generateTxId()" target="payment_tx_id"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8022fb29-d31c-41eb-87b2-c16684cbd501" message="Payment Tx ID:  #[vars.payment_tx_id]"/>
+		<choice doc:name="Choice" doc:id="091a59eb-0fce-4f6c-b5ce-5a92fd5d4214" >
+			<when expression='#[vars.payment_init_Req.PISPPaymentReqData.TransferAction=="REMITTANCE"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="b3309469-2cd7-4e8d-9e6f-8a3e8f9059f4" message="====&gt; Handling Remitances &lt;====="/>
+				<ee:transform doc:name="Transform Message" doc:id="a6228d39-11fd-45fc-add3-e4d892cd8f48" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Meta: {
+		Message: "Valid: Sufficient Funds & Low risk !"
+	},
+	Risk: {
+		PaymentContextCode: "PersonToPerson",
+		MerchantCategoryCode: "000",
+		MerchantCustomerIdentification: "000",
+		DeliveryAddress: {
+			AddressLine: [
+				"",""
+			],
+			StreetName: "",
+			BuildingNumber: "",
+			PostCode: "",
+			TownName: "",
+			CountySubDivision: [
+				"",""
+			],
+			Country: ""
+		}
+	},
+	Data: {
+		Status: "VALID",
+		CreationDateTime: now() as String,
+		PaymentId: vars.payment_tx_id,
+		Initiation: {
+			InstructionIdentification: payload.PISPPaymentReqData.TransferAction,
+			DebtorAccount: {
+				SchemeName: "RetailBank",
+				Identification: payload.PISPPaymentReqData.DebtorAccount.Identification,
+				Name: payload.PISPPaymentReqData.DebtorAccount.Name
+			},
+			CreditorAgent: {
+				Identification: payload.PISPPaymentReqData.CreditorAgency.Identification
+			},
+			EndToEndIdentification: vars.payment_tx_id,
+			CreditorAccount: {
+				SecondaryIdentification: (payload.PISPPaymentReqData.CreditorAccount.SecondaryIdentification default ""),
+				SchemeName: "RetailBank",
+				Identification: payload.PISPPaymentReqData.CreditorAccount.Identification,
+				Name: payload.PISPPaymentReqData.CreditorAccount.Name
+			},
+			DebtorAgent: {
+				SchemeName: payload.PISPPaymentReqData.DebtorAgency.AgencyType,
+				Identification: payload.PISPPaymentReqData.DebtorAgency.Identification
+			},
+			InstructedAmount: {
+				Amount: payload.PISPPaymentReqData.Amount.Amount as String,
+				Currency: payload.PISPPaymentReqData.Amount.Currency
+			}
+		}
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="c4fa6a02-67bd-482e-8a5f-0c5e756146f5" message="====&gt; Handling CREDIT_TRANSFER &lt;====="/>
+				<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="50996ed3-f38a-4122-a7f5-89c4c2616cf1">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Data: {
+		Initiation: {
+			InstructionIdentification: payload.PISPPaymentReqData.TransferAction,
+			EndToEndIdentification: vars.payment_tx_id,
+			InstructedAmount: {
+				Amount: payload.PISPPaymentReqData.Amount.Amount,
+				Currency: payload.PISPPaymentReqData.Amount.Currency
+			},
+			DebtorAgent: {
+				Identification: payload.PISPPaymentReqData.DebtorAgency.Identification,
+				SchemeName: payload.PISPPaymentReqData.DebtorAgency.AgencyType
+			},
+			DebtorAccount: {
+				SchemeName: "RetailBank",
+				Identification: payload.PISPPaymentReqData.DebtorAccount.Identification,
+				Name: payload.PISPPaymentReqData.DebtorAccount.Name
+			},
+			CreditorAgent: {
+				Identification: payload.PISPPaymentReqData.CreditorAgency.Identification,
+				SchemeName: payload.PISPPaymentReqData.CreditorAgency.AgencyType
+			},
+			CreditorAccount: {
+				SchemeName: "RetailBank",
+				Identification: payload.PISPPaymentReqData.CreditorAccount.Identification,
+				Name: payload.PISPPaymentReqData.CreditorAccount.Name,
+				SecondaryIdentification: payload.PISPPaymentReqData.CreditorAccount.SecondaryIdentification
+			},
+			RemittanceInformation: {
+				Reference: "",
+				Unstructured: ""
+			}
+		}
+	},
+	Risk: {
+		"PaymentContextCode": "EcommerceGoods",
+		"MerchantCategoryCode": "5967",
+		"MerchantCustomerIdentification": "053598653254",
+		DeliveryAddress: {
+			"AddressLine": [
+	        "Flat 7",
+	        "Acacia Lodge"
+	      ],
+			"StreetName": "Acacia Avenue",
+			"BuildingNumber": "27",
+			"PostCode": "GU31 2ZZ",
+			"TownName": "Springfield",
+			"CountySubDivision": [
+	        "Arizona"
+	      ],
+			"Country": "US"
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+				<http:request method="POST" doc:name="ASPSP PaymentInitiation" doc:id="bd21b9b3-dc4b-45b0-aff7-dc06bea05754" config-ref="HTTP_Request_configuration_aspsp" path="/api/payment" sendBodyMode="ALWAYS" requestStreamingMode="AUTO" />
+			</otherwise>
+		</choice>
+		<choice doc:name="Choice" doc:id="a28b2f46-7d3e-43c8-b7ab-030d264cfb76" >
+			<when expression='#[payload.Data.Status == "VALID"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="9bf2dcd9-d61b-470d-a63c-f356833900b6" message="+++ Payment Initiation successful : #[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="8d8f124d-2176-4afc-afce-adf3f1fce78c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Data: {
+		PaymentId: payload.Data.PaymentId,
+		Initiation: {
+			InstructionIdentification: (payload.Data.Initiation.InstructionIdentification default "NA"),
+			EndToEndIdentification: (payload.Data.Initiation.EndToEndIdentification default "NA"),
+			InstructedAmount: {
+				Amount: (payload.Data.Initiation.InstructedAmount.Amount default "0.0"),
+				Currency: (payload.Data.Initiation.InstructedAmount.Currency default "USD")
+			},
+			DebtorAgent: {
+				Identification: (payload.Data.Initiation.DebtorAgent.Identification default "NA"),
+				SchemeName: (payload.Data.Initiation.DebtorAgent.SchemeName default "RetailBank")
+			},
+			CreditorAgent: {
+				Identification: (payload.Data.Initiation.CreditorAgent.Identification default "NA"),
+				SchemeName: (payload.Data.Initiation.CreditorAgent.SchemeName default "RetailBank")
+			},
+			DebtorAccount: {
+				SchemeName: (payload.Data.Initiation.DebtorAccount.SchemeName default "RetailBank"),
+				Identification: (payload.Data.Initiation.DebtorAccount.Identification default "NA"),
+				Name: (payload.Data.Initiation.DebtorAccount.Name default "NA")
+			},
+			CreditorAccount: {
+				SchemeName: (payload.Data.Initiation.CreditorAccount.SchemeName default "RetailBank"),
+				Identification: (payload.Data.Initiation.CreditorAccount.Identification default "NA"),
+				Name: (payload.Data.Initiation.CreditorAccount.Name default "NA"),
+				SecondaryIdentification: (payload.Data.Initiation.CreditorAccount.SecondaryIdentification default "NA")
+			},
+			RemittanceInformation: {
+				Reference: (payload.Data.Initiation.RemittanceInformation.Reference default "NA"),
+				Unstructured: (payload.Data.Initiation.RemittanceInformation.Unstructured default "NA")
+			}
+		}
+	},
+	Risk: {
+		PaymentContextCode:(payload.Risk.PaymentContextCode default "EcommerceGoods"),
+		MerchantCategoryCode: (payload.Risk.MerchantCategoryCode default "NA"),
+		MerchantCustomerIdentification: (payload.Risk.MerchantCustomerIdentification default "NA"),
+		DeliveryAddress: {
+			AddressLine: if (payload.Risk.DeliveryAddress.AddressLine != null) (payload.Risk.DeliveryAddress.AddressLine map ( addressLine , indexOfAddressLine ) -> addressLine) else [""],
+			StreetName: "aaa",
+			BuildingNumber: (payload.Risk.DeliveryAddress.BuildingNumber default "NA"),
+			PostCode: (payload.Risk.DeliveryAddress.PostCode default "NA"),
+			TownName: (payload.Risk.DeliveryAddress.TownName default "NA"),
+			CountySubDivision: if(payload.Risk.DeliveryAddress.CountySubDivision != null) (payload.Risk.DeliveryAddress.CountySubDivision map ( countySubDivision , indexOfCountySubDivision ) -> countySubDivision) else [""],
+			Country: (payload.Risk.DeliveryAddress.Country default "NA")
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="2ccb5e3b-5921-4e89-95ab-39187141e572" message="ASPSP Payment Submission data IN: #[payload]"/>
+				<http:request method="POST" doc:name="ASPSP PaymentSubmission" doc:id="223bfa63-614e-4819-befe-3ae851307dd6" config-ref="HTTP_Request_configuration_aspsp" path="/api/payment-submission"/>
+				<ee:transform doc:name="Transform Message" doc:id="c35d825b-e376-4b05-a99f-3bc1e360f3d5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PISPPaymentRespData: {
+		Status: payload.Data.Status,
+		CreationDateTime: payload.Data.CreationDateTime,
+		PaymentId: vars.payment_tx_id,
+		PaymentSubmissionId: payload.Data.PaymentSubmissionId
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="0300941d-e881-47a9-ad12-5edcaa5497ee" message="+++ Payment Innitation Invalid !"/>
+				<ee:transform doc:name="Transform Message" doc:id="fbefb508-ecc0-478e-823c-83c3d9856552" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PISPPaymentRespData: {
+		Status: "PAYMENT_FAILED",
+		// Status: payload.Data.Status,
+		CreationDateTime: now(),
+		PaymentId: vars.payment_tx_id,
+		PaymentSubmissionId: vars.payment_tx_id
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+    </flow>
+</mule>

@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="aspsp_payment_req" format="json">
+      <types:example format="json" location="examples/payment_req_example.json"/>
+    </types:type>
+    <types:type name="aspsp_payment_resp" format="json">
+      <types:example format="json" location="examples/payment_resp_example-1.json"/>
+    </types:type>
+    <types:type name="aspsp_payment_submission_req" format="json">
+      <types:example format="json" location="examples/payment_submission_req_example.json"/>
+    </types:type>
+    <types:type name="aspsp_payment_submission_resp" format="json">
+      <types:example format="json" location="examples/payment_submission_resp_example.json"/>
+    </types:type>
+    <types:type name="aspsp_payment_submissiona_req_1" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#50996ed3-f38a-4122-a7f5-89c4c2616cf1">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="aspsp_payment_req"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#8d8f124d-2176-4afc-afce-adf3f1fce78c">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="aspsp_payment_resp"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="aspsp_payment_submission_req"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#c35d825b-e376-4b05-a99f-3bc1e360f3d5">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="aspsp_payment_submission_resp"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#223bfa63-614e-4819-befe-3ae851307dd6">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="aspsp_payment_submission_req"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="aspsp_payment_submission_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

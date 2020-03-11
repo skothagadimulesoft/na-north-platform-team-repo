@@ -1,0 +1,24 @@
+#%RAML 1.0
+title: MessagingAPI
+
+types: 
+ transportType:
+    enum: [ "AMQ","NATS","SOLACE","WMQ"]
+
+/Message:
+  post:
+    queryParameters: 
+      transport: transportType
+      messageExchangePattern: 
+       enum: ["synch","asynch"]
+       example: synch
+    body: 
+     application/json:
+    
+    responses: 
+      200:
+        body: 
+          application/json:
+        
+        
+    

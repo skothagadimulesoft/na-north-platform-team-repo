@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="transaction-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="transaction-config" raml="transaction.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="PostGreSQL-config" doc:name="Database Config" doc:id="6baf96a3-8460-485d-ab86-ceae2c1bcebd">
+        <db:generic-connection url="jdbc:postgresql://${db.postgre.url}:${db.postgre.port}/${db.postgre.database}?password=${db.postgre.password}&amp;user=${db.postgre.username}" driverClassName="org.postgresql.Driver" />
+    </db:config>
+    <configuration-properties doc:name="Configuration properties" doc:id="8a4bebf9-6323-4115-9c91-19f166b9cf62" file="mule-custom-app.properties" />
+    <flow name="transaction-main">
+        <http:listener config-ref="transaction-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="transaction-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="89dfe02c-34c9-4858-bbb7-35de50c3b73e">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="207adc8d-4489-426b-be69-ace19cb41a79">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="60b1b33c-8d39-4815-aeca-8db26de8774e">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="0de892b3-d696-4639-9063-ba306a729818">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="cd43b6de-892e-4b21-9d82-50dbb4ce8565">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="transaction-console">
+        <http:listener config-ref="transaction-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="transaction-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="210295eb-804c-4f01-b03c-33d3130b8f44">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\Transaction:transaction-config">
+        <db:select doc:name="Select" doc:id="527a422a-0229-49a9-93f6-894a174600c0" config-ref="PostGreSQL-config">
+            <db:sql>SELECT * FROM public."TxTracking"</db:sql>
+        </db:select>
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="24a2b622-16a3-4053-917f-a2946d03c7b2">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	TxId: payload01.TxId,
+	TxOriginatorID: payload01.TxOriginatorId,
+	SourceAccount: payload01.SourceAccount,
+	SourceInst: payload01.SourceInstitution,
+	DestinationAccount: payload01.DestinationAccount,
+	DestinationInst: payload01.DestinationInstitution,
+	Sum: payload01.Sum as String,
+	Currency: payload01.Currency,
+	XChangeRate: payload01.ExchangeRate as String,
+	TimeStamp: payload01.TimeStamp as String,
+	TxType: payload01.TxType,
+	Status: payload01.Status
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\Transaction\(TxId):transaction-config">
+        <set-variable value="#[attributes.uriParams.TxId]" doc:name="Set Variable" doc:id="bd6996d6-b7ea-4c59-8c67-a01a1fed974b" variableName="TraxId" />
+        <ee:transform doc:id="0396678d-bf8f-432d-b154-d8c3e7031b3b">
+            <ee:variables>
+                <ee:set-variable variableName="TxId"><![CDATA[attributes.uriParams.TxId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <db:select doc:name="Select" doc:id="f627a739-2085-4a4e-9a5c-d7df75a9cdf2" config-ref="PostGreSQL-config">
+            <db:sql>SELECT 
+	&quot;TxOriginatorId&quot;, 
+	&quot;SourceAccount&quot;, 
+	&quot;SourceInstitution&quot;, 
+	&quot;DestinationAccount&quot;, 
+	&quot;DestinationInstitution&quot;, 
+	&quot;Sum&quot;, 
+	&quot;Currency&quot;, 
+	&quot;ExchangeRate&quot;, 
+	&quot;TimeStamp&quot;, 
+	&quot;TxType&quot;, 
+	&quot;Status&quot;
+FROM 
+	public.&quot;TxTracking&quot;
+WHERE &quot;TxId&quot; = :TraxId;</db:sql>
+            <db:input-parameters><![CDATA[#[
+	{
+		"TraxId":attributes.uriParams.TxId
+	}
+]]]></db:input-parameters>
+        </db:select>
+        <choice doc:name="Choice" doc:id="4078158c-d002-46c7-8055-4f1dfeb118f1">
+            <when expression="#[sizeOf(payload)&gt;0]">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="e92d075e-75c2-4ab5-b365-76ce6ec8795f">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	TxId: vars.TraxId,
+	TxOriginatorID: payload[0].TxOriginatorId,
+	SourceAccount: payload[0].SourceAccount,
+	SourceInst: payload[0].SourceInstitution,
+	DestinationAccount: payload[0].DestinationAccount,
+	DestinationInst: payload[0].DestinationInstitution,
+	Sum: payload[0].Sum,
+	Currency: payload[0].Currency,
+	XChangeRate: payload[0].ExchangeRate,
+	TimeStamp: payload[0].TimeStamp,
+	TxType: payload[0].TxType,
+	Status:  payload[0].Status
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </when>
+            <otherwise>
+                <set-payload value="#[%dw 2.0 output application/json --- {    message : &quot;The Transaction &quot; ++ vars.TraxId as String ++ &quot; not found&quot; }]" doc:name="Set Payload" doc:id="45d535e8-fdaf-4582-b046-58774942ba7c" />
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="post:\Transaction:transaction-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="54a38b25-5b06-4eff-a890-3c132084c153" variableName="originalPayload" />
+        <db:select doc:name="Select" doc:id="99e1ef6f-0672-4c84-b56e-b01113dae607" config-ref="PostGreSQL-config">
+            <db:sql>SELECT 
+	&quot;TxId&quot;
+FROM 
+	public.&quot;TxTracking&quot;
+WHERE &quot;TxId&quot; = :TraxId;</db:sql>
+            <db:input-parameters><![CDATA[#[{'TraxId':vars.originalPayload.TxId}]]]></db:input-parameters>
+        </db:select>
+        <choice doc:name="Choice" doc:id="4f8f0e2a-4217-4635-904a-f90fe1d982af">
+            <when expression="#[sizeOf(payload)&gt;0]">
+                <logger level="INFO" doc:name="Logger" doc:id="352bc870-caf7-4ef5-a4c2-3d713705fa4b" message="*********************** #[payload.TxId[0] ++ &quot; exists&quot;]" />
+                <set-payload value="#[ %dw 2.0 output application/json --- {    error: &quot;duplicate&quot;,  message : &quot;The Transaction &quot; ++ vars.originalPayload.TxId  ++ &quot; already exists&quot; } ]" doc:name="Set Payload" doc:id="7efdecd0-e71e-49c4-bf7c-7cbe66152602" />
+            </when>
+            <otherwise>
+                <logger level="INFO" doc:name="Logger" doc:id="c95774f2-944e-47cb-a52c-9404d18af990" message="*********************** #[&quot;TraxId does not exists&quot;]" />
+                <db:insert doc:name="Insert" doc:id="0bf6dee7-9690-48fc-ab6c-52ed28236150" config-ref="PostGreSQL-config">
+                    <db:sql>INSERT INTO public."TxTracking"(
+	"TxId", 
+	"TxOriginatorId", 
+	"SourceAccount", 
+	"SourceInstitution", 
+	"DestinationAccount", 
+	"DestinationInstitution", 
+	"Sum", 
+	"Currency", 
+	"ExchangeRate", 
+	"TimeStamp", 
+	"TxType", 
+	"Status"
+	)
+VALUES (
+	:TxId, 
+	:TxOriginatorId, 
+	:SourceAccount, 
+	:SourceInstitution, 
+	:DestinationAccount, 
+	:DestinationInstitution, 
+	:Sum, 
+	:Currency, 
+	:ExchangeRate, 
+	:TimeStamp, 
+	:TxType, 
+	:Status
+	);</db:sql>
+                    <db:input-parameters><![CDATA[#[
+	{
+		'TxId': vars.originalPayload.TxId,
+		'TxOriginatorId': vars.originalPayload.TxOriginatorId,
+		'SourceAccount': vars.originalPayload.SourceAccount,
+		'SourceInstitution': vars.originalPayload.SourceInst,
+		'DestinationAccount': vars.originalPayload.DestinationAccount,
+		'DestinationInstitution': vars.originalPayload.DestinationInst,
+		'Sum': vars.originalPayload.Sum,
+		'Currency': vars.originalPayload.Currency,
+		'ExchangeRate': vars.originalPayload.XChangeRate,
+		'TimeStamp': now() as String {format: "yyyy-MM-dd HH:mm:ss"},
+		'TxType': vars.originalPayload.TxType,
+		'Status': vars.originalPayload.Status
+	}
+]]]></db:input-parameters>
+                </db:insert>
+                <logger level="INFO" doc:name="Logger" doc:id="4c7e41bf-e3e1-4cfd-8c0e-e188187c6989" message="*****************************#[payload.affectedRows] rows added" />
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="e194a028-e7b8-4ad3-bd45-0200b9068f78">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[output application/json
+---
+{
+  message: "Transaction created successfully",
+  TxId: vars.originalPayload.TxId,
+  Status: vars.originalPayload.Status
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="put:\Transaction\(TxId):transaction-config">
+        <ee:transform doc:id="7c2d568b-b6a0-4017-8dc3-4c4e9abe58fc">
+            <ee:variables>
+                <ee:set-variable variableName="TxId"><![CDATA[attributes.uriParams.TxId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <set-variable value="#[message]" doc:name="Set Variable" doc:id="6ea1a76a-669b-4123-ad58-4c40630f3e1b" variableName="originalMessage"/>
+		<db:select doc:name="Select" doc:id="5d9bbb60-9dd9-436f-82b8-714bd632830c" config-ref="PostGreSQL-config">
+            <db:sql>SELECT 
+	&quot;TxId&quot;
+FROM 
+	public.&quot;TxTracking&quot;
+WHERE &quot;TxId&quot; = :TraxId;</db:sql>
+            <db:input-parameters><![CDATA[#[{'TraxId': attributes.uriParams.TxId}] ]]></db:input-parameters>
+        </db:select>
+		<choice doc:name="Choice" doc:id="0c536c90-2e30-491a-b451-607a48f5abe8" >
+			<when expression="#[sizeOf(payload)&gt;0]" >
+				<logger level="INFO" doc:name="Logger" doc:id="0ee64ace-5182-471e-8441-bb6b10be8b82" message="*********************** update status of Tx #[vars.originalMessage.attributes.uriParams.TxId] to #[vars.originalMessage.attributes.queryParams.TxStatus]"/>
+				<db:update doc:name="Update" doc:id="5c978a91-e91f-4277-a867-a6ff61b74b56" config-ref="PostGreSQL-config">
+					<db:sql >UPDATE
+	 public.&quot;TxTracking&quot;
+SET 
+	&quot;TimeStamp&quot;=:TimeStamp,
+	 &quot;Status&quot;=:TxStatus
+WHERE 
+	&quot;TxId&quot; = :TraxId;</db:sql>
+					<db:input-parameters ><![CDATA[#[
+	{
+		'TraxId': vars.originalMessage.attributes.uriParams.TxId,
+		'TimeStamp': now() as String {format: "yyyy-MM-dd HH:mm:ss"},
+		'TxStatus': vars.originalMessage.attributes.queryParams.TxStatus
+
+	}
+] ]]></db:input-parameters>
+				</db:update>
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="ab81b39e-4098-459b-ae9f-df8635adbfec">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Tx updated successfully",
+  TxId: vars.originalMessage.attributes.uriParams.TxId,
+  Status: vars.originalMessage.attributes.queryParams.TxStatus
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+			</when>
+			<otherwise >
+				<set-payload value='#[ %dw 2.0 output application/json 
+--- 
+{    
+	error: "error", 
+	 message : "The Transaction " ++ vars.originalMessage.attributes.uriParams.TxId ++ " not found" 
+}
+ ]' doc:name="Set Payload" doc:id="fae4a1dc-9cfb-45bb-9686-5d457b40186a" />
+			</otherwise>
+		</choice>
+    </flow>
+</mule>

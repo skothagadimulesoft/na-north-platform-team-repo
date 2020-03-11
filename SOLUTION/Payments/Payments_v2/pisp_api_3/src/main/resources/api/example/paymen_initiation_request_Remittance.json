@@ -1,0 +1,31 @@
+{
+  "PISPPaymentReqData": {
+      "Amount": {
+        "Amount": 20.00,
+        "Currency": "MXN"
+      },
+       "DebtorAgency":{
+         "Identification":"BOFAUS3N",
+         "Code":"123",
+         "AgencyType": "RetailBank"
+      },
+      "DebtorAccount": {
+        "Identification": "1QJ9sckMW99BtsEh9ae5R2RxoHRRWXbgZQyzND",
+        "AccountType":"Checking",
+        "Name": "Andrea Smith"
+      },
+     "CreditorAgency":{
+         "Identification":"MENOMXMT",
+         "Code":"456",
+         "AgencyType": "RetailBank"
+      },
+      "CreditorAccount": {
+        "Identification": "1aedxt91r8ouebWB4pyKwwrDXTsrCpMjquLDDK",
+        "AccountType":  "Savings",
+        "Name": "Juan Valdez",
+        "SecondaryIdentification": "0002"
+      },
+      "TransferAction": "REMITTANCE"
+    
+  }
+}

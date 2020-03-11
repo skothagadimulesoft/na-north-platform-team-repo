@@ -1,0 +1,1209 @@
+#%RAML 1.0 Library
+usage: Data structure for submiting a payment; transfer accross 2 accounts
+
+types:
+
+  PaymentOrderID: string
+  RemittanceOrderID:  string
+  PaymentObligationID:  string
+
+  BBANIdentifier:
+    type:  string
+    
+
+  ISODateTime:
+    type: object
+    properties: 
+      DateTime: datetime
+
+  ISODate:
+    type: object
+    properties: 
+      date:   date-only
+
+
+  IBAN2007Identifier:
+    type: string
+
+  UPICProvider:
+    type: string
+    
+      
+  Othr:
+    type: object
+    properties: 
+      
+  AccountIdentification4Choice:
+    type: object
+    properties:
+      IBAN: IBAN2007Identifier
+      Othr: GenericAccountIdentification1
+      
+  GenericAccountIdentification1:
+    type: object
+    properties: 
+      
+      
+  GenericIdentification:
+    type: object
+    properties: 
+     
+
+  AnyBicIdentifier:
+    type: object
+    properties: 
+
+  BICFIIdentifier:
+    type: object
+    properties: 
+      BICCode:  string
+
+  OrganizationIndentification:
+    type: object
+    properties: 
+      AnyBic: AnyBicIdentifier
+      BankPartyIdentification: string
+      BICFI:  BICFIIdentifier
+      
+  Max35Text:
+    type: string
+    maxLength: 35
+
+  Max70Text:
+    type: string
+    maxLength: 70
+
+
+  SequenceType3Code:
+    enum: [ "FRST","RCUR","FNAL","OOFF","RPRE"]
+
+  TransferType:
+    enum: ["CREDIT_TRANSFER","DEBIT_TRANSFER","REMITTANCE"]
+
+  Adjustment:
+    type: object
+    properties: 
+      
+  CountryCode:
+    enum: ["CA", "US", "MEX","DE","CF", "FR", "UK" ]
+
+  CurrencyCode:
+    enum: ["USD","CAD","EUR","MEX","YEN"]
+
+  CurrencyAndAmmount:
+    type: object
+    properties: 
+      Ammount:  number
+      Currency: CurrencyCode
+
+  CollateralAccountTypeCode:
+    enum: ["1","2","3"]
+
+  LanguageCode:
+    enum: ["en","fr","sp","it"]
+
+  PaymentCategoryPurposeCode:
+    enum: ["1","2"]
+    
+  InstructionCode:
+    enum: ["33","44"]
+
+  PaymentMethodCode:
+    enum: ["123","abc"]
+
+  ClearingChannelCode:
+    enum: ["978","999"]
+
+  ExternalCode:
+    enum: ["22","33"]
+
+  PaymentPurposeCode:
+    enum: ["1","2","3"]
+
+  RemittanceLocationMethodCode:
+    enum: ["FAXI","EDIC","URID","EMAL","POST","SMSM"]
+
+  PaymentTimeCode:
+    enum: ["1","2"]
+
+  NettingEligibleCode:
+    enum: ["1","2"]
+
+  BaselineStatus:
+    enum: ["3","4"]
+
+  OptionPartyCode:
+    enum: ["33","44"]
+
+  PartyRoleCode:
+    enum: ["34","35"]
+
+  TradingCapacityCode:
+    enum: ["2","7"]
+
+  AssetClassification:
+    enum: ["1","2"]
+
+  AssetPartyRole:
+    enum: ["FULL","PARTIAL"]
+
+  PaymentOrderSubmissionStatus:
+    enum: ["Rejected","Accepted","Submitted","Processed"]
+
+  TransferProtoccol:
+    enum: ["SWIFT","FIX","ACH", "SEPA", "RPL","ETH"]
+
+  PaymentPath:
+    enum: ["XFER_IN_BANK_NAT", "XFER_IN_BANK_INT", "XFER_INTER_BANK_NAT", "XFER_INTER_BANK_INT","XFER_REMIT"]
+
+  Entry:
+    type: object
+    properties: 
+      
+  System:
+    type: object
+    properties: 
+
+  SystemMemberRole:
+    type: object
+    properties: 
+      
+  ClearingMemberRole:
+    type: object
+    properties: 
+
+  IntermediaryAgentRole:
+    type: object
+    properties: 
+    
+  
+  DefaultFundContribution:
+    type: object
+    properties: 
+      
+  AccountIdentification:
+    type: object
+    properties: 
+      AccountId:  string
+      BBAN: BBANIdentifier
+      IBAN: IBAN2007Identifier
+      Name: Max70Text
+      Number: Max35Text
+      UPIC: UPICProvider
+
+      
+
+  AccountStatus:
+    type: object
+    properties: 
+      
+  AccountContract:
+    type: object
+    properties: 
+
+  AccountRestriction:
+    type: object
+    properties: 
+
+  Agreement:
+    type: object
+    properties: 
+      
+  ProductCharacteristics:
+    type: object
+    properties: 
+    
+  ProductDelivery:
+    type: object
+    properties: 
+      
+  ProductBrokerMasterAgreement:
+    type: object
+    properties: 
+      
+  ProductCategory:
+    type: object
+    properties: 
+
+  ProductIdentification: 
+    type: object
+    properties: 
+      
+  Product:
+    type: object
+    properties: 
+      Agreement:  Agreement
+      Characterisitics: ProductCharacteristics
+      Delivery: ProductDelivery
+      Description:  string
+      Name: string
+      ProductBrokerMasterAgreement:  ProductBrokerMasterAgreement
+      ProductCategory:  ProductCategory
+      ProductIdentification: ProductIdentification
+      Quality:  string
+      Quantity: number
+
+
+  ManagedAcountProduct:
+    type: Product
+    
+  IvestmentFundPartyRole:
+    type: object
+    properties: 
+
+  PartyRole:  
+    type: object
+    properties: 
+
+  CreditorRole: PartyRole
+  DebtorRole: PartyRole
+
+  PaymentPartyRole: CreditorRole | DebtorRole
+
+  
+  Reconciliation:
+    type: object
+    properties: 
+      
+  Collateral:
+    type: object
+    properties: 
+      
+  CorporateActionPartyRole:
+    type: object
+    properties: 
+      
+  RelatedFundProcessingCharacteristics:
+    type: object
+    properties: 
+
+  RelatedProceedsDelivery:
+    type: object
+    properties: 
+
+  SettlementPartyRole:
+    type: object
+    properties: 
+  
+  TradePartyRole:
+    type: object
+    properties: 
+      
+  Account:
+    type: object
+    properties: 
+      AccountContract:  AccountContract
+      AccountRestriction: AccountRestriction
+      Balance:  number
+      CurrencyCode: CurrencyCode
+      ClosingDate:  datetime
+      CollateralAccountType: CollateralAccountTypeCode
+      CurrencyExchange: CurrencyExchange
+      DefaultFundAccountOwner:  ClearingMemberRole
+      DefaultFundContribution: DefaultFundContribution
+      Entry:  Entry
+      Identification: AccountIdentification
+      IvestmentFundPartyRole: IvestmentFundPartyRole
+      Language: LanguageCode
+      LiveDate: datetime
+      ManagedAcountProduct:  ManagedAcountProduct
+      OpeningDate:  datetime
+      PartyRole:  PartyRole
+      Purpose:  string
+      Reconciliation:  Reconciliation
+      RelatedCollateralProcess:  Collateral
+      RelatedCorporateActionPartyRole: CorporateActionPartyRole
+      RelatedFundProcessingCharacteristics:  RelatedFundProcessingCharacteristics 
+      RelatedProceedsDelivery:  RelatedProceedsDelivery
+      ReportedPeriod:   datetime
+      ReportingCurrency:  CurrencyCode
+      SettlementPartyRole:  SettlementPartyRole
+      Status: AccountStatus
+      System: System
+      SystemMember: SystemMemberRole
+      TradePartyRole: TradePartyRole
+      Type: GenericIdentification
+
+  CashAccount:  Account
+
+  Loan:
+    type: object
+    properties: 
+      
+
+  Adjustments:
+    type: object
+    properties: 
+      
+  BankingTransaction:
+    type: object
+    properties: 
+
+  PaymentTerms:
+    type: object
+    properties: 
+      Amount: CurrencyAndAmmount
+      PaymentPeriod:  DateTimePeriod
+      PaymentTime:  PaymentTimeCode
+      Percentage:  PercentageRate
+      RelatedLoan:  Loan
+      RelatedPaymentObligation: PaymentObligationID
+      RelatedPaymentScheduleType: RegisteredContract
+
+  RegisteredContract:
+    type: object
+    properties: 
+  
+  CreditInstrument:
+    type: object
+    properties: 
+      CreditInstrumentIdentification: string
+      Deadline: datetime
+      Method: PaymentMethodCode
+      NetAmmount: CurrencyAndAmmount
+      RelatedPaymentId: string 
+
+  Invoice:
+    type: object
+    properties: 
+    
+  ExposureTypeV2Code:
+    type: object
+    properties: 
+  
+  Role:
+    type: object
+    properties: 
+      
+  Obligation:
+    type: object
+    properties: 
+      Agreement:  Agreement
+      ExposureType: ExposureTypeV2Code
+      Obligee:  Role
+      Obligor:  Role
+
+  DebitCreditCode:
+    type: object
+    properties: 
+
+  InstructingReimbursementAgent:
+    type: object
+    properties: 
+      
+  ThirdReimbursementAgent:
+    type: object
+    properties: 
+      
+  DateTimePeriod:
+    type: object
+    properties: 
+      
+  StandingOrder:
+    type: object
+    properties: 
+      
+  BookEntry:
+    type: object
+    properties: 
+
+  YesNoIndicator:
+    type: object
+    properties: 
+      
+  CashSettlemmentInstructionPartyRole:
+    type: object
+    properties: 
+
+  TransactionAdministrator:
+    type: object
+    properties: 
+      
+  Reservation:
+    type: object
+    properties: 
+      
+  SettlementMethodCode:
+    type: object
+    properties: 
+
+  SettlementParyRole:
+    type: object
+    properties: 
+
+  StandingSettlementInstruction:
+    type: object
+    properties: 
+            
+
+  CashSettlement:
+    type: object
+    properties: 
+      BookEntry:  BookEntry
+      CentralCounterpartyEligibilityIndicator:  YesNoIndicator
+      CreditDateTime: datetime
+      DebitDarteTime: datetime
+      InterBankSettlementAmmount: CurrencyAndAmmount
+      PartyRole:  CashSettlemmentInstructionPartyRole
+      #RelatedPaymentInstruction: PaymentInstruction
+      RelatedTransactionAdministrator:  TransactionAdministrator
+      Reservation:  Reservation
+      RTGS: string
+      SettlementAccount:  CashAccount
+      SettlementMethod: SettlementMethodCode
+      SettlementPartyRole:  SettlementParyRole
+      StandingSettlementInstruction: StandingSettlementInstruction
+
+      
+  PaymentInstruction:
+    type: object
+    properties: 
+      AcceptanceDateTime: datetime
+      ClearingChangeAmmount:  CurrencyAndAmmount
+      CurrencyExchange: CurrencyExchange
+      FirstSettlementAgent: InstructingReimbursementAgent
+      InstructionForNextAgent:  InstructionCode
+      IntermediarySettlementAgent:  ThirdReimbursementAgent
+      LastSettlementAgent:  InstructingReimbursementAgent
+      #Next: PaymentInstruction
+      NoastroVostroAccount: CashAccount
+      #Payment:  Payment
+      #Previous: PaymentExecution
+      ProcessingInstructions:
+        type: array
+        items: PaymentProcessing
+      ProcessingValidityTime: DateTimePeriod
+      RelatedInvestigationCase: PaymentInvestigationCase
+      RelatedInvestigationCaseResolution: PaymentInvestigationCaseResolution
+      SettlementInstruction:  CashSettlement
+      StandingOrder:  StandingOrder
+
+
+      
+  ContactPoint:
+    type: object
+    properties: 
+      
+  DirectDebitMandate:
+    type: object
+    properties: 
+      
+  SequenceTypeCode:
+    type: object
+    properties: 
+      
+  ServiceLevel: 
+    type: object
+    properties: 
+      
+
+  PaymentProcessing:
+    type: object
+    properties: 
+      BankTransaction:  BankingTransaction
+      CategoryPurpose:  PaymentCategoryPurposeCode
+      ClearingChannel:  ClearingChannelCode
+      ContactPoint:
+        type: array
+        items: ContactPoint
+      LocalInstrument:  ExternalCode
+      Priority: PriorityCode
+      RelatedMandate: DirectDebitMandate
+      SequenceType: SequenceTypeCode
+      ServiceLevel: ServiceLevel
+
+  PaymentInvestigationCase:
+    type: object
+    properties: 
+
+  PaymentInvestigationCaseResolution:
+    type: object
+    properties: 
+      
+  PaymentInstrumentCode:
+    type: object
+    properties: 
+      
+  PaymentIdentification:
+    type: object
+    properties: 
+      EndToEndIdentification: Max35Text
+      ExecutionIdentification: Max35Text
+      TransactionIdentification:  Max35Text
+      
+  PaymentStatus:
+    enum: [ "SUBMITTED","PROCESSED","FAILED_INSUFFICIENT_FUNDS","FAILED_HIGH_RISK","IN_PROCESS"]
+      
+  PriorityCode:
+    type: object
+    properties: 
+      
+  DebitAuthorization:
+    type: object
+    properties: 
+      
+  SecuritiesSettlement:
+    type: object
+    properties: 
+      
+  SettlementTimeRequest:
+    type: object
+    properties: 
+      
+  Tax:
+    type: object
+    properties: 
+
+  CommercialTradeSettlement:
+    type: object
+    properties: 
+          
+  PaymentTypeCode:
+    type: object
+    properties: 
+      
+  MasterAgreement:
+    type: object
+    properties: 
+
+  ConsumerLoanAgreement:
+    type: object
+    properties: 
+
+  
+  CommercialTradePartyRole:
+    type: object
+    properties: 
+      Account:
+        type: array
+        items:  Account
+      Agreement:  
+        type: array
+        items:  Agreement
+      ApplicationPeriod:   DateTimePeriod
+      BuyerOrSeller:  OptionPartyCode
+      ConsumerLoanAgreement:
+        type: array
+        items:  ConsumerLoanAgreement
+      CounterpartyRisk: CounterpartyRisk
+      ObliagationForObligee:
+        type: array
+        items:  Obligation
+      ObligationForObligor:
+        type: array
+        items: Obligation
+      PartyRole:  PartyRoleCode
+      Player: 
+        type: array
+        items: RolePlayer
+      Process:    ManagementProcess
+      Trade:
+        type: array
+        items:  Trade
+      TradingPartyCapacity: TradingCapacityCode
+
+  ObligorBank:  CommercialTradePartyRole
+  RecipienBank:  CommercialTradePartyRole
+    
+  Balance: 
+    type: object
+    properties: 
+      
+
+
+  AssetHolding:
+    type: object
+    properties:
+      AmmortizedFaceValue:  CurrencyAndAmmount
+      Balance:
+        type: array
+        items:  Balance
+
+
+  Asset:
+    type: object
+    properties: 
+      AssetClassification: 
+        type: array
+        items:  AssetClassification
+      AssetPartyRole: AssetPartyRole
+      AssetValue:
+        type: array
+        items:  AssetHolding
+
+
+        
+
+  Trade:
+    type: object
+    properties: 
+      AllocationIndicator:  Max35Text
+      Asset: 
+        type: array
+        items: Asset
+
+  Assessment:
+    type: object
+    properties: 
+      
+  Leg:
+    type: object
+    properties: 
+      
+  ProductDeliveryObligation:
+    type: object
+    properties: 
+      
+  PurchaseOrder:
+    type: object
+    properties: 
+      
+  Negotiation:  
+    type: object
+    properties: 
+      
+  UnderlyingTransaction:
+    type: object
+    properties: 
+      
+  Comission:
+    type: object
+    properties: 
+
+  TradeIdentification:
+    type: object
+    properties: 
+
+  CommercialTrade:
+    type: object
+    properties: 
+      Agreement:  Agreement
+      AllocationIndicator:  Max35Text
+      BlockIndicator: YesNoIndicator
+      CollateralisationType:  Max35Text
+      #Document: Document
+      EndDate:  datetime
+      GoverningDocument: MasterAgreement
+      Leg:  
+        type: array
+        items:  Leg
+      Obligation:  
+        type: array
+        items: Obligation
+      PartyRole: 
+        type: array
+        items:  CommercialTradePartyRole
+      #PaymentObligation:
+      #  type: array
+      #  items:  PaymentObligation
+      ProductDeliveryObligation:
+        type: array
+        items:  ProductDeliveryObligation
+      PurchaseAccount: 
+        type: array
+        items:  CashAccount
+      PurchaseOrder:
+        type: array
+        items:  PurchaseOrder
+      RelatedNegotiation: Negotiation
+      RelatedUndertaking: UnderlyingTransaction
+      SettlementNetting:  NettingEligibleCode
+      StartDate:  datetime
+      TotalAcceptedAmount:  CurrencyAndAmmount
+      TradeComission:
+        type: array
+        items:  Comission
+      TradeRealtedIdentifications:
+        type: array
+        items:  TradeIdentification
+      TradeSettlement:  CommercialTradeSettlement
+      TransactionStatus:  BaselineStatus
+      ValueDate:   date-only
+
+  ForeignExchangeTrade:
+    type: object  
+    properties: 
+      
+
+  Document:
+    type: object
+    properties: 
+      Agreement:  Agreement
+      Amount: CurrencyAndAmmount
+      Assessment: 
+        type: array
+        items:  Assessment
+      CommercialTrade:  
+        type: array
+        items: CommercialTrade
+      
+  InterestManagement:
+    type: object
+    properties: 
+  
+  ObligationFulfillment:
+    type: object
+    properties: 
+
+  ExposureCalculation:
+    type: object
+    properties: 
+      
+  RolePlayer:
+    type: object
+    properties: 
+      
+  CounterpartyRisk:
+    type: object
+    properties: 
+      ExposedAmont: CurrencyAndAmmount
+      ExposureCalculation: ExposureCalculation
+
+  ManagementProcess:
+    type: object
+    properties: 
+      
+      
+  PaymentObligationPartyRole:
+    type: object
+    properties: 
+      Agreement:
+        type: array
+        items: Agreement
+      ApplicablePeriod: DateTimePeriod
+      CounterpartyRisk: CounterpartyRisk
+      Party:  Role
+      ObligationForObligee: Obligation
+      ObligationForObligor: Obligation
+      Player: RolePlayer
+      Process:  ManagementProcess
+
+
+  PercentageRate:
+    type: object
+    properties: 
+      rate: number
+
+  CashAccountContract:
+    type: object
+    properties: 
+      
+  CollateralMovement:
+    type: object
+    properties: 
+
+  TransactionRisk:
+    type: object
+    properties: 
+  
+  RemittanceOrder:
+    type: object
+    properties: 
+      
+  UltimateCreditorRole: PaymentObligationPartyRole
+  UltimateDebtorRole: PaymentObligationPartyRole
+  
+  PaymentObligation: 
+    type: object
+    properties: 
+      Agreement:   ProductBrokerMasterAgreement
+      ExposureType:  ExposureTypeV2Code
+      Amount:  CurrencyAndAmmount
+      ApplicatbleLaw: CountryCode
+      AssociatedDocument: 
+        type: array
+        items: Document
+      BankingTransaction: BankingTransaction
+      CommercialTrade:  CommercialTrade
+      ExchangeRateInformatio: ForeignExchangeTrade
+      ExpiryDate: datetime
+      Interest: InterestManagement
+      MaximumAmont:   CurrencyAndAmmount
+      Obligee:  Role
+      Obligor:  Role
+      Offset: ObligationFulfillment
+      PartyRole:  PaymentObligationPartyRole
+      PaymentDueDate: date-only
+      #PaymentOffset:  
+      #  type: array
+      #  items: Payment
+      PaymentTerms: PaymentTerms
+      Percentage: PercentageRate
+      Purpose:  PaymentPurposeCode
+      RelatedAmountClosingTerms:  CashAccountContract
+      RelatedCollateralMovement: CollateralMovement
+      RemittanceDeliveryMethod: RemittanceLocationMethodCode
+      #RemittanceInformation:  
+      #  type: array
+      #  items:  Document
+      RemittanceLocation:
+        type: array
+        items:  ContactPoint
+      #SubObligation:
+      #  type: array
+      #  items:  Obligation
+      Trade:  Trade
+      TransactionRisk: TransactionRisk
+      TriggeringPaymentOrder: PaymentOrderID
+      TriggerningRemittanceOrder: RemittanceOrderID
+      UltimateCreditorRole: UltimateCreditorRole
+      UltimateDebtorRole: UltimateDebtorRole
+
+#--------
+  InterestCalculation:
+    type:  object
+    properties: 
+
+  Deposit:
+    type:  object
+    properties: 
+      DepositAmount:  CurrencyAndAmmount
+      NoteDenomination: CurrencyAndAmmount
+      NumberOfNotes:  
+      
+      
+  Interest:
+    type: object
+    properties: 
+      Amount:  CurrencyAndAmmount
+      AccruedInterestAmpount:  CurrencyAndAmmount
+      InterestCalculation:  
+        type: array
+        items:  InterestCalculation
+      #Deposit:  Deposit
+      InterestName: GenericAccountIdentification1
+      InterestTax:  Tax
+      PaymentDate:  ISODate
+      Rate: PercentageRate
+
+
+  CashBalance:
+    type: object
+    properties: 
+      
+
+  CashEntry:
+     type: object
+     properties: 
+      Amount:  CurrencyAndAmmount
+      Interest: Interest
+      
+
+  CashDistribution:
+    type: object
+    properties: 
+  
+  BaseOneRate:
+    type: object
+    properties: 
+      rate: number
+
+  ExchageRateTypeCode:
+    type: object
+    properties: 
+      
+#---------
+
+  CurrencyExchange:
+    type: object
+    properties: 
+      Adjustment: Adjustment
+      CalcuatedAssetValue:
+        type: array
+        items: AssetHolding
+      CurrenceyExchangeForCashDistribution: CashDistribution
+      CurrentyExchangeForCashEntry: CashEntry
+      ExchangeRate: BaseOneRate
+      OriginalAmount: CurrencyAndAmmount
+      QuotationDate:  ISODateTime
+      QuotedCurrency: CurrencyCode
+      RateType: ExchageRateTypeCode
+      RealtedInvoice: Invoice
+      ResultingAmount:  CurrencyAndAmmount
+      SourceCurrency: CurrencyCode
+      TargetCurrency: CurrencyCode
+      Tax: Tax
+      UnitCurrency:  CurrencyCode
+
+
+  PaymentOrder:
+    type: object
+    properties: 
+      MasterIdentification: Max35Text
+      Trade:  Trade
+      PaymentObligation:  PaymentObligation
+
+  PaymentOrderResponse:
+    type: object
+    properties: 
+      PaymentOrderID: PaymentOrderID
+      PaymentSubmissionID:  string
+      Status: PaymentOrderSubmissionStatus
+      StatusMessage:  string
+
+  PaymentInitiation:
+    type: object
+    properties: 
+      AcceptanceDateTime: ISODateTime
+      CurrencyExchange:   CurrencyExchange
+      Next: PaymentInstruction
+      ProcessingInstructions: 
+        type: array
+        items:  PaymentProcessing
+      RelatedInvestigationCase: PaymentInvestigationCase
+      RelatedInvestigationCaseResolution: PaymentInvestigationCaseResolution
+
+
+  PaymentExecution: 
+    type: object
+    properties: 
+      PaymentInitiation:  PaymentInitiation
+      CreationDate: datetime
+      CreditDebitIndicator: DebitCreditCode
+      RequestedExecutionDate: datetime
+  
+  Payment:
+    type: object
+    properties: 
+      Account:  Account
+      Adjustments:  Adjustments
+      Ammount:  CurrencyAndAmmount
+      ContractRegistration: RegisteredContract
+      CreditMethod: CreditInstrument
+      Creditor: CreditorRole
+      CreditorAcount: Account
+      CurrencyExchange: CurrencyExchange
+      CurrencyOfTransfer: CurrencyCode
+      Date: date-only
+      Debtor: DebtorRole
+      DebtorAcount: Account
+      EquivalentAmmount:  CurrencyAndAmmount
+      FirstAgent: OrganizationIndentification
+      InstructedAmmount: CurrencyAndAmmount
+      InstrutionForCreditorAgent: InstructionCode
+      InstructionForDebtorAgent:  InstructionCode
+      Intermediary: IntermediaryAgentRole
+      InvoiceReconciliation:  Invoice
+      ObligationOffset: Obligation
+      #OriginalPayment:  Payment
+      PartyRole:  PaymentPartyRole
+      PaymentExecution:  PaymentExecution
+      PaymentInstrument:  PaymentInstrumentCode
+      PaymentObligation: PaymentObligation
+      PaymentRelatedIdentifications:
+        type: array
+        items: PaymentIdentification
+      PaymentStatus:  PaymentStatus
+      PoolingAdjustmentDate:  datetime
+      Priority:  PriorityCode
+      RelatedDebitAuthorization: DebitAuthorization
+      #RelatedInvestigationCase: PaymentInvestigationCase
+      #RelatedInvestigationCaseResolution: PaymentInvestigationCaseResolution
+      RelatedSecuritiesSettlement:  SecuritiesSettlement
+      ResultingObligation:  Obligation
+      #ReturnPayment:  Payment
+      SettlementTimeRequest: SettlementTimeRequest
+      StandardSettlementInstructions: string
+      TaxOnPayment: Tax
+      TradeSettlement:  CommercialTradeSettlement
+      Type: PaymentTypeCode
+      ValueDate:  datetime
+      
+   
+  PaymentExeuctionPathRequest:
+    type: object
+    properties: 
+          Amount : number
+          CreditorBank:  string
+          CreditorAccountType:  string
+          CreditorAcountCurrency:  string
+          DebtorBank: string
+          DebtorAccountType:  string
+          DebtorAcountCurrency: string
+          DebtorNostroVostroAccount:  string 
+          CreditorNostroVostroAccount:  string 
+          TransferType: TransferType
+
+  PaymentExecutionPathResponse:
+    type:  object
+    properties: 
+      PaymentExecutionPath: string
+
+  PaymentAccountData: 
+    type: object
+    properties:
+      AccountId: string
+      AccountType: string
+      BankId: string
+      BankName: string
+
+
+  PaymentResponse:
+    type: object
+    properties: 
+      PaymentId: string
+      Amount: 
+        type: object
+        properties:
+          Amount: number
+          Currency: string
+      TransasctionCost: number
+      TransferProtocol: TransferProtoccol
+      PaymentPath: PaymentPath
+      PaymentStatus: PaymentStatus
+      Debtor:
+        type: object
+        properties: 
+          Account:  PaymentAccountData
+      Creditor:
+        type: object
+        properties: 
+          Account:  PaymentAccountData
+          
+        
+  RippleAccountResponse:
+    type: object
+    properties: 
+      result:
+        type: object
+        properties: 
+          account_data:
+            type: object
+            properties: 
+              Account: string
+              Balance: string
+              Flags: number
+              LedgerEntryType: string
+              OwnerCount: number
+              PreviousTxnID:  string
+              PreviousTxnLgrSeq: number
+              Sequence: number
+              index: string
+          ledger_current_index: number
+          queue_data:
+            type: object
+            properties: 
+              txn_count: number
+          status: string
+          validated: boolean
+  
+  RippleSignSubmitRequest:
+    type: object
+    properties: 
+      method: string
+      params: 
+        type: array
+        items: RipplePaymentTransaction
+        
+  RipplePaymentTransaction:
+    type: object
+    properties: 
+      offline:  boolean
+      secret: string
+      tx_json: 
+        type:  object
+        properties: 
+          Account: string
+          Amount:  string
+          Destination:
+          TransactionType: string
+      fee_mult_max: number
+  
+  RippleSignSubmitResponse:
+    type: object
+    properties: 
+      result:
+        type:  object
+        properties: 
+          deprecated: string
+          engine_result: string
+          engine_result_code:  number
+          engine_result_message: string
+          status: string
+          tx_blob: string
+          tx_json:
+            type: object
+            properties: 
+              Account: string
+              Amount: string
+              Destination:  string
+              Fee: string
+              Flags: number
+              Sequence: number
+              SigningPubKey: string
+              TransactionType:  string
+              TxnSignature:  string
+              hash: string
+
+  RippleAccountTxHistory:
+    type: object
+    properties: 
+      result:
+        type: object
+        properties: 
+          account: string
+          ledger_index_min: number
+          ledger_index_max:  number
+          limit:  number
+          status: string
+          transactions:
+            type: array
+            items: RippleTxHistory
+
+  RippleTxHistory:
+    type: object
+    properties: 
+      meta:
+        type: object
+        properties: 
+          AffectedNodes:
+            type: array
+            items: RippleModifiedNodes
+          TransactionIndex: number
+          TransactionResult: string
+          delivered_amount:  string
+
+      tx:
+        type: object
+        properties: 
+          Account: string
+          Amount:  string
+          Destination: string
+          Fee: string
+          Flags: number
+          Sequence: number
+          SigningPubKey: string
+          TransactionType: string
+          TxnSignature: string
+          date:  number
+          hash:  string
+          inLedger: number
+          ledger_index: number
+      validated: boolean
+
+
+  RippleModifiedNodes:
+    type: object
+    properties: 
+      ModifiedNode:
+        type: object
+        properties: 
+          FinalFields:
+            type: object
+            properties: 
+              Account: string
+              Balance: string
+              Flags: number
+              OwnerCount:  number
+              Sequence: number
+          LedgerEntryType: string
+          LedgerIndex: string
+          PreviousFields:
+            type: object
+            properties: 
+              Balance: string
+              Sequence?: number
+          PreviousTxnID: string
+          PreviousTxnLgrSeq: number
+
+ 

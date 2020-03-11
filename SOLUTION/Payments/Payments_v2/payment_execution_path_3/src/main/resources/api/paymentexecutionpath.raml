@@ -1,0 +1,30 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/d6834ca5-d4ce-4b81-9670-5e7455806d73 # 
+title: PaymentExecutionPath
+
+
+
+#----API that embeds Rules to determines which Payment Execution Path to follow
+
+uses: 
+  data_types: exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/paymentorder_banking_datatypes/1.0.3/payment_banking_datatypes.raml
+
+/PaymentExecutionPath:
+  post:
+    body: 
+      application/json:
+        type: data_types.PaymentExeuctionPathRequest
+        examples:
+          IntraBankNat: !include Samples/PaymentExecPath_IntraBankNat.json
+          IntraBankInter: !include  Samples/PaymentExecPath_IntrBankInter.json
+          InterBankNat: !include  Samples/PaymentExecPath_InterBankNat.json
+          InternBankInter:  !include  Samples/PaymentExecPath_InterBankIntern.json
+          Remittance: !include  Samples/PaymentExecPath_Remittance.json
+
+        
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: data_types.PaymentExecutionPathResponse
+            example:  !include  Samples/PaymentExecPath_Response.json

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+    <http:listener-config name="forex-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="forex-config" raml="forex.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" >
+		<apikit:flow-mappings >
+			<apikit:flow-mapping resource="/rate" action="get" flow-ref="get:\rate:forex-config" />
+		</apikit:flow-mappings>
+	</apikit:config>
+    <http:request-config name="forex_api_request" doc:name="HTTP Request configuration" doc:id="9e2efaf0-2f10-4791-964d-e8b42346a428" basePath="/api" >
+		<http:request-connection host="${forex.remote.host}" port="${forex.remote.port}"/>
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="c3e24901-f213-4bc4-be07-5cef396ef007" file="mule-custom-app-forex.properties" />
+	<flow name="set_inputs" doc:id="4bfde272-1dc0-4667-85aa-77629cc74883" >
+		<set-variable value="#[attributes.queryParams.amount]" doc:name="Set Amount" doc:id="7ed5a19b-83a1-4b8b-ae81-91daed568e6d" variableName="amount" mimeType="application/json"/>
+	</flow>
+	<flow name="set_conversion_rates" doc:id="b1a22755-28a9-4b0d-b76c-27734647cafc" >
+		<set-variable value='#[payload.rates[0]]' doc:name="from conversion rate" doc:id="94237145-cbe4-4ff4-a9d7-b79c2b359f64" variableName="from_conversion_rate"/>
+		<set-variable value="#[payload.rates[1] default payload.rates[0] ]" doc:name="to conversion rate" doc:id="d4725879-7488-42ae-8d1b-bdde969cd603" variableName="to_conversion_rate" mimeType="application/json"/>
+		<set-variable value="#[ vars.from_conversion_rate / vars.to_conversion_rate ]" doc:name="Conversion Rate" doc:id="3089c49e-181b-4aad-a8b5-5c3a756795b1" variableName="conversion_rate" mimeType="application/json"/>
+		<set-variable value="#[vars.conversion_rate * vars.amount]" doc:name="Conversion Amount" doc:id="2c065fe4-71be-456d-bca8-808c0f3fcb13" variableName="conversion_amount" mimeType="application/json"/>
+	</flow>
+	<flow name="forexFlow" doc:id="2619aae5-1a90-4516-a0a3-6b392af94ede" >
+		<logger level="INFO" doc:name="Logger" doc:id="aa0c13a4-1938-4c83-baad-608ef43403ce" message='Forex Flow Strted :- From #[attributes.queryParams.from] To  #[attributes.queryParams.to]  amount #[attributes.queryParams.amount]'/>
+		<flow-ref doc:name="set_inputs" doc:id="ef110826-a67f-41f4-9e72-064b745e88f8" name="set_inputs"/>
+		<http:request method="GET" doc:name="Request" doc:id="95a19c60-de24-42bf-a613-cab486df786c" config-ref="forex_api_request" path="/latest">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"access_key" : '${datafixer.io.access.key}',
+	"base" : '${datafixer.io.base.currency}',
+	"symbols" : attributes.queryParams.from ++ "," ++ attributes.queryParams.to
+}]]]></http:query-params>
+		</http:request>
+		<flow-ref doc:name="set_conversion_rates" doc:id="3300eed3-ca56-485f-975c-f72da5cdee39" name="set_conversion_rates" />
+		<logger level="INFO" doc:name="Logger" doc:id="7dad2058-98fb-4dcc-a1d9-ad2f8aad7092" message='Exchange rates from from DATAFIXER.IO  #[payload.rates]'/>
+	</flow>
+	<flow name="forex-main">
+        <http:listener config-ref="forex-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+		<apikit:router config-ref="forex-config" />
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="forex-console">
+        <http:listener config-ref="forex-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="forex-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\rate:forex-config">
+		<logger level="INFO" doc:name="Logger" doc:id="045bb422-bd3c-488b-86c9-2625957bc94a" message="+++Getting ForEx Rate - for #[payload]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="5dfc85e1-e544-4f73-8dfb-95b48dae8b2e" name="forexFlow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="82e1bd94-60bd-4473-8ef8-6f78301829b1" message="-----Forex data: #[payload]"/>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="a59bbe1c-da4d-4dfd-bd14-42ec6665afed">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  conversion_rate: vars.conversion_rate,
+  conversion_amount: vars.conversion_amount
+
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

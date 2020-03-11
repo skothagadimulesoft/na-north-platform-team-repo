@@ -1,0 +1,8 @@
+{
+  "PISPPaymentRespData": {
+    "PaymentSubmissionId": "7290-003",
+    "PaymentId": "7290",
+    "Status": "AcceptedSettlementInProcess",
+    "CreationDateTime": "2017-06-05T15:15:22+00:00"
+  }
+}

@@ -1,0 +1,1485 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="payment_in" format="json">
+      <types:shape format="weave" example="api/Samples/Payment_sample_2.json"><![CDATA[%dw 2.0
+type payment_in = {|
+  Account: {|
+    AccountContract: {|  |}, 
+    AccountRestriction: {|  |}, 
+    Balance: Number {"typeId": "double"}, 
+    CurrencyCode: String, 
+    ClosingDate: String, 
+    CollateralAccountType: String, 
+    CurrencyExchange: {|
+      Adjustment: {|  |}, 
+      CalcuatedAssetValue: Array<{|
+        AmmortizedFaceValue: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        Balance: Array<{|  |}>
+      |}>, 
+      CurrenceyExchangeForCashDistribution: {|  |}, 
+      CurrentyExchangeForCashEntry: {|
+        Amount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        Interest: {|
+          Amount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          AccruedInterestAmpount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          InterestCalculation: Array<{|  |}>, 
+          InterestName: {|  |}, 
+          InterestTax: {|  |}, 
+          PaymentDate: {| date: String |}, 
+          Rate: {| rate: Number {"typeId": "double"} |}
+        |}
+      |}, 
+      ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+      OriginalAmount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      QuotationDate: {| DateTime: String |}, 
+      QuotedCurrency: String, 
+      RateType: {|  |}, 
+      RealtedInvoice: {|  |}, 
+      ResultingAmount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      SourceCurrency: String, 
+      TargetCurrency: String, 
+      Tax: {|  |}, 
+      UnitCurrency: String
+    |}, 
+    DefaultFundAccountOwner: {|  |}, 
+    DefaultFundContribution: {|  |}, 
+    Entry: {|  |}, 
+    Identification: {|
+      AccountId: String, 
+      BBAN: String, 
+      IBAN: String, 
+      Name: String, 
+      Number: String, 
+      UPIC: String
+    |}, 
+    IvestmentFundPartyRole: {|  |}, 
+    Language: String, 
+    LiveDate: String, 
+    ManagedAcountProduct: {|
+      Agreement: {|  |}, 
+      Characterisitics: {|  |}, 
+      Delivery: {|  |}, 
+      Description: String, 
+      Name: String, 
+      ProductBrokerMasterAgreement: {|  |}, 
+      ProductCategory: {|  |}, 
+      ProductIdentification: {|  |}, 
+      Quality: String, 
+      Quantity: Number {"typeId": "int"}
+    |}, 
+    OpeningDate: String, 
+    PartyRole: {|  |}, 
+    Purpose: String, 
+    Reconciliation: {|  |}, 
+    RelatedCollateralProcess: {|  |}, 
+    RelatedCorporateActionPartyRole: {|  |}, 
+    RelatedFundProcessingCharacteristics: {|  |}, 
+    RelatedProceedsDelivery: {|  |}, 
+    ReportedPeriod: String, 
+    ReportingCurrency: String, 
+    SettlementPartyRole: {|  |}, 
+    Status: {|  |}, 
+    System: {|  |}, 
+    SystemMember: {|  |}, 
+    TradePartyRole: {|  |}, 
+    Type: {|  |}
+  |}, 
+  Adjustments: {|  |}, 
+  Ammount: {|
+    Ammount: Number {"typeId": "double"}, 
+    Currency: String
+  |}, 
+  ContractRegistration: {|  |}, 
+  CreditMethod: {|
+    CreditInstrumentIdentification: String, 
+    Deadline: String, 
+    Method: String, 
+    NetAmmount: {|
+      Ammount: Number {"typeId": "double"}, 
+      Currency: String
+    |}, 
+    RelatedPaymentId: String
+  |}, 
+  Creditor: {|  |}, 
+  CreditorAcount: {|
+    AccountContract: {|  |}, 
+    AccountRestriction: {|  |}, 
+    Balance: Number {"typeId": "double"}, 
+    CurrencyCode: String, 
+    ClosingDate: String, 
+    CollateralAccountType: String, 
+    CurrencyExchange: {|
+      Adjustment: {|  |}, 
+      CalcuatedAssetValue: Array<{|
+        AmmortizedFaceValue: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        Balance: Array<{|  |}>
+      |}>, 
+      CurrenceyExchangeForCashDistribution: {|  |}, 
+      CurrentyExchangeForCashEntry: {|
+        Amount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        Interest: {|
+          Amount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          AccruedInterestAmpount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          InterestCalculation: Array<{|  |}>, 
+          InterestName: {|  |}, 
+          InterestTax: {|  |}, 
+          PaymentDate: {| date: String |}, 
+          Rate: {| rate: Number {"typeId": "double"} |}
+        |}
+      |}, 
+      ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+      OriginalAmount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      QuotationDate: {| DateTime: String |}, 
+      QuotedCurrency: String, 
+      RateType: {|  |}, 
+      RealtedInvoice: {|  |}, 
+      ResultingAmount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      SourceCurrency: String, 
+      TargetCurrency: String, 
+      Tax: {|  |}, 
+      UnitCurrency: String
+    |}, 
+    DefaultFundAccountOwner: {|  |}, 
+    DefaultFundContribution: {|  |}, 
+    Entry: {|
+      Country: String, 
+      BankName: String
+    |}, 
+    Identification: {|
+      AccountId: String, 
+      BBAN: String, 
+      IBAN: String, 
+      Name: String, 
+      Number: String, 
+      UPIC: String
+    |}, 
+    IvestmentFundPartyRole: {|  |}, 
+    Language: String, 
+    LiveDate: String, 
+    ManagedAcountProduct: {|
+      Agreement: {|  |}, 
+      Characterisitics: {|  |}, 
+      Delivery: {|  |}, 
+      Description: String, 
+      Name: String, 
+      ProductBrokerMasterAgreement: {|  |}, 
+      ProductCategory: {|  |}, 
+      ProductIdentification: {|  |}, 
+      Quality: String, 
+      Quantity: Number {"typeId": "int"}
+    |}, 
+    OpeningDate: String, 
+    PartyRole: {|  |}, 
+    Purpose: String, 
+    Reconciliation: {|  |}, 
+    RelatedCollateralProcess: {|  |}, 
+    RelatedCorporateActionPartyRole: {|  |}, 
+    RelatedFundProcessingCharacteristics: {|  |}, 
+    RelatedProceedsDelivery: {|  |}, 
+    ReportedPeriod: String, 
+    ReportingCurrency: String, 
+    SettlementPartyRole: {|  |}, 
+    Status: {|  |}, 
+    System: {|  |}, 
+    SystemMember: {|  |}, 
+    TradePartyRole: {|  |}, 
+    Type: {|  |}
+  |}, 
+  CurrencyExchange: {|
+    Adjustment: {|  |}, 
+    CalcuatedAssetValue: Array<{|
+      AmmortizedFaceValue: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      Balance: Array<{|  |}>
+    |}>, 
+    CurrenceyExchangeForCashDistribution: {|  |}, 
+    CurrentyExchangeForCashEntry: {|
+      Amount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      Interest: {|
+        Amount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        AccruedInterestAmpount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        InterestCalculation: Array<{|  |}>, 
+        InterestName: {|  |}, 
+        InterestTax: {|  |}, 
+        PaymentDate: {| date: String |}, 
+        Rate: {| rate: Number {"typeId": "double"} |}
+      |}
+    |}, 
+    ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+    OriginalAmount: {|
+      Ammount: Number {"typeId": "double"}, 
+      Currency: String
+    |}, 
+    QuotationDate: {| DateTime: String |}, 
+    QuotedCurrency: String, 
+    RateType: {|  |}, 
+    RealtedInvoice: {|  |}, 
+    ResultingAmount: {|
+      Ammount: Number {"typeId": "double"}, 
+      Currency: String
+    |}, 
+    SourceCurrency: String, 
+    TargetCurrency: String, 
+    Tax: {|  |}, 
+    UnitCurrency: String
+  |}, 
+  CurrencyOfTransfer: String, 
+  Date: String, 
+  Debtor: {|  |}, 
+  DebtorAcount: {|
+    AccountContract: {|  |}, 
+    AccountRestriction: {|  |}, 
+    Balance: Number {"typeId": "double"}, 
+    CurrencyCode: String, 
+    ClosingDate: String, 
+    CollateralAccountType: String, 
+    CurrencyExchange: {|
+      Adjustment: {|  |}, 
+      CalcuatedAssetValue: Array<{|
+        AmmortizedFaceValue: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        Balance: Array<{|  |}>
+      |}>, 
+      CurrenceyExchangeForCashDistribution: {|  |}, 
+      CurrentyExchangeForCashEntry: {|
+        Amount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        Interest: {|
+          Amount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          AccruedInterestAmpount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          InterestCalculation: Array<{|  |}>, 
+          InterestName: {|  |}, 
+          InterestTax: {|  |}, 
+          PaymentDate: {| date: String |}, 
+          Rate: {| rate: Number {"typeId": "double"} |}
+        |}
+      |}, 
+      ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+      OriginalAmount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      QuotationDate: {| DateTime: String |}, 
+      QuotedCurrency: String, 
+      RateType: {|  |}, 
+      RealtedInvoice: {|  |}, 
+      ResultingAmount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      SourceCurrency: String, 
+      TargetCurrency: String, 
+      Tax: {|  |}, 
+      UnitCurrency: String
+    |}, 
+    DefaultFundAccountOwner: {|  |}, 
+    DefaultFundContribution: {|  |}, 
+    Entry: {|
+      Country: String, 
+      BankName: String
+    |}, 
+    Identification: {|
+      AccountId: String, 
+      BBAN: String, 
+      IBAN: String, 
+      Name: String, 
+      Number: String, 
+      UPIC: String
+    |}, 
+    IvestmentFundPartyRole: {|  |}, 
+    Language: String, 
+    LiveDate: String, 
+    ManagedAcountProduct: {|
+      Agreement: {|  |}, 
+      Characterisitics: {|  |}, 
+      Delivery: {|  |}, 
+      Description: String, 
+      Name: String, 
+      ProductBrokerMasterAgreement: {|  |}, 
+      ProductCategory: {|  |}, 
+      ProductIdentification: {|  |}, 
+      Quality: String, 
+      Quantity: Number {"typeId": "int"}
+    |}, 
+    OpeningDate: String, 
+    PartyRole: {|  |}, 
+    Purpose: String, 
+    Reconciliation: {|  |}, 
+    RelatedCollateralProcess: {|  |}, 
+    RelatedCorporateActionPartyRole: {|  |}, 
+    RelatedFundProcessingCharacteristics: {|  |}, 
+    RelatedProceedsDelivery: {|  |}, 
+    ReportedPeriod: String, 
+    ReportingCurrency: String, 
+    SettlementPartyRole: {|  |}, 
+    Status: {|  |}, 
+    System: {|  |}, 
+    SystemMember: {|  |}, 
+    TradePartyRole: {|  |}, 
+    Type: {|  |}
+  |}, 
+  EquivalentAmmount: {|
+    Ammount: Number {"typeId": "double"}, 
+    Currency: String
+  |}, 
+  FirstAgent: {|
+    AnyBic: {|  |}, 
+    BankPartyIdentification: String, 
+    BICFI: {| BICCode: String |}
+  |}, 
+  InstructedAmmount: {|
+    Ammount: Number {"typeId": "double"}, 
+    Currency: String
+  |}, 
+  InstrutionForCreditorAgent: String, 
+  InstructionForDebtorAgent: String, 
+  Intermediary: {|  |}, 
+  InvoiceReconciliation: {|  |}, 
+  ObligationOffset: {|
+    Agreement: {|  |}, 
+    ExposureType: {|  |}, 
+    Obligee: {|  |}, 
+    Obligor: {|  |}
+  |}, 
+  PartyRole: {|  |}, 
+  PaymentExecution: {|
+    PaymentInitiation: {|
+      AcceptanceDateTime: {| DateTime: String |}, 
+      CurrencyExchange: {|
+        Adjustment: {|  |}, 
+        CalcuatedAssetValue: Array<{|
+          AmmortizedFaceValue: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          Balance: Array<{|  |}>
+        |}>, 
+        CurrenceyExchangeForCashDistribution: {|  |}, 
+        CurrentyExchangeForCashEntry: {|
+          Amount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          Interest: {|
+            Amount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            AccruedInterestAmpount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            InterestCalculation: Array<{|  |}>, 
+            InterestName: {|  |}, 
+            InterestTax: {|  |}, 
+            PaymentDate: {| date: String |}, 
+            Rate: {| rate: Number {"typeId": "double"} |}
+          |}
+        |}, 
+        ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+        OriginalAmount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        QuotationDate: {| DateTime: String |}, 
+        QuotedCurrency: String, 
+        RateType: {|  |}, 
+        RealtedInvoice: {|  |}, 
+        ResultingAmount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        SourceCurrency: String, 
+        TargetCurrency: String, 
+        Tax: {|  |}, 
+        UnitCurrency: String
+      |}, 
+      Next: {|
+        AcceptanceDateTime: String, 
+        ClearingChangeAmmount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        CurrencyExchange: {|
+          Adjustment: {|  |}, 
+          CalcuatedAssetValue: Array<{|
+            AmmortizedFaceValue: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            Balance: Array<{|  |}>
+          |}>, 
+          CurrenceyExchangeForCashDistribution: {|  |}, 
+          CurrentyExchangeForCashEntry: {|
+            Amount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            Interest: {|
+              Amount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              AccruedInterestAmpount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              InterestCalculation: Array<{|  |}>, 
+              InterestName: {|  |}, 
+              InterestTax: {|  |}, 
+              PaymentDate: {| date: String |}, 
+              Rate: {| rate: Number {"typeId": "double"} |}
+            |}
+          |}, 
+          ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+          OriginalAmount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          QuotationDate: {| DateTime: String |}, 
+          QuotedCurrency: String, 
+          RateType: {|  |}, 
+          RealtedInvoice: {|  |}, 
+          ResultingAmount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          SourceCurrency: String, 
+          TargetCurrency: String, 
+          Tax: {|  |}, 
+          UnitCurrency: String
+        |}, 
+        FirstSettlementAgent: {| BIC: String |}, 
+        InstructionForNextAgent: String, 
+        IntermediarySettlementAgent: {| BIC: String |}, 
+        LastSettlementAgent: {| BIC: String |}, 
+        NoastroVostroAccount: {|
+          AccountContract: {|  |}, 
+          AccountRestriction: {|  |}, 
+          Balance: Number {"typeId": "double"}, 
+          CurrencyCode: String, 
+          ClosingDate: String, 
+          CollateralAccountType: String, 
+          CurrencyExchange: {|
+            Adjustment: {|  |}, 
+            CalcuatedAssetValue: Array<{|
+              AmmortizedFaceValue: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              Balance: Array<{|  |}>
+            |}>, 
+            CurrenceyExchangeForCashDistribution: {|  |}, 
+            CurrentyExchangeForCashEntry: {|
+              Amount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              Interest: {|
+                Amount: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                AccruedInterestAmpount: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                InterestCalculation: Array<{|  |}>, 
+                InterestName: {|  |}, 
+                InterestTax: {|  |}, 
+                PaymentDate: {| date: String |}, 
+                Rate: {| rate: Number {"typeId": "double"} |}
+              |}
+            |}, 
+            ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+            OriginalAmount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            QuotationDate: {| DateTime: String |}, 
+            QuotedCurrency: String, 
+            RateType: {|  |}, 
+            RealtedInvoice: {|  |}, 
+            ResultingAmount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            SourceCurrency: String, 
+            TargetCurrency: String, 
+            Tax: {|  |}, 
+            UnitCurrency: String
+          |}, 
+          DefaultFundAccountOwner: {|  |}, 
+          DefaultFundContribution: {|  |}, 
+          Entry: {|  |}, 
+          Identification: {|
+            AccountId: String, 
+            BBAN: String, 
+            IBAN: String, 
+            Name: String, 
+            Number: String, 
+            UPIC: String
+          |}, 
+          IvestmentFundPartyRole: {|  |}, 
+          Language: String, 
+          LiveDate: String, 
+          ManagedAcountProduct: {|
+            Agreement: {|  |}, 
+            Characterisitics: {|  |}, 
+            Delivery: {|  |}, 
+            Description: String, 
+            Name: String, 
+            ProductBrokerMasterAgreement: {|  |}, 
+            ProductCategory: {|  |}, 
+            ProductIdentification: {|  |}, 
+            Quality: String, 
+            Quantity: Number {"typeId": "int"}
+          |}, 
+          OpeningDate: String, 
+          PartyRole: {|  |}, 
+          Purpose: String, 
+          Reconciliation: {|  |}, 
+          RelatedCollateralProcess: {|  |}, 
+          RelatedCorporateActionPartyRole: {|  |}, 
+          RelatedFundProcessingCharacteristics: {|  |}, 
+          RelatedProceedsDelivery: {|  |}, 
+          ReportedPeriod: String, 
+          ReportingCurrency: String, 
+          SettlementPartyRole: {|  |}, 
+          Status: {|  |}, 
+          System: {|  |}, 
+          SystemMember: {|  |}, 
+          TradePartyRole: {|  |}, 
+          Type: {|  |}
+        |}, 
+        ProcessingInstructions: Array<{|
+          BankTransaction: {|  |}, 
+          CategoryPurpose: String, 
+          ClearingChannel: String, 
+          ContactPoint: Array<{|  |}>, 
+          LocalInstrument: String, 
+          Priority: {|  |}, 
+          RelatedMandate: {|  |}, 
+          SequenceType: {|  |}, 
+          ServiceLevel: {|  |}
+        |}>, 
+        ProcessingValidityTime: {|  |}, 
+        RelatedInvestigationCase: {|  |}, 
+        RelatedInvestigationCaseResolution: {|  |}, 
+        SettlementInstruction: {|
+          BookEntry: {|  |}, 
+          CentralCounterpartyEligibilityIndicator: {|  |}, 
+          CreditDateTime: String, 
+          DebitDarteTime: String, 
+          InterBankSettlementAmmount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          PartyRole: {|  |}, 
+          RelatedTransactionAdministrator: {|  |}, 
+          Reservation: {|  |}, 
+          RTGS: String, 
+          SettlementAccount: {|
+            AccountContract: {|  |}, 
+            AccountRestriction: {|  |}, 
+            Balance: Number {"typeId": "double"}, 
+            CurrencyCode: String, 
+            ClosingDate: String, 
+            CollateralAccountType: String, 
+            CurrencyExchange: {|
+              Adjustment: {|  |}, 
+              CalcuatedAssetValue: Array<{|
+                AmmortizedFaceValue: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                Balance: Array<{|  |}>
+              |}>, 
+              CurrenceyExchangeForCashDistribution: {|  |}, 
+              CurrentyExchangeForCashEntry: {|
+                Amount: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                Interest: {|
+                  Amount: {|
+                    Ammount: Number {"typeId": "double"}, 
+                    Currency: String
+                  |}, 
+                  AccruedInterestAmpount: {|
+                    Ammount: Number {"typeId": "double"}, 
+                    Currency: String
+                  |}, 
+                  InterestCalculation: Array<{|  |}>, 
+                  InterestName: {|  |}, 
+                  InterestTax: {|  |}, 
+                  PaymentDate: {| date: String |}, 
+                  Rate: {| rate: Number {"typeId": "double"} |}
+                |}
+              |}, 
+              ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+              OriginalAmount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              QuotationDate: {| DateTime: String |}, 
+              QuotedCurrency: String, 
+              RateType: {|  |}, 
+              RealtedInvoice: {|  |}, 
+              ResultingAmount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              SourceCurrency: String, 
+              TargetCurrency: String, 
+              Tax: {|  |}, 
+              UnitCurrency: String
+            |}, 
+            DefaultFundAccountOwner: {|  |}, 
+            DefaultFundContribution: {|  |}, 
+            Entry: {|  |}, 
+            Identification: {|
+              AccountId: String, 
+              BBAN: String, 
+              IBAN: String, 
+              Name: String, 
+              Number: String, 
+              UPIC: String
+            |}, 
+            IvestmentFundPartyRole: {|  |}, 
+            Language: String, 
+            LiveDate: String, 
+            ManagedAcountProduct: {|
+              Agreement: {|  |}, 
+              Characterisitics: {|  |}, 
+              Delivery: {|  |}, 
+              Description: String, 
+              Name: String, 
+              ProductBrokerMasterAgreement: {|  |}, 
+              ProductCategory: {|  |}, 
+              ProductIdentification: {|  |}, 
+              Quality: String, 
+              Quantity: Number {"typeId": "int"}
+            |}, 
+            OpeningDate: String, 
+            PartyRole: {|  |}, 
+            Purpose: String, 
+            Reconciliation: {|  |}, 
+            RelatedCollateralProcess: {|  |}, 
+            RelatedCorporateActionPartyRole: {|  |}, 
+            RelatedFundProcessingCharacteristics: {|  |}, 
+            RelatedProceedsDelivery: {|  |}, 
+            ReportedPeriod: String, 
+            ReportingCurrency: String, 
+            SettlementPartyRole: {|  |}, 
+            Status: {|  |}, 
+            System: {|  |}, 
+            SystemMember: {|  |}, 
+            TradePartyRole: {|  |}, 
+            Type: {|  |}
+          |}, 
+          SettlementMethod: {|  |}, 
+          SettlementPartyRole: {|  |}, 
+          StandingSettlementInstruction: {|  |}
+        |}, 
+        StandingOrder: {|  |}
+      |}, 
+      ProcessingInstructions: Array<{|
+        BankTransaction: {|  |}, 
+        CategoryPurpose: String, 
+        ClearingChannel: String, 
+        ContactPoint: Array<{|  |}>, 
+        LocalInstrument: String, 
+        Priority: {|  |}, 
+        RelatedMandate: {|  |}, 
+        SequenceType: {|  |}, 
+        ServiceLevel: {|  |}
+      |}>, 
+      RelatedInvestigationCase: {|  |}, 
+      RelatedInvestigationCaseResolution: {|  |}
+    |}, 
+    CreationDate: String, 
+    CreditDebitIndicator: {|  |}, 
+    RequestedExecutionDate: String
+  |}, 
+  PaymentInstrument: {|  |}, 
+  PaymentObligation: {|
+    Agreement: {|  |}, 
+    ExposureType: {|  |}, 
+    Amount: {|
+      Ammount: Number {"typeId": "double"}, 
+      Currency: String
+    |}, 
+    ApplicatbleLaw: String, 
+    AssociatedDocument: Array<{|
+      Agreement: {|  |}, 
+      Amount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      Assessment: Array<{|  |}>, 
+      CommercialTrade: Array<{|
+        Agreement: {|  |}, 
+        AllocationIndicator: String, 
+        BlockIndicator: {|  |}, 
+        CollateralisationType: String, 
+        EndDate: String, 
+        GoverningDocument: {|  |}, 
+        Leg: Array<{|  |}>, 
+        Obligation: Array<{|
+          Agreement: {|  |}, 
+          ExposureType: {|  |}, 
+          Obligee: {|  |}, 
+          Obligor: {|  |}
+        |}>, 
+        PartyRole: Array<{|
+          Account: Array<{|
+            AccountContract: {|  |}, 
+            AccountRestriction: {|  |}, 
+            Balance: Number {"typeId": "double"}, 
+            CurrencyCode: String, 
+            ClosingDate: String, 
+            CollateralAccountType: String, 
+            CurrencyExchange: {|
+              Adjustment: {|  |}, 
+              CalcuatedAssetValue: Array<{|
+                AmmortizedFaceValue: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                Balance: Array<{|  |}>
+              |}>, 
+              CurrenceyExchangeForCashDistribution: {|  |}, 
+              CurrentyExchangeForCashEntry: {|
+                Amount: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                Interest: {|
+                  Amount: {|
+                    Ammount: Number {"typeId": "double"}, 
+                    Currency: String
+                  |}, 
+                  AccruedInterestAmpount: {|
+                    Ammount: Number {"typeId": "double"}, 
+                    Currency: String
+                  |}, 
+                  InterestCalculation: Array<{|  |}>, 
+                  InterestName: {|  |}, 
+                  InterestTax: {|  |}, 
+                  PaymentDate: {| date: String |}, 
+                  Rate: {| rate: Number {"typeId": "double"} |}
+                |}
+              |}, 
+              ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+              OriginalAmount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              QuotationDate: {| DateTime: String |}, 
+              QuotedCurrency: String, 
+              RateType: {|  |}, 
+              RealtedInvoice: {|  |}, 
+              ResultingAmount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              SourceCurrency: String, 
+              TargetCurrency: String, 
+              Tax: {|  |}, 
+              UnitCurrency: String
+            |}, 
+            DefaultFundAccountOwner: {|  |}, 
+            DefaultFundContribution: {|  |}, 
+            Entry: {|  |}, 
+            Identification: {|
+              AccountId: String, 
+              BBAN: String, 
+              IBAN: String, 
+              Name: String, 
+              Number: String, 
+              UPIC: String
+            |}, 
+            IvestmentFundPartyRole: {|  |}, 
+            Language: String, 
+            LiveDate: String, 
+            ManagedAcountProduct: {|
+              Agreement: {|  |}, 
+              Characterisitics: {|  |}, 
+              Delivery: {|  |}, 
+              Description: String, 
+              Name: String, 
+              ProductBrokerMasterAgreement: {|  |}, 
+              ProductCategory: {|  |}, 
+              ProductIdentification: {|  |}, 
+              Quality: String, 
+              Quantity: Number {"typeId": "int"}
+            |}, 
+            OpeningDate: String, 
+            PartyRole: {|  |}, 
+            Purpose: String, 
+            Reconciliation: {|  |}, 
+            RelatedCollateralProcess: {|  |}, 
+            RelatedCorporateActionPartyRole: {|  |}, 
+            RelatedFundProcessingCharacteristics: {|  |}, 
+            RelatedProceedsDelivery: {|  |}, 
+            ReportedPeriod: String, 
+            ReportingCurrency: String, 
+            SettlementPartyRole: {|  |}, 
+            Status: {|  |}, 
+            System: {|  |}, 
+            SystemMember: {|  |}, 
+            TradePartyRole: {|  |}, 
+            Type: {|  |}
+          |}>, 
+          Agreement: Array<{|  |}>, 
+          ApplicationPeriod: {|  |}, 
+          BuyerOrSeller: String, 
+          ConsumerLoanAgreement: Array<{|  |}>, 
+          CounterpartyRisk: {|
+            ExposedAmont: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            ExposureCalculation: {|  |}
+          |}, 
+          ObliagationForObligee: Array<{|
+            Agreement: {|  |}, 
+            ExposureType: {|  |}, 
+            Obligee: {|  |}, 
+            Obligor: {|  |}
+          |}>, 
+          ObligationForObligor: Array<{|
+            Agreement: {|  |}, 
+            ExposureType: {|  |}, 
+            Obligee: {|  |}, 
+            Obligor: {|  |}
+          |}>, 
+          PartyRole: String, 
+          Player: Array<{|  |}>, 
+          Process: {|  |}, 
+          Trade: Array<{|
+            AllocationIndicator: String, 
+            Asset: Array<{|
+              AssetClassification: Array<String>, 
+              AssetPartyRole: String, 
+              AssetValue: Array<{|
+                AmmortizedFaceValue: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                Balance: Array<{|  |}>
+              |}>
+            |}>
+          |}>, 
+          TradingPartyCapacity: String
+        |}>, 
+        ProductDeliveryObligation: Array<{|  |}>, 
+        PurchaseAccount: Array<{|
+          AccountContract: {|  |}, 
+          AccountRestriction: {|  |}, 
+          Balance: Number {"typeId": "double"}, 
+          CurrencyCode: String, 
+          ClosingDate: String, 
+          CollateralAccountType: String, 
+          CurrencyExchange: {|
+            Adjustment: {|  |}, 
+            CalcuatedAssetValue: Array<{|
+              AmmortizedFaceValue: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              Balance: Array<{|  |}>
+            |}>, 
+            CurrenceyExchangeForCashDistribution: {|  |}, 
+            CurrentyExchangeForCashEntry: {|
+              Amount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              Interest: {|
+                Amount: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                AccruedInterestAmpount: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                InterestCalculation: Array<{|  |}>, 
+                InterestName: {|  |}, 
+                InterestTax: {|  |}, 
+                PaymentDate: {| date: String |}, 
+                Rate: {| rate: Number {"typeId": "double"} |}
+              |}
+            |}, 
+            ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+            OriginalAmount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            QuotationDate: {| DateTime: String |}, 
+            QuotedCurrency: String, 
+            RateType: {|  |}, 
+            RealtedInvoice: {|  |}, 
+            ResultingAmount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            SourceCurrency: String, 
+            TargetCurrency: String, 
+            Tax: {|  |}, 
+            UnitCurrency: String
+          |}, 
+          DefaultFundAccountOwner: {|  |}, 
+          DefaultFundContribution: {|  |}, 
+          Entry: {|  |}, 
+          Identification: {|
+            AccountId: String, 
+            BBAN: String, 
+            IBAN: String, 
+            Name: String, 
+            Number: String, 
+            UPIC: String
+          |}, 
+          IvestmentFundPartyRole: {|  |}, 
+          Language: String, 
+          LiveDate: String, 
+          ManagedAcountProduct: {|
+            Agreement: {|  |}, 
+            Characterisitics: {|  |}, 
+            Delivery: {|  |}, 
+            Description: String, 
+            Name: String, 
+            ProductBrokerMasterAgreement: {|  |}, 
+            ProductCategory: {|  |}, 
+            ProductIdentification: {|  |}, 
+            Quality: String, 
+            Quantity: Number {"typeId": "int"}
+          |}, 
+          OpeningDate: String, 
+          PartyRole: {|  |}, 
+          Purpose: String, 
+          Reconciliation: {|  |}, 
+          RelatedCollateralProcess: {|  |}, 
+          RelatedCorporateActionPartyRole: {|  |}, 
+          RelatedFundProcessingCharacteristics: {|  |}, 
+          RelatedProceedsDelivery: {|  |}, 
+          ReportedPeriod: String, 
+          ReportingCurrency: String, 
+          SettlementPartyRole: {|  |}, 
+          Status: {|  |}, 
+          System: {|  |}, 
+          SystemMember: {|  |}, 
+          TradePartyRole: {|  |}, 
+          Type: {|  |}
+        |}>, 
+        PurchaseOrder: Array<{|  |}>, 
+        RelatedNegotiation: {|  |}, 
+        RelatedUndertaking: {|  |}, 
+        SettlementNetting: String, 
+        StartDate: String, 
+        TotalAcceptedAmount: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        TradeComission: Array<{|  |}>, 
+        TradeRealtedIdentifications: Array<{|  |}>, 
+        TradeSettlement: {|  |}, 
+        TransactionStatus: String, 
+        ValueDate: String
+      |}>
+    |}>, 
+    BankingTransaction: {|  |}, 
+    CommercialTrade: {|
+      Agreement: {|  |}, 
+      AllocationIndicator: String, 
+      BlockIndicator: {|  |}, 
+      CollateralisationType: String, 
+      EndDate: String, 
+      GoverningDocument: {|  |}, 
+      Leg: Array<{|  |}>, 
+      Obligation: Array<{|
+        Agreement: {|  |}, 
+        ExposureType: {|  |}, 
+        Obligee: {|  |}, 
+        Obligor: {|  |}
+      |}>, 
+      PartyRole: Array<{|
+        Account: Array<{|
+          AccountContract: {|  |}, 
+          AccountRestriction: {|  |}, 
+          Balance: Number {"typeId": "double"}, 
+          CurrencyCode: String, 
+          ClosingDate: String, 
+          CollateralAccountType: String, 
+          CurrencyExchange: {|
+            Adjustment: {|  |}, 
+            CalcuatedAssetValue: Array<{|
+              AmmortizedFaceValue: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              Balance: Array<{|  |}>
+            |}>, 
+            CurrenceyExchangeForCashDistribution: {|  |}, 
+            CurrentyExchangeForCashEntry: {|
+              Amount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              Interest: {|
+                Amount: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                AccruedInterestAmpount: {|
+                  Ammount: Number {"typeId": "double"}, 
+                  Currency: String
+                |}, 
+                InterestCalculation: Array<{|  |}>, 
+                InterestName: {|  |}, 
+                InterestTax: {|  |}, 
+                PaymentDate: {| date: String |}, 
+                Rate: {| rate: Number {"typeId": "double"} |}
+              |}
+            |}, 
+            ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+            OriginalAmount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            QuotationDate: {| DateTime: String |}, 
+            QuotedCurrency: String, 
+            RateType: {|  |}, 
+            RealtedInvoice: {|  |}, 
+            ResultingAmount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            SourceCurrency: String, 
+            TargetCurrency: String, 
+            Tax: {|  |}, 
+            UnitCurrency: String
+          |}, 
+          DefaultFundAccountOwner: {|  |}, 
+          DefaultFundContribution: {|  |}, 
+          Entry: {|  |}, 
+          Identification: {|
+            AccountId: String, 
+            BBAN: String, 
+            IBAN: String, 
+            Name: String, 
+            Number: String, 
+            UPIC: String
+          |}, 
+          IvestmentFundPartyRole: {|  |}, 
+          Language: String, 
+          LiveDate: String, 
+          ManagedAcountProduct: {|
+            Agreement: {|  |}, 
+            Characterisitics: {|  |}, 
+            Delivery: {|  |}, 
+            Description: String, 
+            Name: String, 
+            ProductBrokerMasterAgreement: {|  |}, 
+            ProductCategory: {|  |}, 
+            ProductIdentification: {|  |}, 
+            Quality: String, 
+            Quantity: Number {"typeId": "int"}
+          |}, 
+          OpeningDate: String, 
+          PartyRole: {|  |}, 
+          Purpose: String, 
+          Reconciliation: {|  |}, 
+          RelatedCollateralProcess: {|  |}, 
+          RelatedCorporateActionPartyRole: {|  |}, 
+          RelatedFundProcessingCharacteristics: {|  |}, 
+          RelatedProceedsDelivery: {|  |}, 
+          ReportedPeriod: String, 
+          ReportingCurrency: String, 
+          SettlementPartyRole: {|  |}, 
+          Status: {|  |}, 
+          System: {|  |}, 
+          SystemMember: {|  |}, 
+          TradePartyRole: {|  |}, 
+          Type: {|  |}
+        |}>, 
+        Agreement: Array<{|  |}>, 
+        ApplicationPeriod: {|  |}, 
+        BuyerOrSeller: String, 
+        ConsumerLoanAgreement: Array<{|  |}>, 
+        CounterpartyRisk: {|
+          ExposedAmont: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          ExposureCalculation: {|  |}
+        |}, 
+        ObliagationForObligee: Array<{|
+          Agreement: {|  |}, 
+          ExposureType: {|  |}, 
+          Obligee: {|  |}, 
+          Obligor: {|  |}
+        |}>, 
+        ObligationForObligor: Array<{|
+          Agreement: {|  |}, 
+          ExposureType: {|  |}, 
+          Obligee: {|  |}, 
+          Obligor: {|  |}
+        |}>, 
+        PartyRole: String, 
+        Player: Array<{|  |}>, 
+        Process: {|  |}, 
+        Trade: Array<{|
+          AllocationIndicator: String, 
+          Asset: Array<{|
+            AssetClassification: Array<String>, 
+            AssetPartyRole: String, 
+            AssetValue: Array<{|
+              AmmortizedFaceValue: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              Balance: Array<{|  |}>
+            |}>
+          |}>
+        |}>, 
+        TradingPartyCapacity: String
+      |}>, 
+      ProductDeliveryObligation: Array<{|  |}>, 
+      PurchaseAccount: Array<{|
+        AccountContract: {|  |}, 
+        AccountRestriction: {|  |}, 
+        Balance: Number {"typeId": "double"}, 
+        CurrencyCode: String, 
+        ClosingDate: String, 
+        CollateralAccountType: String, 
+        CurrencyExchange: {|
+          Adjustment: {|  |}, 
+          CalcuatedAssetValue: Array<{|
+            AmmortizedFaceValue: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            Balance: Array<{|  |}>
+          |}>, 
+          CurrenceyExchangeForCashDistribution: {|  |}, 
+          CurrentyExchangeForCashEntry: {|
+            Amount: {|
+              Ammount: Number {"typeId": "double"}, 
+              Currency: String
+            |}, 
+            Interest: {|
+              Amount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              AccruedInterestAmpount: {|
+                Ammount: Number {"typeId": "double"}, 
+                Currency: String
+              |}, 
+              InterestCalculation: Array<{|  |}>, 
+              InterestName: {|  |}, 
+              InterestTax: {|  |}, 
+              PaymentDate: {| date: String |}, 
+              Rate: {| rate: Number {"typeId": "double"} |}
+            |}
+          |}, 
+          ExchangeRate: {| rate: Number {"typeId": "double"} |}, 
+          OriginalAmount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          QuotationDate: {| DateTime: String |}, 
+          QuotedCurrency: String, 
+          RateType: {|  |}, 
+          RealtedInvoice: {|  |}, 
+          ResultingAmount: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          SourceCurrency: String, 
+          TargetCurrency: String, 
+          Tax: {|  |}, 
+          UnitCurrency: String
+        |}, 
+        DefaultFundAccountOwner: {|  |}, 
+        DefaultFundContribution: {|  |}, 
+        Entry: {|  |}, 
+        Identification: {|
+          AccountId: String, 
+          BBAN: String, 
+          IBAN: String, 
+          Name: String, 
+          Number: String, 
+          UPIC: String
+        |}, 
+        IvestmentFundPartyRole: {|  |}, 
+        Language: String, 
+        LiveDate: String, 
+        ManagedAcountProduct: {|
+          Agreement: {|  |}, 
+          Characterisitics: {|  |}, 
+          Delivery: {|  |}, 
+          Description: String, 
+          Name: String, 
+          ProductBrokerMasterAgreement: {|  |}, 
+          ProductCategory: {|  |}, 
+          ProductIdentification: {|  |}, 
+          Quality: String, 
+          Quantity: Number {"typeId": "int"}
+        |}, 
+        OpeningDate: String, 
+        PartyRole: {|  |}, 
+        Purpose: String, 
+        Reconciliation: {|  |}, 
+        RelatedCollateralProcess: {|  |}, 
+        RelatedCorporateActionPartyRole: {|  |}, 
+        RelatedFundProcessingCharacteristics: {|  |}, 
+        RelatedProceedsDelivery: {|  |}, 
+        ReportedPeriod: String, 
+        ReportingCurrency: String, 
+        SettlementPartyRole: {|  |}, 
+        Status: {|  |}, 
+        System: {|  |}, 
+        SystemMember: {|  |}, 
+        TradePartyRole: {|  |}, 
+        Type: {|  |}
+      |}>, 
+      PurchaseOrder: Array<{|  |}>, 
+      RelatedNegotiation: {|  |}, 
+      RelatedUndertaking: {|  |}, 
+      SettlementNetting: String, 
+      StartDate: String, 
+      TotalAcceptedAmount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      TradeComission: Array<{|  |}>, 
+      TradeRealtedIdentifications: Array<{|  |}>, 
+      TradeSettlement: {|  |}, 
+      TransactionStatus: String, 
+      ValueDate: String
+    |}, 
+    ExchangeRateInformatio: {|  |}, 
+    ExpiryDate: String, 
+    Interest: {|  |}, 
+    MaximumAmont: {|
+      Ammount: Number {"typeId": "double"}, 
+      Currency: String
+    |}, 
+    Obligee: {|  |}, 
+    Obligor: {|  |}, 
+    Offset: {|  |}, 
+    PartyRole: {|
+      Agreement: Array<{|  |}>, 
+      ApplicablePeriod: {|  |}, 
+      CounterpartyRisk: {|
+        ExposedAmont: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        ExposureCalculation: {|  |}
+      |}, 
+      Party: {|  |}, 
+      ObligationForObligee: {|
+        Agreement: {|  |}, 
+        ExposureType: {|  |}, 
+        Obligee: {|  |}, 
+        Obligor: {|  |}
+      |}, 
+      ObligationForObligor: {|
+        Agreement: {|  |}, 
+        ExposureType: {|  |}, 
+        Obligee: {|  |}, 
+        Obligor: {|  |}
+      |}, 
+      Player: {|  |}, 
+      Process: {|  |}
+    |}, 
+    PaymentDueDate: String, 
+    PaymentTerms: {|
+      Amount: {|
+        Ammount: Number {"typeId": "double"}, 
+        Currency: String
+      |}, 
+      PaymentPeriod: {|  |}, 
+      PaymentTime: String, 
+      Percentage: {| rate: Number {"typeId": "double"} |}, 
+      RelatedLoan: {|  |}, 
+      RelatedPaymentObligation: String, 
+      RelatedPaymentScheduleType: {|  |}
+    |}, 
+    Percentage: {| rate: Number {"typeId": "double"} |}, 
+    Purpose: String, 
+    RelatedAmountClosingTerms: {|  |}, 
+    RelatedCollateralMovement: {|  |}, 
+    RemittanceDeliveryMethod: String, 
+    RemittanceLocation: Array<{|  |}>, 
+    Trade: {|
+      AllocationIndicator: String, 
+      Asset: Array<{|
+        AssetClassification: Array<String>, 
+        AssetPartyRole: String, 
+        AssetValue: Array<{|
+          AmmortizedFaceValue: {|
+            Ammount: Number {"typeId": "double"}, 
+            Currency: String
+          |}, 
+          Balance: Array<{|  |}>
+        |}>
+      |}>
+    |}, 
+    TransactionRisk: {|  |}, 
+    TriggeringPaymentOrder: String, 
+    TriggerningRemittanceOrder: String, 
+    UltimateCreditorRole: {|
+      Agreement: Array<{|  |}>, 
+      ApplicablePeriod: {|  |}, 
+      CounterpartyRisk: {|
+        ExposedAmont: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        ExposureCalculation: {|  |}
+      |}, 
+      Party: {|  |}, 
+      ObligationForObligee: {|
+        Agreement: {|  |}, 
+        ExposureType: {|  |}, 
+        Obligee: {|  |}, 
+        Obligor: {|  |}
+      |}, 
+      ObligationForObligor: {|
+        Agreement: {|  |}, 
+        ExposureType: {|  |}, 
+        Obligee: {|  |}, 
+        Obligor: {|  |}
+      |}, 
+      Player: {|  |}, 
+      Process: {|  |}
+    |}, 
+    UltimateDebtorRole: {|
+      Agreement: Array<{|  |}>, 
+      ApplicablePeriod: {|  |}, 
+      CounterpartyRisk: {|
+        ExposedAmont: {|
+          Ammount: Number {"typeId": "double"}, 
+          Currency: String
+        |}, 
+        ExposureCalculation: {|  |}
+      |}, 
+      Party: {|  |}, 
+      ObligationForObligee: {|
+        Agreement: {|  |}, 
+        ExposureType: {|  |}, 
+        Obligee: {|  |}, 
+        Obligor: {|  |}
+      |}, 
+      ObligationForObligor: {|
+        Agreement: {|  |}, 
+        ExposureType: {|  |}, 
+        Obligee: {|  |}, 
+        Obligor: {|  |}
+      |}, 
+      Player: {|  |}, 
+      Process: {|  |}
+    |}
+  |}, 
+  PaymentRelatedIdentifications: Array<{|
+    EndToEndIdentification: String, 
+    ExecutionIdentification: String, 
+    TransactionIdentification: String
+  |}>, 
+  PaymentStatus: String, 
+  PoolingAdjustmentDate: String, 
+  Priority: {|  |}, 
+  RelatedDebitAuthorization: {|  |}, 
+  RelatedSecuritiesSettlement: {|  |}, 
+  ResultingObligation: {|
+    Agreement: {|  |}, 
+    ExposureType: {|  |}, 
+    Obligee: {|  |}, 
+    Obligor: {|  |}
+  |}, 
+  SettlementTimeRequest: {|  |}, 
+  StandardSettlementInstructions: String, 
+  TaxOnPayment: {|  |}, 
+  TradeSettlement: {|  |}, 
+  Type: {|  |}, 
+  ValueDate: String
+|} {"MetadataFormat": "json",
+"example": "{\"Account\":{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{},\"Identification\":{\"AccountId\":\"\",\"BBAN\":\"\",\"IBAN\":\"\",\"Name\":\"\",\"Number\":\"\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}},\"Adjustments\":{},\"Ammount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"ContractRegistration\":{},\"CreditMethod\":{\"CreditInstrumentIdentification\":\"\",\"Deadline\":\"2019-10-02T10:00:00-05:00\",\"Method\":\"123\",\"NetAmmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"RelatedPaymentId\":\"\"},\"Creditor\":{},\"CreditorAcount\":{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{\"Country\":\"US\",\"BankName\":\"RBC\"},\"Identification\":{\"AccountId\":\"999-SAVINGS\",\"BBAN\":\"\",\"IBAN\":\"ROYCCAT2IBO\",\"Name\":\"SavingsSpecial\",\"Number\":\"23435\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}},\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"CurrencyOfTransfer\":\"USD\",\"Date\":\"2019-10-02\",\"Debtor\":{},\"DebtorAcount\":{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{\"Country\":\"US\",\"BankName\":\"BOA\"},\"Identification\":{\"AccountId\":\"333-CHECKING\",\"BBAN\":\"\",\"IBAN\":\"BOFAUS3N\",\"Name\":\"ChequingSimple\",\"Number\":\"333987\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}},\"EquivalentAmmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"FirstAgent\":{\"AnyBic\":{},\"BankPartyIdentification\":\"\",\"BICFI\":{\"BICCode\":\"\"}},\"InstructedAmmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InstrutionForCreditorAgent\":\"33\",\"InstructionForDebtorAgent\":\"33\",\"Intermediary\":{},\"InvoiceReconciliation\":{},\"ObligationOffset\":{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}},\"PartyRole\":{},\"PaymentExecution\":{\"PaymentInitiation\":{\"AcceptanceDateTime\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"Next\":{\"AcceptanceDateTime\":\"2019-10-02T10:00:00-05:00\",\"ClearingChangeAmmount\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"FirstSettlementAgent\":{\"BIC\":\"BOFAUS3N\"},\"InstructionForNextAgent\":\"33\",\"IntermediarySettlementAgent\":{\"BIC\":\"ROYCCAT2IBO\"},\"LastSettlementAgent\":{\"BIC\":\"ROYCCAT2IBO\"},\"NoastroVostroAccount\":{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{},\"Identification\":{\"AccountId\":\"\",\"BBAN\":\"\",\"IBAN\":\"\",\"Name\":\"\",\"Number\":\"\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}},\"ProcessingInstructions\":[{\"BankTransaction\":{},\"CategoryPurpose\":\"1\",\"ClearingChannel\":\"978\",\"ContactPoint\":[{}],\"LocalInstrument\":\"22\",\"Priority\":{},\"RelatedMandate\":{},\"SequenceType\":{},\"ServiceLevel\":{}}],\"ProcessingValidityTime\":{},\"RelatedInvestigationCase\":{},\"RelatedInvestigationCaseResolution\":{},\"SettlementInstruction\":{\"BookEntry\":{},\"CentralCounterpartyEligibilityIndicator\":{},\"CreditDateTime\":\"2019-10-02T10:00:00-05:00\",\"DebitDarteTime\":\"2019-10-02T10:00:00-05:00\",\"InterBankSettlementAmmount\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"PartyRole\":{},\"RelatedTransactionAdministrator\":{},\"Reservation\":{},\"RTGS\":\"\",\"SettlementAccount\":{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{},\"Identification\":{\"AccountId\":\"\",\"BBAN\":\"\",\"IBAN\":\"\",\"Name\":\"\",\"Number\":\"\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}},\"SettlementMethod\":{},\"SettlementPartyRole\":{},\"StandingSettlementInstruction\":{}},\"StandingOrder\":{}},\"ProcessingInstructions\":[{\"BankTransaction\":{},\"CategoryPurpose\":\"1\",\"ClearingChannel\":\"978\",\"ContactPoint\":[{}],\"LocalInstrument\":\"22\",\"Priority\":{},\"RelatedMandate\":{},\"SequenceType\":{},\"ServiceLevel\":{}}],\"RelatedInvestigationCase\":{},\"RelatedInvestigationCaseResolution\":{}},\"CreationDate\":\"2019-10-02T10:00:00-05:00\",\"CreditDebitIndicator\":{},\"RequestedExecutionDate\":\"2019-10-02T10:00:00-05:00\"},\"PaymentInstrument\":{},\"PaymentObligation\":{\"Agreement\":{},\"ExposureType\":{},\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"ApplicatbleLaw\":\"US\",\"AssociatedDocument\":[{\"Agreement\":{},\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Assessment\":[{}],\"CommercialTrade\":[{\"Agreement\":{},\"AllocationIndicator\":\"\",\"BlockIndicator\":{},\"CollateralisationType\":\"\",\"EndDate\":\"2019-10-02T10:00:00-05:00\",\"GoverningDocument\":{},\"Leg\":[{}],\"Obligation\":[{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}}],\"PartyRole\":[{\"Account\":[{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{},\"Identification\":{\"AccountId\":\"\",\"BBAN\":\"\",\"IBAN\":\"\",\"Name\":\"\",\"Number\":\"\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}}],\"Agreement\":[{}],\"ApplicationPeriod\":{},\"BuyerOrSeller\":\"33\",\"ConsumerLoanAgreement\":[{}],\"CounterpartyRisk\":{\"ExposedAmont\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"ExposureCalculation\":{}},\"ObliagationForObligee\":[{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}}],\"ObligationForObligor\":[{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}}],\"PartyRole\":\"34\",\"Player\":[{}],\"Process\":{},\"Trade\":[{\"AllocationIndicator\":\"\",\"Asset\":[{\"AssetClassification\":[\"1\"],\"AssetPartyRole\":\"FULL\",\"AssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Balance\":[{}]}]}]}],\"TradingPartyCapacity\":\"2\"}],\"ProductDeliveryObligation\":[{}],\"PurchaseAccount\":[{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{},\"Identification\":{\"AccountId\":\"\",\"BBAN\":\"\",\"IBAN\":\"\",\"Name\":\"\",\"Number\":\"\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}}],\"PurchaseOrder\":[{}],\"RelatedNegotiation\":{},\"RelatedUndertaking\":{},\"SettlementNetting\":\"1\",\"StartDate\":\"2019-10-02T10:00:00-05:00\",\"TotalAcceptedAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"TradeComission\":[{}],\"TradeRealtedIdentifications\":[{}],\"TradeSettlement\":{},\"TransactionStatus\":\"3\",\"ValueDate\":\"2019-10-02\"}]}],\"BankingTransaction\":{},\"CommercialTrade\":{\"Agreement\":{},\"AllocationIndicator\":\"\",\"BlockIndicator\":{},\"CollateralisationType\":\"\",\"EndDate\":\"2019-10-02T10:00:00-05:00\",\"GoverningDocument\":{},\"Leg\":[{}],\"Obligation\":[{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}}],\"PartyRole\":[{\"Account\":[{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{},\"Identification\":{\"AccountId\":\"\",\"BBAN\":\"\",\"IBAN\":\"\",\"Name\":\"\",\"Number\":\"\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}}],\"Agreement\":[{}],\"ApplicationPeriod\":{},\"BuyerOrSeller\":\"33\",\"ConsumerLoanAgreement\":[{}],\"CounterpartyRisk\":{\"ExposedAmont\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"ExposureCalculation\":{}},\"ObliagationForObligee\":[{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}}],\"ObligationForObligor\":[{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}}],\"PartyRole\":\"34\",\"Player\":[{}],\"Process\":{},\"Trade\":[{\"AllocationIndicator\":\"\",\"Asset\":[{\"AssetClassification\":[\"1\"],\"AssetPartyRole\":\"FULL\",\"AssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Balance\":[{}]}]}]}],\"TradingPartyCapacity\":\"2\"}],\"ProductDeliveryObligation\":[{}],\"PurchaseAccount\":[{\"AccountContract\":{},\"AccountRestriction\":{},\"Balance\":234.56,\"CurrencyCode\":\"USD\",\"ClosingDate\":\"2002-10-02T10:00:00-05:00\",\"CollateralAccountType\":\"1\",\"CurrencyExchange\":{\"Adjustment\":{},\"CalcuatedAssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":123.33,\"Currency\":\"USD\"},\"Balance\":[{}]}],\"CurrenceyExchangeForCashDistribution\":{},\"CurrentyExchangeForCashEntry\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Interest\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"AccruedInterestAmpount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"InterestCalculation\":[{}],\"InterestName\":{},\"InterestTax\":{},\"PaymentDate\":{\"date\":\"2018-11-29\"},\"Rate\":{\"rate\":1.5}}},\"ExchangeRate\":{\"rate\":0.5},\"OriginalAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"QuotationDate\":{\"DateTime\":\"2019-10-02T10:00:00-05:00\"},\"QuotedCurrency\":\"USD\",\"RateType\":{},\"RealtedInvoice\":{},\"ResultingAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"SourceCurrency\":\"USD\",\"TargetCurrency\":\"CAD\",\"Tax\":{},\"UnitCurrency\":\"USD\"},\"DefaultFundAccountOwner\":{},\"DefaultFundContribution\":{},\"Entry\":{},\"Identification\":{\"AccountId\":\"\",\"BBAN\":\"\",\"IBAN\":\"\",\"Name\":\"\",\"Number\":\"\",\"UPIC\":\"\"},\"IvestmentFundPartyRole\":{},\"Language\":\"en\",\"LiveDate\":\"2019-10-02T10:00:00-05:00\",\"ManagedAcountProduct\":{\"Agreement\":{},\"Characterisitics\":{},\"Delivery\":{},\"Description\":\"\",\"Name\":\"\",\"ProductBrokerMasterAgreement\":{},\"ProductCategory\":{},\"ProductIdentification\":{},\"Quality\":\"\",\"Quantity\":3},\"OpeningDate\":\"2019-10-02T10:00:00-05:00\",\"PartyRole\":{},\"Purpose\":\"\",\"Reconciliation\":{},\"RelatedCollateralProcess\":{},\"RelatedCorporateActionPartyRole\":{},\"RelatedFundProcessingCharacteristics\":{},\"RelatedProceedsDelivery\":{},\"ReportedPeriod\":\"2019-10-02T10:00:00-05:00\",\"ReportingCurrency\":\"USD\",\"SettlementPartyRole\":{},\"Status\":{},\"System\":{},\"SystemMember\":{},\"TradePartyRole\":{},\"Type\":{}}],\"PurchaseOrder\":[{}],\"RelatedNegotiation\":{},\"RelatedUndertaking\":{},\"SettlementNetting\":\"1\",\"StartDate\":\"2019-10-02T10:00:00-05:00\",\"TotalAcceptedAmount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"TradeComission\":[{}],\"TradeRealtedIdentifications\":[{}],\"TradeSettlement\":{},\"TransactionStatus\":\"3\",\"ValueDate\":\"2019-10-02\"},\"ExchangeRateInformatio\":{},\"ExpiryDate\":\"2019-10-02T10:00:00-05:00\",\"Interest\":{},\"MaximumAmont\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Obligee\":{},\"Obligor\":{},\"Offset\":{},\"PartyRole\":{\"Agreement\":[{}],\"ApplicablePeriod\":{},\"CounterpartyRisk\":{\"ExposedAmont\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"ExposureCalculation\":{}},\"Party\":{},\"ObligationForObligee\":{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}},\"ObligationForObligor\":{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}},\"Player\":{},\"Process\":{}},\"PaymentDueDate\":\"2019-10-02\",\"PaymentTerms\":{\"Amount\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"PaymentPeriod\":{},\"PaymentTime\":\"1\",\"Percentage\":{\"rate\":1.5},\"RelatedLoan\":{},\"RelatedPaymentObligation\":\"\",\"RelatedPaymentScheduleType\":{}},\"Percentage\":{\"rate\":1.5},\"Purpose\":\"1\",\"RelatedAmountClosingTerms\":{},\"RelatedCollateralMovement\":{},\"RemittanceDeliveryMethod\":\"SMSM\",\"RemittanceLocation\":[{}],\"Trade\":{\"AllocationIndicator\":\"\",\"Asset\":[{\"AssetClassification\":[\"1\"],\"AssetPartyRole\":\"FULL\",\"AssetValue\":[{\"AmmortizedFaceValue\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"Balance\":[{}]}]}]},\"TransactionRisk\":{},\"TriggeringPaymentOrder\":\"\",\"TriggerningRemittanceOrder\":\"\",\"UltimateCreditorRole\":{\"Agreement\":[{}],\"ApplicablePeriod\":{},\"CounterpartyRisk\":{\"ExposedAmont\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"ExposureCalculation\":{}},\"Party\":{},\"ObligationForObligee\":{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}},\"ObligationForObligor\":{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}},\"Player\":{},\"Process\":{}},\"UltimateDebtorRole\":{\"Agreement\":[{}],\"ApplicablePeriod\":{},\"CounterpartyRisk\":{\"ExposedAmont\":{\"Ammount\":333.33,\"Currency\":\"USD\"},\"ExposureCalculation\":{}},\"Party\":{},\"ObligationForObligee\":{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}},\"ObligationForObligor\":{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}},\"Player\":{},\"Process\":{}}},\"PaymentRelatedIdentifications\":[{\"EndToEndIdentification\":\"1234567\",\"ExecutionIdentification\":\"ABCDEFGH\",\"TransactionIdentification\":\"1233avc\"}],\"PaymentStatus\":\"PROCESSED\",\"PoolingAdjustmentDate\":\"2019-10-02T10:00:00-05:00\",\"Priority\":{},\"RelatedDebitAuthorization\":{},\"RelatedSecuritiesSettlement\":{},\"ResultingObligation\":{\"Agreement\":{},\"ExposureType\":{},\"Obligee\":{},\"Obligor\":{}},\"SettlementTimeRequest\":{},\"StandardSettlementInstructions\":\"\",\"TaxOnPayment\":{},\"TradeSettlement\":{},\"Type\":{},\"ValueDate\":\"2019-10-02T10:00:00-05:00\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#0a9ca62e-fd3b-47d3-85af-7de1713fe9ef">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="payment_in"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

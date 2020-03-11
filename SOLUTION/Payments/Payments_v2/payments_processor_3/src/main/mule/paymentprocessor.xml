@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="paymentprocessor-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="paymentprocessor-config" raml="paymentprocessor.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" disableValidations="true"/>
+    <configuration-properties doc:name="Configuration properties" doc:id="b827241a-1dda-4e2b-8f65-e74a5d373573" file="mule-custom-app-pp.properties" />
+	<http:request-config name="HTTP_Request_configuration_PaymentExecPath" doc:name="HTTP Request configuration" doc:id="7436e4c4-c596-4a58-827d-d15fa5869454" >
+		<http:request-connection host="${payment.exec.path.host}" port="${payment.exec.path.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_PaymentTransaction" doc:name="HTTP Request configuration" doc:id="7b2a1a52-1368-4fcc-9e36-3af39f3d7ca4" >
+		<http:request-connection host="${payment.processor.host}" port="${http.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_IntraBankNat" doc:name="HTTP Request configuration" doc:id="34779e17-704a-4555-ba3c-ef260ec5099c" >
+		<http:request-connection host="${intra.bank.nat.host}" port="${intra.bank.nat.port}" connectionIdleTimeout="300000"/>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_IntraBankInter" doc:name="HTTP Request configuration" doc:id="10105540-53f6-4eeb-a255-cc5296af9dba" >
+		<http:request-connection host="${intra.bank.int.host}" port="${intra.bank.int.port}" connectionIdleTimeout="300000"/>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_InterBankNat" doc:name="HTTP Request configuration" doc:id="20ae326c-b9ec-41f4-943e-25c18d0fef90" >
+		<http:request-connection host="${inter.bank.nat.host}" port="${inter.bank.nat.port}" connectionIdleTimeout="300000"/>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_InterBankInt" doc:name="HTTP Request configuration" doc:id="bae3c5da-408f-4bbb-ab41-f08dcc43f1ad" >
+		<http:request-connection host="${inter.bank.int.host}" port="${inter.bank.int.port}" connectionIdleTimeout="300000"/>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_Remitance" doc:name="HTTP Request configuration" doc:id="49de0808-be08-48a2-b0de-d03220bc99c5" >
+		<http:request-connection host="${remitance.host}" port="${remitance.port}" connectionIdleTimeout="300000"/>
+	</http:request-config>
+	<flow name="paymentprocessor-main">
+        <http:listener config-ref="paymentprocessor-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="paymentprocessor-config" />
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="paymentprocessor-console">
+        <http:listener config-ref="paymentprocessor-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="paymentprocessor-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\PaymentExecutionTransaction\(PaymentExecutionTransactionId):paymentprocessor-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="PaymentExecutionTransactionId">attributes.uriParams.PaymentExecutionTransactionId</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\PaymentExecutionTransaction\(PaymentExecutionTransactionId):paymentprocessor-config" />
+    </flow>
+    <flow name="get:\PaymentOrderTransaction\(PaymentOrderTransactionId):paymentprocessor-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:id="1a637bf0-75c4-4d91-aa89-2a800025a026">
+            <ee:variables>
+                <ee:set-variable variableName="PaymentOrderTransactionId"><![CDATA[attributes.uriParams.PaymentOrderTransactionId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\PaymentOrderTransaction\(PaymentOrderTransactionId):paymentprocessor-config" />
+    </flow>
+    <flow name="post:\PaymentOrderTransaction:application\json:paymentprocessor-config" doc:id="19fa4b4a-4424-4ea5-b8a4-917a93a75522">
+        <set-payload value="#[payload]" doc:name="Set Payload" doc:id="438dbc67-6959-4b7b-895e-91782f94d3b3" mimeType="application/json"/>
+		<logger level="INFO" message="--4) Processing Payment Order -  #[payload]" />
+		<choice doc:name="Choice" doc:id="a8aa0b20-7afe-40d7-ba61-86bbca1dac45" >
+			<when expression='#[payload.PaymentRelatedIdentifications[0].TransactionIdentification == "REMITTANCE"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="32aea5eb-5108-430c-b064-1382d79f4837" message="###Executing Remittance order !!!!" />
+				<set-variable value="#[payload]" doc:name="Set Variable" doc:id="d160aefa-0ec1-44b3-9ccf-d7d643384e8b" variableName="PaymentObject" mimeType="application/json"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="34943e27-f4a2-447b-b758-f8f113ad8cb8" message="Execugting Credit Transfer order !"/>
+				<flow-ref doc:name="util_ppFlow_UpdateAccountData" doc:id="1df6a074-d031-4e9b-aff1-843a672e67be" name="util_ppFlow_UpdateAccountData" />
+				<set-variable value="#[payload]" doc:name="Set Variable" doc:id="975cebeb-6217-4cbd-a4b0-3329df8c427e" variableName="PaymentObject" mimeType="application/json" />
+			</otherwise>
+		</choice>
+		<flow-ref doc:name="util_ppFlow_PaymentExecPath" doc:id="7ca31482-9f3e-49aa-935c-7696846c7d79" name="util_ppFlow_PaymentExecPath" />
+		<http:request method="POST" doc:name="executePaymentTx" doc:id="86045a73-d2c2-4977-8703-be3f5c3c7faf" config-ref="HTTP_Request_configuration_PaymentTransaction" path="/api/PaymentExecutionTransaction">
+			<http:body ><![CDATA[#[vars.PaymentObject]]]></http:body>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"executionPath" : payload.PaymentExecutionPath
+}]]]></http:query-params>
+		</http:request>
+    </flow>
+	<flow name="post:\PaymentExecutionTransaction:application\json:paymentprocessor-config">
+		<logger level="INFO" doc:name="Logger" doc:id="d594adf9-b09a-4342-af58-d8d660d70f75" message="--6) Executing Payment Transaction for path #[message.attributes.queryParams.executionPath] --- for :  #[payload]"/>
+		<choice doc:name="Choice" doc:id="ec6e1098-41ba-4754-b2db-cfaa2232b919" >
+			<when expression='#[message.attributes.queryParams.executionPath == "XFER_IN_BANK_NAT"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="42e478d4-9774-4df2-bc70-30bf28f3923b" message="----&gt;Executing the IntraBankNational Path----"/>
+				<http:request method="POST" doc:name="intraBankNat" doc:id="452c4743-2fd0-4c76-9489-14fe93bde7d9" config-ref="HTTP_Request_configuration_IntraBankNat" path="/api/IntraBankNationalXfer"/>
+				<ee:transform doc:name="Transform Message" doc:id="77ba8433-a658-4697-af64-7a4059df97c6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: payload.PaymentStatus,
+	PaymentOrderID: payload.PaymentId,
+	PaymentSubmissionID: uuid(),
+	StatusMessage: payload.PaymentStatus
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[message.attributes.queryParams.executionPath == "XFER_IN_BANK_INT"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="b99240b6-cce1-43e8-b863-849ec44b9992" message="----&gt;Executing the IntraBankInterNational Path----"/>
+				<http:request method="POST" doc:name="intraBankInter" doc:id="29015862-d5ca-4d26-8b88-023e04e25ccd" config-ref="HTTP_Request_configuration_IntraBankInter" path="/api/IntraBankInternationalXfer"/>
+				<ee:transform doc:name="Transform Message" doc:id="a66652dd-137f-48d7-83d7-3332947f8f25" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: payload.PaymentStatus,
+	PaymentOrderID: payload.PaymentId,
+	PaymentSubmissionID: uuid(),
+	StatusMessage: payload.PaymentStatus
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[message.attributes.queryParams.executionPath == "XFER_INTER_BANK_NAT"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="277fb688-f233-4c05-928c-3afe918edbc9" message="----&gt;Executing the InterBankNational Path----"/>
+				<http:request method="POST" doc:name="interBankNat" doc:id="0e751005-00a9-46f4-adf6-ecba3d1d0ee9" config-ref="HTTP_Request_configuration_InterBankNat" path="/api/InterBankNationalXfer"/>
+				<ee:transform doc:name="Transform Message" doc:id="b87224f6-8503-4876-8eff-3d44fb7d1627" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: payload.PaymentStatus,
+	PaymentOrderID: payload.PaymentId,
+	PaymentSubmissionID: uuid(),
+	StatusMessage: payload.PaymentStatus
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[message.attributes.queryParams.executionPath == "XFER_INTER_BANK_INT"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="525d2f0e-ff11-469e-abbb-62983d9d3c80" message="----&gt;Executing the InterBankInterNational Path----"/>
+				<http:request method="POST" doc:name="interBankINt" doc:id="a01a88e2-08d3-4cef-a16a-7356b3cf6fdb" config-ref="HTTP_Request_configuration_InterBankInt" path="/api/InterBankInternationalXfer"/>
+				<ee:transform doc:name="Transform Message" doc:id="efea2173-afae-4e4d-a447-b33abce21414" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: payload.PaymentStatus,
+	PaymentOrderID: payload.PaymentId,
+	PaymentSubmissionID: uuid(),
+	StatusMessage: payload.PaymentStatus
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[message.attributes.queryParams.executionPath == "XFER_REMIT"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="56c32ae1-7152-4c19-a243-ced9394e17cd" message="----&gt;Executing the Remittances Path--------"/>
+				<http:request method="POST" doc:name="remitance" doc:id="8f7b6ff9-1d3d-47d4-a6f4-0d593b3a32e1" config-ref="HTTP_Request_configuration_Remitance" path="/api/Remittance"/>
+				<ee:transform doc:name="Transform Message" doc:id="0688d19f-d098-470c-b891-47f2f6e02da7" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Status: payload.PaymentStatus,
+	PaymentOrderID: payload.PaymentId,
+	PaymentSubmissionID: uuid(),
+	StatusMessage: payload.PaymentStatus
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="e0e6f18d-08e5-4689-acd5-e6963565cfc8" message="----&gt;INVALID PATH--------"/>
+			</otherwise>
+		</choice>
+    </flow>
+</mule>

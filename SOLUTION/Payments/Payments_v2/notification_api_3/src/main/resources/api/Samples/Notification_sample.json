@@ -1,0 +1,8 @@
+{
+     "DebtorBank":"RBC",
+     "DebtorAcct":  "333-savings",
+     "CreditorBank": "BOA",
+     "CreditorAcct": "777-checking",
+     "Sum":  397.00,
+     "Currency": "USD"
+}

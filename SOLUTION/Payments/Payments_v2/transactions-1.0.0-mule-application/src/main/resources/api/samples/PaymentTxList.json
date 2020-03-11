@@ -1,0 +1,16 @@
+[
+  {
+    "TxId" : "123456789",
+    "TxOriginatorId" : "987654321",
+    "SourceAccount" : "",
+    "SourceInst" : "",
+    "DestinationAccount" : "",
+    "DestinationInst" : "",
+    "Sum" : "",
+    "Currency" : "",
+    "XChangeRate" : "",
+    "TimeStamp" : "",
+    "TxType" : "",
+    "Status" : ""
+  }
+]

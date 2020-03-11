@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:account="http://www.mulesoft.org/schema/mule/account" xmlns:for-ex="http://www.mulesoft.org/schema/mule/for-ex"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+http://www.mulesoft.org/schema/mule/for-ex http://www.mulesoft.org/schema/mule/for-ex/current/mule-for-ex.xsd
+http://www.mulesoft.org/schema/mule/account http://www.mulesoft.org/schema/mule/account/current/mule-account.xsd">
+
+<!-- 
+	<http:request-config name="Account_API_Request" doc:name="HTTP Request configuration" doc:id="4e8ffd85-0154-46c7-89ac-f9678a23f369" >
+		<http:request-connection host="${account.api.host}" protocol="HTTPS"/>
+	</http:request-config>
+	-->
+	
+	<http:request-config name="ForEx_Config" doc:name="ForEx Config" doc:id="54e1eb5e-fc04-441d-b934-0e6a08b0fe14" >
+		<http:request-connection host="localhost" port="8933" />
+	</http:request-config>
+		<http:request-config name="Account_Config" doc:name="Account Config" doc:id="4e92b36b-595c-4a54-962d-e0db0380b3fe">
+		<http:request-connection host="${account.api.host}" port="${account.api.port}" />
+	</http:request-config>
+	
+	<configuration-properties doc:name="Configuration properties" doc:id="2e45874f-1d49-4032-af06-50148a893571" file="mule-custom-app-auth.properties" />
+	<http:request-config name="HTTP_Request_configuration-Forex" doc:name="HTTP Request configuration" doc:id="abad7ea4-4564-4a96-abec-fd9f04a62df8" >
+		<http:request-connection host="${forex.host}" port="${forex.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_ForEx_2" doc:name="HTTP Request configuration" doc:id="0c2ceb12-2180-4282-bd3f-84d81e20a7a2" >
+		<http:request-connection host="${forex.host}" port="${forex.port}" />
+	</http:request-config>
+	<flow name="Set_Transfer_Details" doc:id="efdff82b-d309-4a3a-84e1-aed0bf6734d1" >
+		<logger level="INFO" doc:name="Logger" doc:id="e093e317-2797-4ddc-9e4b-ebf50db348df" message="Setting Transfer details"/>
+		<set-variable value="#[payload.DebtorAccount.Identification]" doc:name="Account No" doc:id="5fa660d0-98e0-4f92-b9f7-52e7c112b157" variableName="account_no"/>
+		<set-variable value="#[payload.InstructedAmount.Amount as Number]" doc:name="Transfer Amount" doc:id="3bff5c9e-50e5-4c51-b1bc-29e7fa181702" variableName="transfer_amount"/>
+		<set-variable value="#[payload.InstructedAmount.Currency]" doc:name="Transfer Currency" doc:id="300b17ac-c036-410b-b8b4-007a6749a82b" variableName="transfer_currency"/>
+		<set-variable value='#[{ "PaymentID": payload.PaymentID, "DebtorAgent": { "SchemeName": payload.DebtorAgent.SchemeName, "Identification": payload.DebtorAgent.Identification }, "DebtorAccount": { "SchemeName": payload.DebtorAccount.SchemeName, "Identification": payload.DebtorAccount.Identification, "Name": payload.DebtorAccount.Name }, "Status": "PaymentAuthorized" }]' doc:name="Auth Response" doc:id="ca9207fd-7cfc-4938-88ba-1a0dd0c060d8" variableName="auth_response"/>
+	</flow>
+	<flow name="Set_Account_Details" doc:id="5f127aca-0609-458b-a577-6cebb57ef3b2" >
+		<logger level="INFO" doc:name="Logger" doc:id="a7fdc328-d588-4df0-917e-17a23635432e" message="Setting Account details"/>
+		<set-variable value="#[payload.Balance as Number]" doc:name="Account Balance" doc:id="f89b9460-02e9-49fa-99d3-332558341f22" variableName="account_balance"/>
+		<set-variable value="#[payload.CurrencyCode]" doc:name="Account Currency" doc:id="fe2c37ee-f76c-42c5-bb26-535af0d4d24e" variableName="account_currency"/>
+		<logger level="INFO" doc:name="Logger" doc:id="103d5244-f8fd-447b-a4fd-1b8750a03cb5" message="ForEx Rate  - from=#[vars.transfer_currency]  to=#[vars.account_currency]  amount=#[vars.transfer_amount]"/>
+		<!-- <for-ex:get-rates doc:name="Get rates" doc:id="941ae8f8-78c4-405a-af56-a1d04fb6c22a" config-ref="ForEx_Config" from="#[vars.transfer_currency]" to="#[vars.account_currency]" amount="#[vars.transfer_amount]"/> -->
+		<choice doc:name="Choice" doc:id="df9fb70a-9cc5-44d6-a085-5552f79b69ef" >
+			<when expression="#[vars.transfer_currency != vars.account_currency]" >
+				<http:request method="GET" doc:name="Request" doc:id="c3a9779c-c09f-4d0f-ab73-12fec1e4f6a9" config-ref="HTTP_Request_configuration_ForEx_2" path="/api/rate">
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	to : vars.transfer_currency,
+	from : vars.account_currency,
+	amount : vars.transfer_amount
+}]]]></http:query-params>
+		</http:request>
+				<logger level="INFO" doc:name="Logger" doc:id="363f1eeb-9a6a-465c-b4e6-bf807b9eee34" message="Stuff comming out of ForEx: #[payload]"/>
+				<set-variable value="#[payload.conversion_amount as Number]" doc:name="Set Converted transfer amount" doc:id="426a1b68-d3a4-4685-9816-7bb84f33207c" variableName="transfer_amount" />
+			</when>
+			<otherwise >
+				<set-variable value="#[vars.transfer_amount]" doc:name="Copy_of_Set Converted transfer amount" doc:id="69876c64-0387-452f-9165-02bfcf26a7a1" variableName="transfer_amount" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="aurhorization_processFlow" doc:id="60651191-c2f1-4feb-b068-d06a2adccdbc" >
+		<logger level="INFO" doc:name="Logger" doc:id="d6cbdedc-3317-488d-9dcc-058744fdb725" message="Authorization validation  - validating account for sufficient funds !!!!!!!!!"/>
+		<flow-ref doc:name="Set_Transfer_Details" doc:id="92112543-a13e-4327-8b54-e63a308a16d3" name="Set_Transfer_Details"/>
+		<http:request method="GET" doc:name="GetAcount" doc:id="3756cc6a-e4ba-477c-be51-db51383a6bd1" config-ref="Account_Config" path="/api/Account/{AccountId}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"AccountId" : vars.account_no
+}]]]></http:uri-params>
+		
+		</http:request>
+		<!-- <account:get-account-by-account-id doc:name="Get account by account id" doc:id="07c6b874-5b89-4d86-a786-915453e89856" config-ref="Account_Config" account-id="#[vars.account_no]" /> -->
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="9b6210dd-e8c9-4d30-82b6-d4228be4474c" variableName="Account_Var"/>
+		<flow-ref doc:name="Set Account Details" doc:id="4034a002-4f12-4917-be37-026ea104d6cd" name="Set_Account_Details"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e0c11b57-c6a1-4851-baa3-32736a08d3d9" message=" Value to Debit: #[vars.transfer_amount], Current Balance: #[vars.account_balance]"/>
+		<choice doc:name="Choice" doc:id="445077a8-ce60-42d5-8d33-91fe2cf14284" >
+			<when expression="#[vars.transfer_amount &lt; vars.account_balance]" >
+				<logger level="INFO" doc:name="Success Flow" doc:id="74fcf5ef-3a55-434d-bfa8-7f19a2e32b0e" message="***** Authorization Sucess Flow *****"/>
+				<set-payload value="#[vars.auth_response]" doc:name="Set Payload" doc:id="dd3316ec-5e06-4be6-8197-38896452cce6" />
+				<ee:transform doc:name="Set Success Status" doc:id="64a85f15-11e7-44ee-99f6-e5244475c44c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentID: payload.PaymentID,
+	DebtorAgent: {
+		SchemeName: payload.DebtorAgent.SchemeName,
+		Identification: payload.DebtorAgent.Identification
+	},
+	DebtorAccount: {
+		SchemeName: payload.DebtorAccount.SchemeName,
+		Identification: payload.DebtorAccount.Identification,
+		Name: payload.DebtorAccount.Name
+	},
+	Status: "VALID"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Failure Flow" doc:id="97c854b9-cfab-4866-846d-648faf1891b9" message="***** Authorization Failure Flow *****"/>
+				<set-payload value="#[vars.auth_response]" doc:name="Set Payload" doc:id="27e0331b-9e62-45ca-93e1-62cdf483e48a" />
+				<ee:transform doc:name="Set Failure Status" doc:id="bcdb8a36-ff86-406e-8c41-d95e6fd34cb9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentID: payload.PaymentID,
+	DebtorAgent: {
+		SchemeName: payload.DebtorAgent.SchemeName,
+		Identification: payload.DebtorAgent.Identification
+	},
+	DebtorAccount: {
+		SchemeName: payload.DebtorAccount.SchemeName,
+		Identification: payload.DebtorAccount.Identification,
+		Name: payload.DebtorAccount.Name
+	},
+	Status: "INVALID"
+}]]></ee:set-payload>
+					</ee:message>
+						<ee:variables>
+                         <ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+ output application/java
+ ---
+ "200" as Number ]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

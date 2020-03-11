@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="notification" format="json">
+      <types:shape format="weave" example="samples/Notification_sample.json"><![CDATA[%dw 2.0
+type notification = {|
+  DebtorBank: String, 
+  DebtorAcct: String, 
+  CreditorBank: String, 
+  CreditorAcct: String, 
+  Sum: Number {"typeId": "double"}, 
+  Currency: String
+|} {"MetadataFormat": "json",
+"example": "{\"DebtorBank\":\"RBC\",\"DebtorAcct\":\"333-savings\",\"CreditorBank\":\"BOA\",\"CreditorAcct\":\"777-checking\",\"Sum\":397.00,\"Currency\":\"USD\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="payment_response" format="json">
+      <types:shape format="weave" example="samples/PaymentResponse_sample.json"><![CDATA[%dw 2.0
+type payment_response = {|
+  PaymentId: String, 
+  Amount: {|
+    Amount: Number {"typeId": "double"}, 
+    Currency: String
+  |}, 
+  TransasctionCost: Number {"typeId": "double"}, 
+  TransferProtocol: String, 
+  PaymentPath: String, 
+  PaymentStatus: String, 
+  Debtor: {|
+    Account: {|
+      AccountId: String, 
+      AccountType: String, 
+      BankId: String, 
+      BankName: String
+    |}
+  |}, 
+  Creditor: {|
+    Account: {|
+      AccountId: String, 
+      AccountType: String, 
+      BankId: String, 
+      BankName: String
+    |}
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"PaymentId\":\"end-to-end-number\",\"Amount\":{\"Amount\":333.33,\"Currency\":\"USD\"},\"TransasctionCost\":10.00,\"TransferProtocol\":\"SWIFT\",\"PaymentPath\":\"XFER_INTER_BANK_INT\",\"PaymentStatus\":\"PROCESSED\",\"Debtor\":{\"Account\":{\"AccountId\":\"123456\",\"AccountType\":\"CHECKING\",\"BankId\":\"IBAN_NUM\",\"BankName\":\"BOA\"}},\"Creditor\":{\"Account\":{\"AccountId\":\"123456\",\"AccountType\":\"CHECKING\",\"BankId\":\"IBAN_NUM\",\"BankName\":\"BOA\"}}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="niotification_resp" format="json">
+      <types:shape format="weave" example="samples/Notification_Resp_Sample.json"><![CDATA[%dw 2.0
+type niotification_resp = {|
+  Code: String, 
+  Message: String
+|} {"MetadataFormat": "json",
+"example": "{\"Code\":\"123\",\"Message\":\"SUCCESS\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#18dffdee-c4c0-499b-b7e3-dda7b1c727c5">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="payment_response"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="notification"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#2cd3d9b2-1103-43e2-a805-2b8c93df02a1">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="niotification_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

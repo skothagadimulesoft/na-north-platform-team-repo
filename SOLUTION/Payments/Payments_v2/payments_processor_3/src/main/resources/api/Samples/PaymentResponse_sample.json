@@ -1,0 +1,29 @@
+{
+ 	"PaymentId": "end-to-end-number",
+     "Amount":{
+     	"Amount": 333.33,
+        "Currency": "USD"
+     },
+     "TransasctionCost": 10.00,
+      "TransferProtocol": "SWIFT",
+      "PaymentPath": "XFER_INTER_BANK_INT",
+      "PaymentStatus": "PROCESSED",
+      "Debtor":{
+      	"Account":{
+      		 "AccountId": "123456",
+     		 "AccountType": "CHECKING",
+     		 "BankId": "IBAN_NUM",
+      		 "BankName": "BOA"
+      	}
+      },
+      "Creditor":{
+      		"Account":{
+      		 "AccountId": "123456",
+     		 "AccountType": "CHECKING",
+     		 "BankId": "IBAN_NUM",
+      		 "BankName": "BOA"
+      	}
+      
+      }
+        
+}

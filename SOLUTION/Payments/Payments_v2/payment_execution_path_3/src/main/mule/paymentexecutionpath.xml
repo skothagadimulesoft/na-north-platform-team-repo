@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="paymentexecutionpath-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="paymentexecutionpath-config" raml="paymentexecutionpath.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <configuration-properties doc:name="Configuration properties" doc:id="8294bda8-e861-4bb8-bd60-ff44e973b1f4" file="mule-custom-app-pe.properties" />
+	<flow name="paymentexecutionpath-main">
+        <http:listener doc:name="Listener" doc:id="ee34c5c2-41a7-40be-856b-0c6a9cf9c04b" config-ref="paymentexecutionpath-httpListenerConfig" path="/api/*"/>
+        <apikit:router config-ref="paymentexecutionpath-config" />
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="paymentexecutionpath-console">
+        <http:listener config-ref="paymentexecutionpath-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="paymentexecutionpath-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\PaymentExecutionPath:application\json:paymentexecutionpath-config">
+		<choice doc:name="Copy_of_Choice" doc:id="92485ea8-3dac-4df7-aaa2-2e3982def0ac" >
+			<when expression='#[payload.DebtorBank == payload.CreditorBank and payload.CreditorAcountCurrency == payload.DebtorAcountCurrency and payload.DebtorNostroVostroAccount=="NA" and payload.CreditorNostroVostroAccount == "NA" and payload.TransferType=="CREDIT_TRANSFER"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="cb7694ad-987c-45a3-b5c1-53c9fa0cf4e4" message="IntraBankNational Path" />
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="e6e914d0-5353-4c12-83da-29e4f0e658ac" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentExecutionPath: "XFER_IN_BANK_NAT"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[payload.DebtorBank == payload.CreditorBank and payload.CreditorAcountCurrency != payload.DebtorAcountCurrency and payload.DebtorNostroVostroAccount=="NA" and payload.CreditorNostroVostroAccount == "NA"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="6a48ab41-599d-4f98-aea5-983c588898a4" message="IntraBankInternational Path" />
+				<ee:transform doc:name="Transform Message" doc:id="4ab20eed-e815-4e00-9a0f-f36ce4cbff17" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentExecutionPath: "XFER_IN_BANK_INT"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[payload.DebtorBank != payload.CreditorBank and payload.CreditorAcountCurrency == payload.DebtorAcountCurrency and payload.DebtorNostroVostroAccount=="NA" and payload.CreditorNostroVostroAccount == "NA" and payload.TransferType=="CREDIT_TRANSFER"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="17a6e660-391f-4d3b-b86f-e8760eb732e4" message="InterBankNational Path" />
+				<ee:transform doc:name="Transform Message" doc:id="da2769b5-cd81-4e72-9407-3afb5e48f7ee" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentExecutionPath: "XFER_INTER_BANK_NAT"
+
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[payload.DebtorBank != payload.CreditorBank and payload.CreditorAcountCurrency != payload.DebtorAcountCurrency and payload.DebtorNostroVostroAccount !="NA" and payload.CreditorNostroVostroAccount != "NA" and payload.TransferType=="CREDIT_TRANSFER"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="93fac035-4065-4568-82a8-be565b111bf8" message="InterBankInternational Path" />
+				<ee:transform doc:name="Transform Message" doc:id="f2e6a9a9-02f6-4eeb-a450-b6d0266dd428" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentExecutionPath: "XFER_INTER_BANK_INT"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[payload.DebtorBank != payload.CreditorBank and payload.CreditorAcountCurrency == payload.DebtorAcountCurrency and payload.DebtorNostroVostroAccount =="NA" and payload.CreditorNostroVostroAccount == "NA" and payload.TransferType=="REMITTANCE"]' >
+				<logger level="INFO" doc:name="Logger" doc:id="f43482bd-7577-4c79-bcb8-d0673af9bfee" message="Remittance Path" />
+				<ee:transform doc:name="Transform Message" doc:id="916b210c-3779-4602-b06d-28c5f32247ed" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentExecutionPath: "XFER_REMIT"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="8cc779aa-abc3-4c70-bc2f-d26f872e32c2" message="====Invalid Selection Parameters===" />
+				<ee:transform doc:name="Transform Message" doc:id="abcb64e8-0c35-49b0-94cb-8606f01587e5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentExecutionPath: "INVALID_PATH"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+    </flow>
+</mule>

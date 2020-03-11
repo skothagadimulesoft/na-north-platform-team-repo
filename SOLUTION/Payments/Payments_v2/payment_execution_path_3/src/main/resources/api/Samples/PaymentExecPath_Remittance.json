@@ -1,0 +1,12 @@
+{
+ 	"Amount" : 333.33,
+  "CreditorBank":  "BOFAUS3N",
+  "CreditorAccountType": "SavingsSpecial",
+  "CreditorAcountCurrency":  "USD",
+  "DebtorBank": "ROYCCAT2IBO",
+  "DebtorAccountType":  "SavingsSpecial",
+  "DebtorAcountCurrency": "CAD",
+  "DebtorNostroVostroAccount": "YES",
+  "CreditorNostroVostroAccount":  "YES",
+   "TransferType":"REMITTANCE"
+}

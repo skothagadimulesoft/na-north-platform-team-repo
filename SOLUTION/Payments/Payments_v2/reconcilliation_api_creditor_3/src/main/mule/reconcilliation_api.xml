@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<anypoint-mq:default-subscriber-config name="Anypoint_MQ_Default_subscriber" doc:name="Anypoint MQ Default subscriber" doc:id="299e89e0-ef63-44cf-bf62-a6b53b68e3cd" >
+		<anypoint-mq:connection clientId="fc5560b938814097808ba14e08fca686" clientSecret="361b7cF4039b4678B59e01dd671F3BD3" />
+	</anypoint-mq:default-subscriber-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="d9ad0d84-e546-4bab-8f05-9b087805b752" file="mule-custom-app-credit.properties" />
+	<http:request-config name="Accounts_API_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="b908ff70-ed47-4061-a286-ba3979913804" basePath="${account.api.basepath}" >
+		<http:request-connection host="${account.api.host}" port="${account.api.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_notify" doc:name="HTTP Request configuration" doc:id="d2c03ec4-4546-496a-826f-1498ab6a450a" >
+		<http:request-connection host="${notification.api.host}" port="${notification.api.port}" />
+	</http:request-config>
+	<flow name="reconcilliation_apiFlow" doc:id="4cb48aeb-325d-4a74-b5ff-a68193ad11ae" >
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="49367ec0-ce73-48fe-8637-baef916d6580" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.sub.queue.ch}" />
+		<ee:transform doc:name="BIN to JSON" doc:id="2064e492-48c9-443f-8367-ed78b295010d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8b52d3d9-7d8a-4ff0-ae12-549a9db4f732" message="---Reconciliation Creditor API received message: #[payload]"/>
+		<set-variable value="#[payload]" doc:name="Store Payload" doc:id="6681327d-cbac-46da-87f4-6ab6c5f1f78e" variableName="originalPayload" />
+		<flow-ref doc:name="reconcilliation_updateAccounts" doc:id="2be01e94-268f-4875-9f76-eb106ca454e5" name="reconcilliation_updateAccounts"/>
+		<set-payload value="#[vars.originalPayload]" doc:name="Set Payload" doc:id="ff7be4cf-e66d-4d60-845c-29b2c958333a" />
+		<flow-ref doc:name="reconcilliation_notification" doc:id="232c1077-96dd-45ad-9498-3a14aa48335f" name="reconcilliation_notification"/>
+	</flow>
+	<flow name="reconcilliation_updateAccounts" doc:id="8635205e-b7e6-4fee-aa9a-0bde70c301de" >
+		<logger level="INFO" doc:name="Before Account Update Logger" doc:id="5490b84f-6e3d-4550-8d32-f591166fc8f7" message="********************* Credit Flow-------AccountId #[vars.originalPayload.Creditor.Account.AccountId[0]]-------------Amount #[vars.originalPayload.Amount.Amount[0]]" />
+		<http:request method="PUT" doc:name="Request" doc:id="35028aaf-6615-46e1-83fa-ab7a2f5d27cf" config-ref="Accounts_API_HTTP_Request_configuration" path="/Account/{AccountId}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"AccountId" : vars.originalPayload.Creditor.Account.AccountId[0]
+}]]]></http:uri-params>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"action" : "credit",
+	"amount" : vars.originalPayload.Amount.Amount[0]
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="138e69cb-96bc-404c-b842-50584821c7ea" message="Out of Update account #[payload]"/>
+	</flow>
+	<flow name="reconcilliation_notification" doc:id="6931d038-f3cb-444c-a3bc-677d103df567" >
+		<logger level="INFO" doc:name="Logger" doc:id="f7d8de0f-bd56-4f06-9ec5-edb0fbf3a30c" message="++++Sending Notification !"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="18dffdee-c4c0-499b-b7e3-dda7b1c727c5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	DebtorBank: payload.Debtor.Account.BankId[0],
+	DebtorAcct: payload.Debtor.Account.AccountId[0],
+	CreditorBank: "SRC:" ++ payload.Creditor.Account.BankId[0],
+	CreditorAcct: payload.Creditor.Account.AccountId[0],
+	Sum: payload.Amount.Amount[0],
+	Currency: payload.Amount.Currency[0]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="18bf85ec-0e1a-4d38-98e6-730448b772b3" message="Data going into Notification !: #[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="855a079b-9bca-4ce8-8f2f-e19bef0cde56" config-ref="HTTP_Request_configuration_notify" path="/api/Notification" >
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"destination" : "twitter"
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="2cd3d9b2-1103-43e2-a805-2b8c93df02a1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Code: "200",
+	Message:"Message succesfully published"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

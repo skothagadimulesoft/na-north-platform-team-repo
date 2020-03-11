@@ -1,0 +1,10 @@
+{
+  "Amount": 333.33,
+  "Currency": "USD",
+  "PersonId": "john.smith",
+  "TransactionId" : "12345678",
+  "AccountId": "1234-savings",
+  "OriginationLocation": "Chicago",
+  "OriginationCountry": "US",
+  "OriginationMedium":  "Mobile"
+}

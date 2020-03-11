@@ -1,0 +1,50 @@
+{
+	"Pacs002":{
+		"GGrpHdr":{
+			"MsgId": "1234",
+			 "CreDtTm": ""
+		}
+	
+	
+	}
+	
+
+		
+			ns0#OrgnlGrpInfAndSts: {
+				ns0#OrgnlMsgId: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#MsgId,
+				ns0#OrgnlCreDtTm: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#CreDtTm,
+				ns0#OrgnlNbOfTxs: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#NbOfTxs,
+				ns0#GrpSts: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#CtrlSum 
+			},
+			(payload.ns01#Document.ns01#FIToFICstmrCdtTrf.*ns01#CdtTrfTxInf map ( cdtTrfTxInf , indexOfCdtTrfTxInf ) -> {
+				ns0#TxInfAndSts: {
+					ns0#OrgnlEndToEndId: cdtTrfTxInf.ns01#PmtId.ns01#EndToEndId,
+					ns0#OrgnlTxId: cdtTrfTxInf.ns01#PmtId.ns01#TxId,
+					ns0#TxSts: "RJCT",
+					ns0#StsRsnInf: {
+						ns0#StsRsn: {
+							ns0#Cd: "AM02"
+						}
+					},
+					ns0#AccptncDtTm: now(),
+					ns0#InstgAgt: {
+						ns0#FinInstnId: {
+							ns0#BIC: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#InstgAgt.ns01#FinInstnId.ns01#BIC
+						}
+					},
+					ns0#InstdAgt: {
+						ns0#FinInstnId: {
+							ns0#BIC: payload.ns01#Document.ns01#FIToFICstmrCdtTrf.ns01#GrpHdr.ns01#InstdAgt.ns01#FinInstnId.ns01#BIC
+						}
+					},
+					ns0#OrgnlTxRef: {
+						ns0#IntrBkSttlmAmt @(Ccy: cdtTrfTxInf.ns01#IntrBkSttlmAmt.@Ccy): cdtTrfTxInf.ns01#IntrBkSttlmAmt
+					}
+				}
+			})
+
+
+
+
+
+}

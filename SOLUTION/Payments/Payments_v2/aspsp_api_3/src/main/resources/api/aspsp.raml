@@ -1,0 +1,52 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/b9c25356-a08e-4980-978f-51603b5e9bbe # baseUri: https://mocksvc.mulesoft.com/mocks/a9bcb03a-0acf-4663-a8a7-c7ff120975be # 
+version: v1
+title: ASPSP
+
+uses:
+  data_types: exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/payment_ob_datatypes/1.0.1/payment_ob_datatypes.raml
+
+/payment:
+  get:
+    responses: 
+      200:
+        body: 
+          application/json:
+            
+  /{id}:
+    get:
+  
+  post:
+    body: 
+      application/json:
+        type: data_types.PaymentInitiationRequest
+        example:  !include  example/payment_req_example.json
+        
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: data_types.PaymentInitiationResponse
+            example:  !include  example/payment_resp_example.json
+            
+/payment-submission:
+
+  get:
+  /{id}:
+    get:
+    
+  post:
+    body: 
+      application/json:
+        type: data_types.PaymentSubmissionRequest
+        example:  !include  example/payment_submission_req_example.json
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: data_types.PaymentSubmissionResponse
+            example: !include  example/payment_submission_resp_example.json
+
+
+    
+

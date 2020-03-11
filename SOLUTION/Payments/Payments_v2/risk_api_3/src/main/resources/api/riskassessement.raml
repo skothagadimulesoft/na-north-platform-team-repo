@@ -1,0 +1,42 @@
+#%RAML 1.0
+title: RiskAssessement
+
+uses: 
+  ob_data_types: exchange_modules/2d171740-984a-4fda-901d-169f459ea106/payment_ob_datatypes/1.0.3/payment_ob_datatypes.raml
+
+types: 
+  RiskRequest:
+     properties: 
+      Amount: number
+      Currency: string
+      PersonId: string
+      TransactionId:  string
+      AccountId: string
+      OriginationLocation:  string
+      OriginationCountry: string
+      OriginationMedium:  string
+
+
+  RiskResponse:
+    properties: 
+      PersonId: string
+      RiskLevel: integer
+      RiskDescription:  string
+
+/Risk:
+  post:
+    body: 
+      application/json:
+        type: RiskRequest
+        example:  !include examples/risk_req.json
+
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: RiskResponse
+            example: !include examples/risk_resp.json
+            
+      
+      
+    

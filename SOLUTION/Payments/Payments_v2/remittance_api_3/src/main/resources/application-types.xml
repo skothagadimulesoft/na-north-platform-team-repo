@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="payment_response" format="json">
+      <types:shape format="weave" example="api/Samples/PaymentResponse_Sample.json"><![CDATA[%dw 2.0
+type payment_response = {|
+  PaymentId: String, 
+  Amount: {|
+    Amount: Number {"typeId": "double"}, 
+    Currency: String
+  |}, 
+  TransasctionCost: Number {"typeId": "double"}, 
+  TransferProtocol: String, 
+  PaymentPath: String, 
+  PaymentStatus: String, 
+  Debtor: {|
+    Account: {|
+      AccountId: String, 
+      AccountType: String, 
+      BankId: String, 
+      BankName: String
+    |}
+  |}, 
+  Creditor: {|
+    Account: {|
+      AccountId: String, 
+      AccountType: String, 
+      BankId: String, 
+      BankName: String
+    |}
+  |}
+|} {"MetadataFormat": "json",
+"example": "{\"PaymentId\":\"end-to-end-number\",\"Amount\":{\"Amount\":333.33,\"Currency\":\"USD\"},\"TransasctionCost\":10.00,\"TransferProtocol\":\"SWIFT\",\"PaymentPath\":\"XFER_INTER_BANK_INT\",\"PaymentStatus\":\"PROCESSED\",\"Debtor\":{\"Account\":{\"AccountId\":\"123456\",\"AccountType\":\"CHECKING\",\"BankId\":\"IBAN_NUM\",\"BankName\":\"BOA\"}},\"Creditor\":{\"Account\":{\"AccountId\":\"123456\",\"AccountType\":\"CHECKING\",\"BankId\":\"IBAN_NUM\",\"BankName\":\"BOA\"}}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#79b76967-6b6c-4b87-ad91-d726311b88e7">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="payment_response"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="utilsFlow_getToken" doc:id="e1c88f26-0c7f-4235-9bb0-aa01426bb39e" >
+		<ee:transform doc:name="Transform Message" doc:id="741baa08-4ad0-44c1-a4f1-9c30ebd6f5da" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	userId: "mulesoft",
+	password: "mulesoft123"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="login" doc:id="183ae518-0b02-4931-ad99-c1456fad3426" config-ref="HTTP_Request_configuration" path="/VolanteMessagingServices/rest/client/login" />
+		<logger level="INFO" doc:name="Logger" doc:id="d7e29c5b-3fd0-4b81-8acc-397e2d6ec713" message="Login response: #[payload]" />
+		<ee:transform doc:name="Transform Message" doc:id="c92ef190-92c2-4300-9228-59bee4b059b2" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="token" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.accessToken]]></ee:set-variable>
+				<ee:set-variable variableName="token_type" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.tokenType]]></ee:set-variable>
+				<ee:set-variable variableName="expiration_time" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.expirationDate]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<os:store doc:name="StoreToken" doc:id="ea6f8afb-1df1-4adb-b7e8-55122af8c80b" key="volante_token" failOnNullValue="false" objectStore="Object_store">
+			<os:value ><![CDATA[#[vars.token]]]></os:value>
+		</os:store>
+		<os:store doc:name="StoreTokenType" doc:id="5b3a05f2-231f-414f-8ae2-712be0e536ad" key="volante_token_type" failOnNullValue="false" objectStore="Object_store">
+			<os:value ><![CDATA[#[vars.token_type]]]></os:value>
+		</os:store>
+		<os:store doc:name="StoreExpirationDate" doc:id="a0382253-b0d9-4978-9afb-f04770747799" key="volante_token_expiration_date" failOnNullValue="false" objectStore="Object_store">
+			<os:value ><![CDATA[#[vars.expiration_time]]]></os:value>
+		</os:store>
+	</flow>
+	<flow name="utilsFlow_getPACS_XML" doc:id="c13d40b7-a427-46f3-8bac-d739bedddf81" >
+		<ee:transform doc:name="Transform Message" doc:id="52ad7936-43a5-4b30-8678-897ed3041f0a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="utilsFlow_refreshToken" doc:id="59dbe194-b552-41e9-a8ab-198c62a14815" >
+		<os:retrieve doc:name="Retrieve" doc:id="cb48bafe-5a5a-42fc-9b1f-50609e1209d1" key="volante_token_expiration_date" objectStore="Object_store"/>
+		<logger level="INFO" doc:name="Logger" doc:id="a7fe52cc-f66d-4fb1-8287-32dcb42d3064" message="expiry Date: #[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="a7ff1fcc-cb31-492b-a665-11898bd40d03" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	expiry_tstamp: ("2018-09-09T01:09:50.132" as DateTime) as Number {unit: "milliseconds"},
+	current_tstamp: now() as Number {unit: "milliseconds"}
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="aefd2902-4f8a-4d78-997e-9a252e22b686" message="tstmps: #[payload]"/>
+		<choice doc:name="Choice" doc:id="e70d7be9-7186-4032-a3e3-6cf7c6ea6782" >
+			<when expression="#[payload.expiry_tstamp &gt; payload.current_tstamp]" >
+				<logger level="INFO" doc:name="Logger" doc:id="46655a20-b396-4f0f-93bb-72fb127c9a1f" message="---Volante Token Not Expired"/>
+				<os:retrieve doc:name="Retrieve" doc:id="5f7b1b0a-f0b9-4cb3-8ee0-4099312d1649" key="volante_token" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="d3bdab28-9f59-4b83-871f-15dfebdffb43" message="---Volante Token Has Expired, getting new one !"/>
+				<flow-ref doc:name="Flow Reference" doc:id="98bf2936-e248-49ef-93f7-298867aae9fc" name="utilsFlow_getToken"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

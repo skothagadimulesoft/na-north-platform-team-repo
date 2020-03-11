@@ -1,0 +1,63 @@
+#%RAML 1.0
+version: v1
+title: PaymentProcessor
+
+uses:
+  ob_datatype:  exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/payment_ob_datatypes/1.0.0/payment_ob_datatypes.raml
+  banking_datatype:  exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/paymentorder_banking_datatypes/1.0.4/payment_banking_datatypes.raml
+
+/PaymentOrderTransaction:
+  post:
+    body: 
+      application/json:
+        #type: banking_datatype.PaymentOrder
+        type: banking_datatype.Payment
+        example: !include Samples/Payment_sample_2.json
+
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: banking_datatype.PaymentOrderResponse
+            #example:  !include  Samples/Payment_Response.json
+
+ 
+  /{PaymentOrderTransactionId}:
+    get:
+      body: 
+        application/json:
+
+/PaymentExecutionTransaction:
+  post:
+    queryParameters: 
+      executionPath:
+        type: banking_datatype.PaymentPath
+        examples:
+          intraBankNat: "XFER_IN_BANK_NAT"
+          intrBankInter:  "XFER_IN_BANK_INT"
+          interBankNat: "XFER_INTER_BANK_NAT"
+          interBankInt: "XFER_INTER_BANK_INT"
+          remittance: "XFER_REMIT"
+         
+    body: 
+      application/json:
+       type: banking_datatype.Payment
+       example: !include Samples/Payment_sample_2.json
+
+    responses: 
+      200:
+        body: 
+          application/json:
+             type: banking_datatype.PaymentOrderResponse
+             example: !include Samples/Payment_Response.json
+
+  /{PaymentExecutionTransactionId}:
+    get:
+      responses: 
+        200:
+          body: 
+            application/json:
+              
+ 
+
+  

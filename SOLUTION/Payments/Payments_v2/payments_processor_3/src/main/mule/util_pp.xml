@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration_Account" doc:name="HTTP Request configuration" doc:id="663adfd4-2ed4-408d-8150-bfad4179951a" >
+		<http:request-connection host="${account.host}" port="${account.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_ExchangeRate" doc:name="HTTP Request configuration" doc:id="92dc9238-b63b-4b49-9e1f-98b5999ae1ea" >
+		<http:request-connection host="${exchange.rate.host}" port="${exchange.rate.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_PaymentExecutionPath" doc:name="HTTP Request configuration" doc:id="912e79ba-541c-4a7c-91f3-a7f42e4e0e49" >
+		<http:request-connection host="${payment.exec.path.host}" port="${payment.exec.path.port}" />
+	</http:request-config>
+	<flow name="util_ppFlow_UpdateAccountData" doc:id="98a970b8-c0da-425a-b249-304cf879b704" >
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="35ef37cf-42db-4dae-8bb2-38f57acee926" variableName="InitialPayment" mimeType="application/json"/>
+		<ee:transform doc:name="Transform Message" doc:id="cb4611f7-f53a-4de1-91cd-d4596a00d510" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="debtorAccoutId" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.DebtorAcount.Identification.AccountId]]></ee:set-variable>
+				<ee:set-variable variableName="creditorAccountId" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.CreditorAcount.Identification.AccountId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="acdba31c-db88-4581-af6f-436a776f27b4" message="===DebtorAccount: #[vars.debtorAccoutId] , Creditor Account: #[vars.creditorAccountId]"/>
+		<http:request method="GET" doc:name="getAccountDebtor" doc:id="12901c3b-d1e5-4ba3-a1e7-dc2bd0a0c2a3" config-ref="HTTP_Request_configuration_Account" path="/api/Account/{AccountId}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"AccountId" : vars.debtorAccoutId
+}]]]></http:uri-params>
+		</http:request>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="73aa23ec-7b33-46c5-bf27-9e828303dabf" variableName="DebtorAccount" mimeType="application/json"/>
+		<http:request method="GET" doc:name="getAccountCreditor" doc:id="ec95ca5a-cab2-4435-9c97-18a81de9b7fc" config-ref="HTTP_Request_configuration_Account" path="/api/Account/{AccountId}">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"AccountId" : vars.creditorAccountId
+}]]]></http:uri-params>
+		</http:request>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="3a3afbcd-e27f-4cfa-b93d-0861aedbfc56" variableName="CreditorAccount" mimeType="application/json"/>
+		<flow-ref doc:name="util_ppFlow_getExchangeRate" doc:id="1c63b9e4-3b2e-4cb1-bc7c-ce58a125a300" name="util_ppFlow_getExchangeRate"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="f97040ee-183f-4344-b500-db6c2c6b1448" variableName="exchange_rate_out"/>
+		<flow-ref doc:name="util_ppFlow_nostroVostroAccount" doc:id="4efdf59b-48de-425b-8b51-c558dcde24f3" name="util_ppFlow_nostroVostroAccount"/>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="527e5ef4-7c69-4399-b0e9-09ed4844b872" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Ammount: {
+		Ammount: vars.InitialPayment.Ammount.Ammount,
+		Currency: vars.InitialPayment.Ammount.Currency
+	},
+	CreditorAcount: {
+		Balance: vars.CreditorAccount.Balance,
+		CurrencyCode: vars.CreditorAccount.CurrencyCode,
+		Entry: {
+			Country: vars.CreditorAccount.Entry.Country,
+			BankName: vars.CreditorAccount.Entry.BankName
+		},
+		Identification: {
+			AccountId: vars.CreditorAccount.Identification.AccountId,
+			IBAN: vars.CreditorAccount.Identification.IBAN,
+			Name: vars.CreditorAccount.Identification.Name
+		},
+		Language: vars.CreditorAccount.Language
+	},
+	CurrencyExchange: {
+		ExchangeRate: {
+			rate: vars.exchange_rate_out.conversion_rate
+		}
+	},
+	DebtorAcount: {
+		Balance: vars.DebtorAccount.Balance,
+		CurrencyCode: vars.DebtorAccount.CurrencyCode,
+		Entry: {
+			Country: vars.DebtorAccount.Entry.Country,
+			BankName: vars.DebtorAccount.Entry.BankName
+		},
+		Identification: {
+			AccountId: vars.DebtorAccount.Identification.AccountId,
+			IBAN: vars.DebtorAccount.Identification.IBAN,
+			Name: vars.DebtorAccount.Identification.Name
+		}
+	},
+	EquivalentAmmount: {
+		Ammount: vars.InitialPayment.EquivalentAmmount.Ammount,
+		Currency: vars.InitialPayment.EquivalentAmmount.Currency
+	},
+	InstructedAmmount: {
+		Ammount: vars.InitialPayment.InstructedAmmount.Ammount,
+		Currency: vars.InitialPayment.InstructedAmmount.Currency
+	},
+	PaymentExecution: {
+		PaymentInitiation: {
+			Next: {
+				FirstSettlementAgent: {
+					BIC: vars.InitialPayment.PaymentExecution.PaymentInitiation.Next.FirstSettlementAgent.BIC
+				},
+				LastSettlementAgent: {
+					BIC: vars.InitialPayment.PaymentExecution.PaymentInitiation.Next.LastSettlementAgent.BIC
+				},
+				NoastroVostroAccount: {
+					Identification: {
+						//AccountId: vars.InitialPayment.PaymentExecution.PaymentInitiation.Next.NoastroVostroAccount.Identification.AccountId
+						AccountId: payload
+					}
+				},
+				ProcessingInstructions: vars.InitialPayment.PaymentExecution.PaymentInitiation.Next.ProcessingInstructions map ( processingInstruction , indexOfProcessingInstruction ) -> {
+					BankTransaction: processingInstruction.BankTransaction
+				},
+				SettlementInstruction: {
+					InterBankSettlementAmmount: {
+						Ammount: vars.InitialPayment.PaymentExecution.PaymentInitiation.Next.SettlementInstruction.InterBankSettlementAmmount.Ammount,
+						Currency: vars.InitialPayment.PaymentExecution.PaymentInitiation.Next.SettlementInstruction.InterBankSettlementAmmount.Currency
+					}
+				}
+			},
+			ProcessingInstructions: vars.InitialPayment.PaymentExecution.PaymentInitiation.ProcessingInstructions map ( processingInstruction , indexOfProcessingInstruction ) -> {
+				BankTransaction: processingInstruction.BankTransaction
+			}
+		}
+	},
+	PaymentRelatedIdentifications: vars.InitialPayment.PaymentRelatedIdentifications map ( paymentRelatedIdentification , indexOfPaymentRelatedIdentification ) -> {
+		EndToEndIdentification: paymentRelatedIdentification.EndToEndIdentification,
+		ExecutionIdentification: uuid(),
+		TransactionIdentification: paymentRelatedIdentification.TransactionIdentification
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="529742cd-936c-459d-bce0-89e9395458e8" message="  **** Outgoing Messge to Payment Transasctions: #[payload]"/>
+	</flow>
+	<flow name="util_ppFlow_getExchangeRate" doc:id="16679d1a-0573-4d42-81bc-7952681b9ea0" >
+		<logger level="INFO" doc:name="Logger" doc:id="84b4b576-04a0-46ab-8196-3acda9769f68" message=" Getting ExchngeRate !"/>
+		<ee:transform doc:name="Transform Message" doc:id="77e87f53-e642-477f-922c-81887d039a82" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{ 
+	debtorAcountCurrency: vars.DebtorAccount.CurrencyCode,
+	creditorAccountCurrency: vars.CreditorAccount.CurrencyCode,
+	ammount:vars.InitialPayment.Ammount.Ammount
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1b75eb6a-4cc1-49f2-985a-dc89f9884fee" message="pre-ExchageRate: #[payload]"/>
+		<http:request method="GET" doc:name="Request" doc:id="a2da8b92-5a19-4fa7-bb55-d569d4ad3b90" config-ref="HTTP_Request_configuration_ExchangeRate" path="/api/rate">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"to" : payload.creditorAccountCurrency,
+	"from" : payload.debtorAcountCurrency ,
+	"amount" : payload.ammount
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="9bef7ae3-82c2-4ca7-92c1-59c7479fcbea" message="exchange rate payload: #[payload]"/>
+	</flow>
+	<flow name="util_ppFlow_PaymentExecPath" doc:id="8f2fa181-319a-46cc-8bb8-4619bc8c9de1">
+		<logger level="INFO" doc:name="Logger" doc:id="5e41494e-154e-4185-8e37-2b861913961a" message="---5) Getting Exeution Path." />
+		<choice doc:name="Choice" doc:id="657c9e0b-6696-46cc-b0b2-6c6a1cde8075" >
+			<when expression='#[payload.PaymentRelatedIdentifications[0].TransactionIdentification ==  "REMITTANCE"]' >
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="98ac5b75-6a5b-4036-aa98-3609c1e659a9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Amount: payload.Ammount.Ammount,
+	CreditorBank: payload.CreditorAcount.Identification.IBAN,
+	CreditorAccountType: "",
+	CreditorAcountCurrency: payload.Ammount.Currency,
+	DebtorBank: payload.DebtorAcount.Identification.IBAN,
+	DebtorAccountType: "",
+	DebtorAcountCurrency: payload.Ammount.Currency,
+	DebtorNostroVostroAccount:"NA",
+	CreditorNostroVostroAccount: "NA",
+	TransferType: payload.PaymentRelatedIdentifications[0].TransactionIdentification default ""
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="c9ce6418-3dd0-4c8d-895d-6af1f9cf51b8">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Amount: payload.Ammount.Ammount,
+	CreditorBank: payload.CreditorAcount.Identification.IBAN,
+	CreditorAccountType: payload.CreditorAcount.Identification.Name,
+	CreditorAcountCurrency: payload.CreditorAcount.CurrencyCode,
+	DebtorBank: payload.DebtorAcount.Identification.IBAN,
+	DebtorAccountType: payload.DebtorAcount.Identification.Name,
+	DebtorAcountCurrency: payload.DebtorAcount.CurrencyCode,
+	DebtorNostroVostroAccount: payload.PaymentExecution.PaymentInitiation.Next.NoastroVostroAccount.Identification.AccountId,
+	CreditorNostroVostroAccount: payload.PaymentExecution.PaymentInitiation.Next.NoastroVostroAccount.Identification.AccountId,
+	TransferType: payload.PaymentRelatedIdentifications[0].TransactionIdentification default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="26450e4c-b87b-4df7-9eb8-cc2e51bd664a" message="---Data going in to Payment Path Exec: #[payload]" />
+		<http:request method="POST" doc:name="Request" doc:id="f35c05e9-c174-4cf6-9b4c-f33741dec361" config-ref="HTTP_Request_configuration_PaymentExecutionPath" path="/api/PaymentExecutionPath"/>
+		<logger level="INFO" doc:name="Logger" doc:id="18a534c4-32b0-4803-a924-91324f6226ce" message="Got Payment Exec Path: #[payload]"/>
+	</flow>
+	<flow name="util_ppFlow_nostroVostroAccount" doc:id="b96b655d-dbfc-496e-bf26-f5854aa13dc7">
+		<choice doc:name="Choice" doc:id="a949c162-042f-4af4-892a-8e63b45bdd3c" >
+			<when expression="#[vars.DebtorAccount.Identification.IBAN !=  vars.CreditorAccount.Identification.IBAN and vars.CreditorAccount.CurrencyCode != vars.DebtorAccount.CurrencyCode]" >
+				<logger level="INFO" doc:name="Logger" doc:id="5b5b6d2d-f246-421a-9b89-e503939db7b4" message="InterBankInternationTransaction: setting NostroVostroAccounts"/>
+				<set-payload value="#[vars.DebtorAccount.Identification.AccountId]" doc:name="Set Payload" doc:id="f08480af-0a23-4ab7-8bef-7363c46ee6a6" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="2e9350e6-f46a-49c8-865a-31fe283ccc52" message="NOT an InterBankInternationTransaction"/>
+				<set-payload doc:name="Set Payload" doc:id="0c06e853-ed76-41e4-8afb-3a1aa17e47fe" value="NA"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

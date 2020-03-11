@@ -1,0 +1,27 @@
+{
+	"PaymentId": "end-to-end-number",
+	"Amount": {
+		"Amount": 333.33,
+		"Currency": "USD"
+	},
+	"TransasctionCost": 10,
+	"TransferProtocol": "SWIFT",
+	"PaymentPath": "XFER_INTER_BANK_NAT",
+	"PaymentStatus": "FAILED",
+	"Debtor": {
+		"Account": {
+			"AccountId": "1234567",
+			"AccountType": "CHECKING",
+			"BankId": "IBAN_NUM",
+			"BankName": "BOA"
+		}
+	},
+	"Creditor": {
+		"Account": {
+			"AccountId": "999-SAVINGS",
+			"AccountType": "CHECKING",
+			"BankId": "IBAN_NUM",
+			"BankName": "RBC"
+		}
+	}
+}

@@ -1,0 +1,30 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/99ae80db-e747-4213-8265-8b0b30d1e3f3 # baseUri: https://mocksvc.mulesoft.com/mocks/feb0d144-bbb6-42a2-9f65-5f89acec4e3c # baseUri: https://mocksvc.mulesoft.com/mocks/fb1b5aa4-d4c2-42fc-b4e6-181ea22353e2 # 
+version: v1
+title: SWIFTProtocol
+
+uses:
+  banking_types: exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/paymentorder_banking_datatypes/1.0.1/payment_banking_datatypes.raml
+
+/SWIFTMessage:
+  post:
+    queryParameters: 
+      sendToClearingHouse: 
+        type: boolean
+        example:  false
+        
+    body: 
+      application/json:
+         type: banking_types.Payment
+         example: !include Samples/Payment_sample_2.json
+
+    responses: 
+      200:  
+        body: 
+          application/json:
+            type: banking_types.PaymentResponse
+            example: !include Samples/PaymentResponse_sample.json
+
+            
+            
+          

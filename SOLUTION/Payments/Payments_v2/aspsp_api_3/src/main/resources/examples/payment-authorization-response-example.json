@@ -1,0 +1,14 @@
+{ 
+   "PaymentID":  "1234567",
+       "DebtorAgent": {
+        "SchemeName": "SortCodeAccountNumber",
+        "Identification": "11280001234567"
+       
+      },
+      "DebtorAccount": {
+        "SchemeName": "SortCodeAccountNumber",
+        "Identification": "11280001234567",
+        "Name": "Andrea Smith"
+      },
+      "Status": "PaymentAuthorized"
+}

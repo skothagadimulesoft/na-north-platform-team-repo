@@ -1,0 +1,108 @@
+{
+  "AccountContract":{},
+  "AccountRestriction":{},
+  "Balance": 234.56,
+  "CurrencyCode":"USD",
+  "ClosingDate": "2002-10-02T10:00:00-05:00",
+  "CollateralAccountType": "1",
+  "CurrencyExchange":{
+      "Adjustment":{},
+      "CalcuatedAssetValue":[ 
+        {
+          "AmmortizedFaceValue":{
+            "Ammount":123.33,
+            "Currency":"USD"
+          },
+          "Balance":[{}]
+        }
+      ],
+       "CurrenceyExchangeForCashDistribution":{},
+        "CurrentyExchangeForCashEntry":{
+            "Amount":  {
+              "Ammount":  333.33,
+              "Currency": "USD"
+            },
+          "Interest": {
+              "Amount": {
+                "Ammount":  333.33,
+                "Currency": "USD"
+              },
+               "AccruedInterestAmpount":{
+                  "Ammount":  333.33,
+                  "Currency": "USD"
+            },
+            "InterestCalculation": [{}],
+            "InterestName":{},
+            "InterestTax":{},
+            "PaymentDate":{
+              "date":"2018-11-29"
+            },
+            "Rate":{
+              "rate": 1.5
+            }
+         }
+       },
+     "ExchangeRate":{},
+      "OriginalAmount":{
+        "Ammount":  333.33,
+        "Currency": "USD"
+      },
+       "QuotationDate":{
+            "DateTime":"2019-10-02T10:00:00-05:00"
+          },
+      "QuotedCurrency":"USD",
+      "RateType":{},
+      "RealtedInvoice":{},
+      "ResultingAmount":{
+          "Ammount":  333.33,
+          "Currency": "USD"
+        },
+      "SourceCurrency":"USD",
+      "TargetCurrency":"CAD",
+      "Tax":{},
+      "UnitCurrency":"USD"
+  },
+   "DefaultFundAccountOwner":{},
+   "DefaultFundContribution":{},
+   "Entry":{},
+  "Identification":{
+          "AccountId": "",
+          "BBAN":"",
+          "IBAN":"",
+          "Name":"",
+          "Number":"",
+          "UPIC":""
+        },
+    "IvestmentFundPartyRole":{},
+    "Language":"en",
+    "LiveDate":"2019-10-02T10:00:00-05:00",
+    "ManagedAcountProduct":{
+      "Agreement": {},
+        "Characterisitics": {},
+        "Delivery": {},
+        "Description": "",
+        "Name": "",
+        "ProductBrokerMasterAgreement":  {},
+        "ProductCategory":  {},
+        "ProductIdentification": {},
+        "Quality":  "",
+        "Quantity": 3
+    },
+    "OpeningDate":"2019-10-02T10:00:00-05:00",
+    "PartyRole":{},
+    "Purpose":"",
+    "Reconciliation":{},
+    "RelatedCollateralProcess":{},
+    "RelatedCorporateActionPartyRole":{},
+    "RelatedFundProcessingCharacteristics":{},
+    "RelatedProceedsDelivery":{},
+    "ReportedPeriod":"2019-10-02T10:00:00-05:00",
+    "ReportingCurrency":"USD",
+    "SettlementPartyRole":{},
+    "Status":{},
+    "System":{},
+    "SystemMember":{},
+    "TradePartyRole":{},
+    "Type":{}
+   
+}

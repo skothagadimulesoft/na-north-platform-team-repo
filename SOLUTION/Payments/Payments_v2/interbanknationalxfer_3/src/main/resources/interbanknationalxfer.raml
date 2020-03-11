@@ -1,0 +1,20 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/8e3b3965-7358-4f9e-8ebe-2af48e0765a5 # 
+title: InterBankNationalXfer
+
+uses:
+  data_types: exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/paymentorder_banking_datatypes/1.0.4/payment_banking_datatypes.raml
+
+/InterBankNationalXfer:
+  post:
+    body: 
+      application/json:
+        type: data_types.Payment
+        example: !include Samples/Payment_sample_2.json
+
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: data_types.PaymentResponse
+            example:  !include  Samples/PaymentResponse_sample.json

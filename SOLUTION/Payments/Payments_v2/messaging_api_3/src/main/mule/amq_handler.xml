@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<anypoint-mq:default-subscriber-config name="Anypoint_MQ_Default_subscriber" doc:name="Anypoint MQ Default subscriber" doc:id="d7d182ed-3c18-464a-b74a-e14f349d5ba9" >
+		<anypoint-mq:connection clientId="d4f49fdf19f5422f89724b8a1870688c" clientSecret="708aa64d7EFe4E0Da0b72a46604Cdc81" />
+	</anypoint-mq:default-subscriber-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="1846e0d4-8c82-4df9-9cc9-9cf27031c701" file="mule-custom-app-msg.properties" />
+	<flow name="amq_handlerFlow" doc:id="6dac89fa-4b85-451d-b2fc-055225781106" >
+		<logger level="INFO" doc:name="Logger" doc:id="5774916e-b6c1-4c1e-9584-04b4f6663781" message="Handling AMQ Synch!"/>
+		<anypoint-mq:publish doc:name="Publish" doc:id="9337f776-ffe2-4414-a931-71a3a0e91f83" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.pub.queue}"/>
+		<anypoint-mq:consume doc:name="Consume" doc:id="c2314527-a614-4ef4-a5df-f700b4951497" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.sub.queue}" acknowledgementTimeout="20000" pollingTime="5000">
+			<reconnect />
+		</anypoint-mq:consume>
+		<logger level="INFO" doc:name="Logger" doc:id="94c58eae-2737-4dab-ac13-50d2c646211e" message="@@@@@  got SWIFT message response from Bank: #[payload] !"/>
+	</flow>
+	<flow name="amq_handlerFlowAsynch" doc:id="d795122c-eb4d-466f-9050-a862de6334dd" >
+		<logger level="INFO" doc:name="Logger" doc:id="8077ff15-7ba6-4226-8a56-343d85a6f9bd" message="Handling AMQ ASynch!"/>
+		<anypoint-mq:publish doc:name="Copy_of_Publish" doc:id="ef866f07-9fcd-4911-99b2-823b02ee0657" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.pub.queue.ch}" />
+	</flow>
+</mule>

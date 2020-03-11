@@ -1,0 +1,17 @@
+{ 
+  "PaymentID":  "1234567",
+   "InstructedAmount": {
+        "Amount": 20.00,
+        "Currency": "GBP"
+      },
+       "DebtorAgent": {
+        "SchemeName": "SortCodeAccountNumber",
+        "Identification": "11280001234567"
+      
+      },
+      "DebtorAccount": {
+        "SchemeName": "SortCodeAccountNumber",
+        "Identification": "33378923-CHQK",
+        "Name": "John Smith"
+      }
+}

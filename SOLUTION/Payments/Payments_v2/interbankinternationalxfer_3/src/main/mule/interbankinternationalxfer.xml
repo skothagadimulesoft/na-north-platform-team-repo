@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="interbankinternationalxfer-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="interbankinternationalxfer-config" raml="interbankinternationalxfer.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" disableValidations="true"/>
+    <configuration-properties doc:name="Configuration properties" doc:id="9edf11f3-84cf-4ed7-bc44-2d251cf5134a" file="mule-custom-app-interbin.properties" />
+	<http:request-config name="SWIFT_APT_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="68d83d72-dd67-460f-a9ca-88de9751155f" basePath="${swift.api.basepath}">
+		<http:request-connection host="${swift.api.host}" port="${swift.api.port}" />
+	</http:request-config>
+	<http:request-config name="FOREX_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="aad07d79-b773-4c3b-9fe3-46c6e0dbd087">
+		<http:request-connection host="${forex.api.host}" port="${forex.api.port}" />
+	</http:request-config>
+	<flow name="interbankinternationalxfer-main">
+        <http:listener config-ref="interbankinternationalxfer-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="interbankinternationalxfer-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="interbankinternationalxfer-console">
+        <http:listener config-ref="interbankinternationalxfer-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="interbankinternationalxfer-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\InterBankInternationalXfer:application\json:interbankinternationalxfer-config">
+        <logger level="INFO" doc:name="Logger" doc:id="a3061258-7cee-45ec-9104-bb35b27bd804" message="******** Starting InterBankInternationalXfer ********"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="e4ed44cc-acd2-4f90-b014-f9e5cb4aec28" variableName="InitialPayment" />
+		<ee:transform doc:name="Payload to Array" doc:id="438260fd-b965-438a-9d34-dac475034c31">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="paymentArray"><![CDATA[%dw 2.0
+output application/json
+---
+[payload]
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="ForexFlow" doc:id="cc8b753a-f82f-4836-a188-f75b37b9e89d" name="forexFlow"/>
+		<flow-ref doc:name="SwiftFlow" doc:id="8017edd5-860a-40c1-9ef8-bd07a275de06" name="SwiftFlow" />
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="f268026a-9cf9-4959-8053-6c5ca1d913e5">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentId: payload.PaymentId,
+	Amount: {
+		Amount: payload.Amount.Amount,
+		Currency: payload.Amount.Currency
+	},
+	TransasctionCost: payload.TransasctionCost,
+	TransferProtocol: "SWIFT",
+	PaymentPath: "XFER_INTER_BANK_INT",
+	PaymentStatus: payload.PaymentStatus,
+	Debtor: {
+		Account: {
+			AccountId: payload.Debtor.Account.AccountId,
+			AccountType: payload.Debtor.Account.AccountType,
+			BankId: payload.Debtor.Account.BankId,
+			BankName: payload.Debtor.Account.BankName
+		}
+	},
+	Creditor: {
+		Account: {
+			AccountId: payload.Creditor.Account.AccountId,
+			AccountType: payload.Creditor.Account.AccountType,
+			BankId: payload.Creditor.Account.BankId,
+			BankName: payload.Creditor.Account.BankName
+		}
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="forexFlow" doc:id="f71ca466-a5bd-422d-a9ee-a13e7bba8cbf" >
+		<logger level="INFO" doc:name="Logger" doc:id="5a383f09-444a-4295-b201-4c35b4c863c7" message="ENTERING FOREX CONVERSION"/>
+		<http:request method="GET" doc:name="Forex Request" doc:id="29a4ab21-0a17-43b3-a5f9-75853b1fbc25" config-ref="FOREX_HTTP_Request_configuration" path="/api/rate">
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	"from" : vars.InitialPayment.InstructedAmmount.Currency,
+	"to" : vars.InitialPayment.DebtorAcount.CurrencyCode,
+	"amount" : vars.InitialPayment.InstructedAmmount.Ammount
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="fb949de2-ef4a-41ae-b1d2-35c225756fbb" message="Left Forex with #[payload]"/>
+		<ee:transform doc:name="Edit the Equivalent Amount to forex amount" doc:id="4f184080-6e7a-49b2-a9a0-0d70d0de29a4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var conversionRate = payload.conversion_rate
+var conversionAmount = payload.conversion_amount
+---
+vars.paymentArray map ((obj) ->
+    obj mapObject ((val,key) ->
+        key match {
+            case "EquivalentAmmount" -> EquivalentAmmount: {"Ammount": conversionAmount, "Currency": val.Currency}
+            case "field4" -> newField4: val
+            else -> (key): val
+        }
+    )
+)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="cf5f761c-32f4-4e98-88d0-2153bba2984a" message="NEW PAYLOAD #[payload[0]]" />
+	</flow>
+	<flow name="SwiftFlow" doc:id="abe8fc64-a52c-45e7-852c-e96953aa2da6" >
+		<logger level="INFO" doc:name="Logger" doc:id="b1322f5e-a509-4137-9425-1feafc70e815" message="******* Calling SWIFT API ********"/>
+		<http:request method="POST" doc:name="Request" doc:id="9e12d5c3-fc19-4490-927a-471be4d19b26" config-ref="SWIFT_APT_HTTP_Request_configuration" path="/SWIFTMessage">
+			<http:body ><![CDATA[#[payload[0]]]]></http:body>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"sendToClearingHouse" : "false"
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="4bcab3f5-287e-47b8-8bae-35bb95055fef" message="*************** Using the Swift API ------------------Response  END of InterBankInternationalXfer"/>
+	</flow>
+</mule>

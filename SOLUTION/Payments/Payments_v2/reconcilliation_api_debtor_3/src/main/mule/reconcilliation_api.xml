@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<anypoint-mq:default-subscriber-config name="Anypoint_MQ_Default_subscriber" doc:name="Anypoint MQ Default subscriber" doc:id="299e89e0-ef63-44cf-bf62-a6b53b68e3cd" >
+		<anypoint-mq:connection clientId="936467635d094aa5904d8579eda03864" clientSecret="817e94e957B44aB58C616003E9e15F93" />
+	</anypoint-mq:default-subscriber-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="ce99e380-ea1e-44b6-8ae9-48fdd55c3904" file="mule-custom-app-debt.properties" />
+	<http:request-config name="Accounts_API_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="8e5422ea-6d65-4c59-ad62-4691ee5ec796" basePath="${account.api.basepath}" >
+		<http:request-connection host="${account.api.host}" port="${account.api.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_notification" doc:name="HTTP Request configuration" doc:id="5564ed1a-331d-4aa5-aa6f-30d2d26e20fb" >
+		<http:request-connection host="${notification.api.host}" port="${notification.api.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="b8f6e423-9068-46ab-afad-56f2319e643d" >
+		<http:request-connection host="${notification.api.host}" port="${notification.api.port}" />
+	</http:request-config>
+	<flow name="reconcilliation_apiFlow" doc:id="4cb48aeb-325d-4a74-b5ff-a68193ad11ae" >
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="923d929c-6aa8-49de-b2b4-db0f3aa3a6a1" config-ref="Anypoint_MQ_Default_subscriber" destination="${banking.sub.queue.ch}" />
+		<ee:transform doc:name="Bin to JSON" doc:id="8b0a635e-fdbe-4672-bee9-5e1bf9d7774f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8b52d3d9-7d8a-4ff0-ae12-549a9db4f732" message="---Reconciliation Debtor API received message: #[payload]"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="bf99fea5-4c3a-4f08-b731-74aa92cf2ff6" variableName="originalPayload" mimeType="application/json"/>
+		<flow-ref doc:name="reconcilliation_updateAccounts" doc:id="2be01e94-268f-4875-9f76-eb106ca454e5" name="reconcilliation_updateAccounts" />
+		<set-payload value="#[vars.originalPayload]" doc:name="Set Payload" doc:id="0298e473-cea2-49f9-8532-23c1894c9cff" />
+		<flow-ref doc:name="reconcilliation_notification" doc:id="232c1077-96dd-45ad-9498-3a14aa48335f" name="reconcilliation_notification" />
+	</flow>
+	<flow name="reconcilliation_updateAccounts" doc:id="02691816-621e-4196-a546-994db816cfb4">
+		<logger level="INFO" doc:name="Before Account Update Logger" doc:id="675b7633-ab21-4c28-ad54-7b87d7d83b1c" message="********************* Credit Flow-------AccountId #[vars.originalPayload.Debtor.Account.AccountId[0]]-------------Amount #[vars.originalPayload.Amount.Amount[0]]" />
+		<http:request method="PUT" doc:name="Request" doc:id="5422587e-4936-4748-a3a4-540e18d19f93" config-ref="Accounts_API_HTTP_Request_configuration" path="/Account/{AccountId}">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"AccountId" : vars.originalPayload.Debtor.Account.AccountId[0]
+}]]]></http:uri-params>
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	"action" : "debit",
+	"amount" : vars.originalPayload.Amount.Amount[0]
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="8c2a7491-ee5d-4f95-8f5e-c9bec3cf1f21" message="Out of Update account #[payload]" />
+	</flow>
+	<flow name="reconcilliation_notification" doc:id="6931d038-f3cb-444c-a3bc-677d103df567" >
+		<logger level="INFO" doc:name="Logger" doc:id="f7d8de0f-bd56-4f06-9ec5-edb0fbf3a30c" message="++++Sending Notification ! "/>
+		<ee:transform doc:name="Transform Message" doc:id="d1d29483-e152-48d6-883b-8f7e567c7136" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	DebtorBank: "SRC:" ++ payload.Debtor.Account.BankId[0],
+	DebtorAcct:  payload.Debtor.Account.AccountId[0],
+	CreditorBank: payload.Creditor.Account.BankId[0],
+	CreditorAcct: payload.Creditor.Account.AccountId[0],
+	Sum: payload.Amount.Amount[0],
+	Currency: payload.Amount.Currency[0]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="70668549-66eb-4c2c-93cd-44c2a8d13c10" message="Data going into notification: #[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="f7fe8d7e-f516-43ef-a0a2-411836cac1d2" config-ref="HTTP_Request_configuration" path="/api/Notification">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"destination" : "twitter-sms"
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="e1171da7-ab29-45d0-90ce-9a3958f8b12d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Code: "200",
+	Message:"Message succesfully published"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

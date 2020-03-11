@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<os:object-store name="Object_store_ReceiveingBank" doc:name="Object store" doc:id="382f1bdf-2eac-4b0a-b237-559929c21eae" persistent="false"/>
+	<flow name="volante_transformFlow_inbound" doc:id="6437f0ee-3500-4181-a9d7-efe885545808" >
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="4eb0281a-49c8-4d12-a30e-4d387537fd7d" variableName="pacs.008.message"/>
+		<os:contains doc:name="Contains" doc:id="9dc11f82-164d-4b5e-951c-bbfe915865e8" key="volate_token_resp" objectStore="Object_store_ReceiveingBank"/>
+		<logger level="INFO" doc:name="Logger" doc:id="666b9c27-a0ee-497b-b0bc-d383ae9bf085" message="Restp Token exists: #[payload]"/>
+		<choice doc:name="Choice" doc:id="55e73d50-554e-445e-8d27-080ebe515e02" >
+			<when expression="#[payload == false]" >
+				<logger level="INFO" doc:name="Logger" doc:id="22c381c4-5b8a-4a39-8ecc-45247f487cd8" message="RcvBank does not have token !"/>
+				<flow-ref doc:name="Flow Reference" doc:id="7cc45c67-8f2e-47b1-8c77-3fbb392b58be" name="utilsFlow_getToken"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="71da0e45-fa40-4abd-84aa-0ae6a7bec4f4" message="Rcv Bank has Token !"/>
+				<flow-ref doc:name="Flow Reference" doc:id="85e7350b-bcca-4cac-8e73-65fe6a0e9477" name="utilsFlow_refreshToken"/>
+			</otherwise>
+		</choice>
+		<os:retrieve doc:name="Copy_of_Retrieve" doc:id="6d1f8552-30f3-4fab-9feb-24a164c371ad" key="volate_token_resp" objectStore="Object_store_ReceiveingBank" />
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="1251ec3d-51c6-4437-ae0d-51124e3bacea" message="Rcv Bank got vToken: #[payload]" />
+		<set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="4ccb5af1-7584-4a01-b5e1-9f99f932eda2" variableName="vTokenRcvBank" />
+		<ee:transform doc:name="Transform Message" doc:id="fe291a96-8a11-4e93-b57c-12e7753da2a9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+vars."pacs.008.message"."output" replace "\r\n" with "\n" ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1c63b6ab-60c1-4770-b27e-fb7806b57c67" message="+++RcvBank PaymentrReq: #[payload]"/>
+		<http:request method="POST" doc:name="PaymentRequest" doc:id="2d74df45-ec56-48e5-81c2-3b8fb4a8edaa" config-ref="HTTP_Request_configuration_Volante" path="/VolanteMessagingServices/rest/transformation" sendBodyMode="ALWAYS" >
+			<http:headers ><![CDATA[#[output applicaton/java
+---
+{
+	Authorization : 'Bearer $(vars.vTokenRcvBank)'
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="b62be3e2-2fa3-4030-b2ac-de526250802b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+
+read(payload."output", "application/xml").Message.&Document]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f4c72e80-c01f-4c16-8d78-65c9378f6345" message="RcvBank payment response XML : #[payload]" />
+	</flow>
+	<flow name="utilsFlow_getToken" doc:id="4424ed5e-91a2-4dd6-b016-08cae3b582cf" >
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="7e34469a-f1ab-414c-9c2d-4a5e8a4072a2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	userId: "mulesoft",
+	password: "mulesoft123"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Copy_of_login" doc:id="22f57544-6d05-48cf-97f0-a408af7b6601" config-ref="HTTP_Request_configuration_Volante" path="/VolanteMessagingServices/rest/client/login" />
+		<logger level="INFO" doc:name="Copy_of_Logger" doc:id="fd96b42e-102d-44d2-a6b2-6a3d56acfd3b" message="Login response Rcv Bank : #[payload]" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="49bcb360-d476-4688-890b-6459666c999f" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="token" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.accessToken]]></ee:set-variable>
+				<ee:set-variable variableName="token_type" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.tokenType]]></ee:set-variable>
+				<ee:set-variable variableName="expiration_time" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.expirationDate]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<os:store doc:name="Copy_of_StoreToken" doc:id="fd212648-cb94-4688-8830-fd2e58540a08" key="volate_token_resp" failOnNullValue="false" objectStore="Object_store_ReceiveingBank" >
+			<os:value ><![CDATA[#[vars.token]]]></os:value>
+		</os:store>
+		<os:store doc:name="Copy_of_StoreTokenType" doc:id="1126c1df-3754-45a9-867a-471082f57331" key="volante_token_resp_type" failOnNullValue="false" objectStore="Object_store_ReceiveingBank" >
+			<os:value ><![CDATA[#[vars.token_type]]]></os:value>
+		</os:store>
+		<os:store doc:name="Copy_of_StoreExpirationDate" doc:id="a16233e3-e5a1-4756-9b1d-6d02c7e72316" key="volante_resp_token_expiration_date" failOnNullValue="false" objectStore="Object_store_ReceiveingBank" >
+			<os:value ><![CDATA[#[vars.expiration_time]]]></os:value>
+		</os:store>
+	</flow>
+	<flow name="volante_transformFlow_outbound" doc:id="835f8e79-b8f7-40e0-82e7-93ed00c83738" >
+		<set-variable value="#[payload]" doc:name="Copy_of_Set Variable" doc:id="0cec7607-199d-4405-8634-920f9b42b91e" variableName="pacs.002.message" />
+		<os:contains doc:name="Copy_of_Contains" doc:id="65cb8ad1-b7f5-4937-a399-65de7f65b57d" key="volate_token_resp" objectStore="Object_store_ReceiveingBank" />
+		<choice doc:name="Copy_of_Choice" doc:id="eac032db-a818-45a8-8202-836798420e8d" >
+			<when expression="#[payload == false]" >
+				<logger level="INFO" doc:name="Copy_of_Logger" doc:id="145f02f4-d5a1-4157-98de-01505be70e5e" message="RcvBank not token !" />
+				<flow-ref doc:name="Copy_of_Flow Reference" doc:id="14539f66-314b-4818-a74b-866dd1c552d2" name="utilsFlow_getToken" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Copy_of_Logger" doc:id="5d1004bf-3e8a-4f6c-87ac-79901cf6ebba" message="Rcv Bank has Token !" />
+				<flow-ref doc:name="Flow Reference" doc:id="fb130301-dc08-4480-888a-5382cff7b043" name="utilsFlow_refreshToken"/>
+			</otherwise>
+		</choice>
+		<os:retrieve doc:name="Copy_of_Copy_of_Retrieve" doc:id="2e55cb85-00db-45f8-97a0-571d3952a542" key="volate_token_resp" objectStore="Object_store_ReceiveingBank" />
+		<logger level="INFO" doc:name="Copy_of_Copy_of_Logger" doc:id="2ee34818-39cc-4e86-9410-e24173cfbed4" message="Rcv Bank got vToken: #[payload]" />
+		<set-variable value="#[payload]" doc:name="Copy_of_Copy_of_Set Variable" doc:id="ab0897a6-959e-4ad6-9eda-24b810d9f041" variableName="vTokenRcvBank" />
+		<set-payload value='#[vars."pacs.002.message"]' doc:name="Set Payload" doc:id="6bfc05bb-f490-438b-8e0d-a86b9f1a01c1" />
+		<http:request method="POST" doc:name="Copy_of_Copy_of_PaymentRequest" doc:id="52d6e413-ccb1-4897-b373-8cc554e89252" config-ref="HTTP_Request_configuration_Volante" path="/VolanteMessagingServices/rest/transformation" sendBodyMode="ALWAYS" >
+			<http:headers ><![CDATA[#[output applicaton/java
+---
+{
+	Authorization : 'Bearer $(vars.vTokenRcvBank)'
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="81befa80-5415-408e-9704-527beb645593">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+vars."pacs.002.message"."output" replace "\r\n" with "\n" ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Copy_of_Copy_of_Logger" doc:id="6164e46f-0a5d-426f-a370-abac354b138c" message="RcvBank payment response: #[payload]" />
+	</flow>
+	<flow name="utilsFlow_refreshToken" doc:id="2e87f0a3-b6c2-4091-8ad5-bad89bd7cc24" >
+		<os:retrieve doc:name="Retrieve" doc:id="c90cb018-8ebd-43b3-afda-8582fe69924f" key="volante_resp_token_expiration_date" objectStore="Object_store_ReceiveingBank" />
+		<logger level="INFO" doc:name="Logger" doc:id="6d15a420-03d7-4e9c-8ed3-9efdd679017a" message="expiry Date: #[payload]" />
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="3f12f6c2-78bf-4446-a166-d546bbe93b7d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	expiry_tstamp: ("2018-09-09T01:09:50.132" as DateTime) as Number {unit: "milliseconds"},
+	current_tstamp: now() as Number {unit: "milliseconds"}
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="cf7d59ed-3750-46c4-84f2-f1ac008335a2" message="tstmps: #[payload]" />
+		<choice doc:name="Copy_of_Choice" doc:id="86572932-a541-47cb-aa37-c13d914ce50d" >
+			<when expression="#[payload.expiry_tstamp &gt; payload.current_tstamp]" >
+				<logger level="INFO" doc:name="Copy_of_Logger" doc:id="935c9631-26a4-4f3f-83b3-98166b6935e5" message="---Volante Token Not Expired" />
+				<os:retrieve doc:name="Copy_of_Retrieve" doc:id="a173e4b7-69b7-4729-aba6-8d5eba575ecf" key="volate_token_resp" objectStore="Object_store_ReceiveingBank"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Copy_of_Logger" doc:id="c3c0b2c3-a129-4ba3-913b-681c893a109a" message="---Volante Token Has Expired, getting new one !" />
+				<flow-ref doc:name="Copy_of_Flow Reference" doc:id="cde7dccf-1011-4ee1-8335-bde7d2e3b487" name="utilsFlow_getToken" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

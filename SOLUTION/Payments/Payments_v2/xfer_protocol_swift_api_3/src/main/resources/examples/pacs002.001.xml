@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.002.001.07" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FIToFIPmtStsRpt>
+		<GrpHdr>
+			<MsgId>M20160229569321456HKL2365478920</MsgId>
+			<CreDtTm>2016-02-29T00:26:20</CreDtTm>
+		</GrpHdr>
+		<OrgnlGrpInfAndSts>
+			<OrgnlMsgId>M20140130741023658BDF4125789638</OrgnlMsgId>
+			<OrgnlMsgNmId>remt.001.001.02</OrgnlMsgNmId>
+			<OrgnlCreDtTm>2016-02-29T00:26:20</OrgnlCreDtTm>
+			<OrgnlNbOfTxs>1</OrgnlNbOfTxs>
+		</OrgnlGrpInfAndSts>
+		<TxInfAndSts>
+			<OrgnlInstrId>20100930478521369BASD7841253695</OrgnlInstrId>
+			<OrgnlTxId>TX-ID001</OrgnlTxId>
+			<TxSts>RJCT</TxSts>
+			<StsRsnInf>
+				<Rsn>
+					<Cd>AM02</Cd>
+				</Rsn>
+			</StsRsnInf>
+			<AccptncDtTm>2016-06-27T10:48:47</AccptncDtTm>
+			<AcctSvcrRef>AcctSvcrRef</AcctSvcrRef>
+			<InstgAgt>
+				<FinInstnId>
+					<ClrSysMmbId>
+						<MmbId>123456789</MmbId>
+					</ClrSysMmbId>
+				</FinInstnId>
+			</InstgAgt>
+			<InstdAgt>
+				<FinInstnId>
+					<ClrSysMmbId>
+						<MmbId>123456789</MmbId>
+					</ClrSysMmbId>
+				</FinInstnId>
+			</InstdAgt>
+			<OrgnlTxRef>
+			<IntrBkSttlmAmt Ccy="USD">12345678.97</IntrBkSttlmAmt>
+			<IntrBkSttlmDt>2016-09-08</IntrBkSttlmDt>
+			</OrgnlTxRef>
+		</TxInfAndSts>
+	</FIToFIPmtStsRpt>
+</Document>

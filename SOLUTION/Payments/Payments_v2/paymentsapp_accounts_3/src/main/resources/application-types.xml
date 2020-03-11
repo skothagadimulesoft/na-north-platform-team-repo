@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="account" format="json">
+      <types:example format="json" location="api/samples/accountData.json"/>
+    </types:type>
+    <types:type name="acctArray" format="json">
+      <types:example format="json" location="api/samples/accountDataList.json"/>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#4a383f2e-ef52-4a1c-8789-806982d4c750">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="acctArray"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#f0047132-3457-4ef1-9ecb-2d41c56c99f5">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="account"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

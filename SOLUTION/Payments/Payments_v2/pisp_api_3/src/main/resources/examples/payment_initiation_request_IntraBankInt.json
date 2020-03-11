@@ -1,0 +1,31 @@
+{
+  "PISPPaymentReqData": {
+      "Amount": {
+        "Amount": 200.00,
+        "Currency": "JPY"
+      },
+       "DebtorAgency":{
+         "Identification":"CITIUS33",
+         "Code":"123",
+         "AgencyType": "RetailBank"
+      },
+      "DebtorAccount": {
+        "Identification": "7678334-SVG",
+        "AccountType":"Savings",
+        "Name": "Andrea Smith"
+      },
+     "CreditorAgency":{
+         "Identification":"CITIUS33",
+         "Code":"456",
+         "AgencyType": "RetailBank"
+      },
+      "CreditorAccount": {
+        "Identification": "123456-SVG",
+        "AccountType":  "Savings",
+        "Name": "John Smith",
+        "SecondaryIdentification": "0002"
+      },
+      "TransferAction": "CREDIT_TRANSFER"
+    
+  }
+}

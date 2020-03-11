@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="account-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="account-config" raml="account.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="2f2ba24f-9411-4bc4-9bf5-c3b77aef8284">
+        <db:my-sql-connection host="${db.mysql.url}" port="${db.mysql.port}" user="${db.mysql.username}" password="${db.mysql.password}" database="${db.mysql.database}" />
+    </db:config>
+    <configuration-properties doc:name="Configuration properties" doc:id="b7dc8cfc-9354-4c3f-9e3c-fc6c69269cda" file="mule-custom-app.properties" />
+	<flow name="account-main">
+        <http:listener config-ref="account-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="account-config" />
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="account-console">
+        <http:listener config-ref="account-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="account-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+	<flow name="put:\Account\(AccountId):account-config">
+        <logger level="INFO" doc:name="Logger" doc:id="743a7864-8a24-4d2c-89f6-0dd9c9088976" message="#[attributes.uriParams.AccountId]-----#[attributes.queryParams.action]------#[attributes.queryParams.amount]"/>
+		<set-variable value="#[attributes]" doc:name="Set Variable" doc:id="6eaecc2b-3bc7-4d3e-a369-4b8d5815aaad" variableName="myAttributes"/>
+		<ee:transform doc:name="Transform Message" doc:id="bf0277a7-f74d-470b-bb7a-30bbdad0d1f4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="TRIM_AMMT" ><![CDATA[%dw 2.0
+output application/java
+---
+if( sizeOf(attributes.queryParams.amount as String) <=10) attributes.queryParams.amount else ((attributes.queryParams.amount as String)[0 to 4]) as Number]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<db:select doc:name="Select" doc:id="f34abace-9f95-4d33-871b-82b00cc3020c" config-ref="Database_Config">
+			<db:sql >select 
+	customer_accounts.acct_id 	
+from 
+	customer_accounts
+where
+	customer_accounts.acct_id = :account_id;</db:sql>
+			<db:input-parameters ><![CDATA[#[
+	{
+		'account_id':attributes.uriParams.AccountId
+	}
+]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="bcf0cc45-3918-4af0-a967-590150eaa33e" >
+			<when expression="#[sizeOf(payload)&gt;0]" >
+				<logger level="INFO" doc:name="Logger" doc:id="a3759f99-c947-45db-beeb-7d64024b9a18" message="******************** Credit or debit the account"/>
+				<choice doc:name="Choice" doc:id="0c6fe976-d5b6-4347-a3d6-e50f2dafa154">
+			<when expression="#[vars.myAttributes.queryParams.action == 'credit']">
+				<logger level="INFO" doc:name="Logger" doc:id="e0bacc71-4905-4bc0-ad29-c743a550959a" message="************************ Account to be credited #[vars.myAttributes.uriParams.AccountId]-------#[vars.myAttributes.queryParams.action]---------#[vars.myAttributes.queryParams.amount]" />
+				<db:update doc:name="Update" doc:id="33225134-a07f-4d70-ad10-38f3798eab18" config-ref="Database_Config">
+					<db:sql>UPDATE banking_db.customer_accounts SET acct_balance= acct_balance+:amount  WHERE acct_id=:account_id;</db:sql>
+					<db:input-parameters><![CDATA[#[
+	{
+		'account_id':vars.myAttributes.uriParams.AccountId,
+		'amount': vars.TRIM_AMMT
+	}
+]]]></db:input-parameters>
+				</db:update>
+				<logger level="INFO" doc:name="Logger" doc:id="2d1bd637-2ed7-424a-bb80-04c0e960ef2c" message="********************** after update #[payload.affectedRows]"/>
+						<ee:transform doc:name="Transform Message" doc:id="78bd0d37-ce45-4a83-ae14-ae1e673b7f56">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Account updated successfully",
+  acct_num: vars.myAttributes.uriParams.AccountId,
+  action: vars.myAttributes.queryParams.action,
+  amount: vars.myAttributes.queryParams.amount  
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[vars.myAttributes.queryParams.action=='debit']">
+				<logger level="INFO" doc:name="Logger" doc:id="c136fa5f-a38c-43d5-a95d-0c35d2e065b4" message="************************ Account to be debited" />
+				<db:update doc:name="Update" doc:id="af9a7231-ebe5-4d24-8f2b-7d954774e22b" config-ref="Database_Config">
+					<db:sql>UPDATE banking_db.customer_accounts SET acct_balance= acct_balance-:amount  WHERE acct_id=:account_id;</db:sql>
+					<db:input-parameters><![CDATA[#[
+	{
+		'account_id':vars.myAttributes.uriParams.AccountId,
+		'amount': vars.TRIM_AMMT
+	}
+]]]></db:input-parameters>
+				</db:update>
+				<ee:transform doc:name="Transform Message" doc:id="d04ab6af-495b-4e92-9ebd-20859b8686c1">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Account updated successfully",
+  acct_num: vars.myAttributes.uriParams.AccountId,
+  action: vars.myAttributes.queryParams.action,
+  amount: vars.myAttributes.queryParams.amount  
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+		</choice>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="ea85e1b3-b450-4857-83df-4ab4723546b7" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Account does not exists.",
+  account_id : vars.myAttributes.uriParams.AccountId
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+        <logger level="INFO" message="put:\Account\(AccountId):account-config" />
+    </flow>
+    <flow name="delete:\Account\(AccountId):account-config">
+        <ee:transform doc:id="5b0e0006-ba64-4ee9-bb57-632d47b6480a">
+            <ee:variables>
+                <ee:set-variable variableName="AccountId"><![CDATA[attributes.uriParams.AccountId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="delete:\Account\(AccountId):account-config" />
+    </flow>
+    <flow name="get:\Account:account-config">
+        <logger level="INFO" doc:name="Logger" doc:id="fe1ed965-8bce-464b-96eb-4844aa340568" message="Get all accounts" />
+        <db:select doc:name="Select" doc:id="663fc9da-8672-45c0-97d7-4bf2af43219d" config-ref="Database_Config">
+            <db:sql>SELECT 
+	customer_accounts.acct_id,
+	customer_accounts.bban,
+	customer_accounts.iban,
+	customer_accounts.acct_name,
+	customer_accounts.bank_num, 
+	customer_accounts.upic,
+	customer_accounts.bank_name,
+	customer_accounts.country,
+	customer_accounts.acct_balance,
+	customer_accounts.currency
+ FROM banking_db.customer_accounts;</db:sql>
+        </db:select>
+        <logger level="INFO" doc:name="Logger" doc:id="c136db6e-3f4d-471a-b2eb-922e517befd4" message="All accounts returned" />
+		<ee:transform doc:name="Transform Message" doc:id="4a383f2e-ef52-4a1c-8789-806982d4c750">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	"AccountContract": {
+	},
+	"AccountRestriction": {
+	},
+	"Balance": payload01.acct_balance,
+	"CurrencyCode": payload01.currency, 
+	"ClosingDate": "2002-10-02T10:00:00-05:00",
+	"CollateralAccountType": "1",
+	"CurrencyExchange": {
+		"Adjustment": {
+		},
+		"CalcuatedAssetValue": [ 
+        {
+			"AmmortizedFaceValue": {
+				"Ammount": 123.33,
+				"Currency": "USD"
+			},
+			"Balance": [{
+			}]
+		}
+      ],
+		"CurrenceyExchangeForCashDistribution": {
+		},
+		"CurrentyExchangeForCashEntry": {
+			"Amount": {
+				"Ammount": 333.33,
+				"Currency": "USD"
+			},
+			"Interest": {
+				"Amount": {
+					"Ammount": 333.33,
+					"Currency": "USD"
+				},
+				"AccruedInterestAmpount": {
+					"Ammount": 333.33,
+					"Currency": "USD"
+				},
+				"InterestCalculation": [{
+				}],
+				"InterestName": {
+				},
+				"InterestTax": {
+				},
+				"PaymentDate": {
+					"date": "2018-11-29"
+				},
+				"Rate": {
+					"rate": 1.5
+				}
+			}
+		},
+		"ExchangeRate": {
+		},
+		"OriginalAmount": {
+			"Ammount": 333.33,
+			"Currency": "USD"
+		},
+		"QuotationDate": {
+			"DateTime": "2019-10-02T10:00:00-05:00"
+		},
+		"QuotedCurrency": "USD",
+		"RateType": {
+		},
+		"RealtedInvoice": {
+		},
+		"ResultingAmount": {
+			"Ammount": 333.33,
+			"Currency": "USD"
+		},
+		"SourceCurrency": "USD",
+		"TargetCurrency": "CAD",
+		"Tax": {
+		},
+		"UnitCurrency": "USD"
+	},
+	"DefaultFundAccountOwner": {
+	},
+	"DefaultFundContribution": {
+	},
+	"Entry": {
+		"Country": payload01.country,
+		"BankName": payload01.bank_name
+	},
+	"Identification": {
+		"AccountId": payload01.acct_id,
+		"BBAN": payload01.bban, 
+		"IBAN": payload01.iban,
+		"Name": payload01.acct_name,
+		"Number": payload01.bank_num,
+		"UPIC": payload01.upic 
+	},
+	"IvestmentFundPartyRole": {
+	},
+	"Language": "en",
+	"LiveDate": "2019-10-02T10:00:00-05:00",
+	"ManagedAcountProduct": {
+		"Agreement": {
+		},
+		"Characterisitics": {
+		},
+		"Delivery": {
+		},
+		"Description": "",
+		"Name": "",
+		"ProductBrokerMasterAgreement": {
+		},
+		"ProductCategory": {
+		},
+		"ProductIdentification": {
+		},
+		"Quality": "",
+		"Quantity": 3
+	},
+	"OpeningDate": "2019-10-02T10:00:00-05:00",
+	"PartyRole": {
+	},
+	"Purpose": (payload01.purpose default ""),
+	"Reconciliation": {
+	},
+	"RelatedCollateralProcess": {
+	},
+	"RelatedCorporateActionPartyRole": {
+	},
+	"RelatedFundProcessingCharacteristics": {
+	},
+	"RelatedProceedsDelivery": {
+	},
+	"ReportedPeriod": "2019-10-02T10:00:00-05:00",
+	"ReportingCurrency": "USD",
+	"SettlementPartyRole": {
+	},
+	"Status": {
+	},
+	"System": {
+	},
+	"SystemMember": {
+	},
+	"TradePartyRole": {
+	},
+	"Type": payload01.acct_type default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="get:\Account\(AccountId):account-config">
+        <logger level="INFO" doc:name="Logger" doc:id="469c561e-34b8-44a6-8822-d3c43b813fc0" message="Get account Info for account no. #[attributes.uriParams.AccountId]" />
+        <set-variable value="#[attributes.uriParams.AccountId]" doc:name="Set Variable" doc:id="47a64b43-0df8-42f1-9a66-a2d05ecf3417" variableName="account_id" />
+        <logger level="INFO" doc:name="Logger" doc:id="1b61482f-b9e3-4f60-92df-41c6f019daa3" message="AccountId : #[vars.account_id]" />
+        <db:select doc:name="Select" doc:id="6a7db671-b93f-415f-b3ca-cd4c9c0788a4" config-ref="Database_Config">
+            <db:sql>SELECT 
+	customer_accounts.acct_id,
+	customer_accounts.bban,
+	customer_accounts.iban,
+	customer_accounts.acct_name,
+	customer_accounts.bank_num, 
+	customer_accounts.upic,
+	customer_accounts.bank_name,
+	customer_accounts.country,
+	customer_accounts.acct_balance,
+	customer_accounts.currency
+FROM banking_db.customer_accounts
+WHERE
+	customer_accounts.acct_id = :account_id;</db:sql>
+            <db:input-parameters><![CDATA[#[
+	{
+		'account_id':vars.account_id
+	}
+]]]></db:input-parameters>
+        </db:select>
+        <logger level="INFO" doc:name="Logger" doc:id="8e3b5a45-62e4-447b-823a-b018b1700861" message=" size of payload #[sizeOf(payload)]" />
+        <choice doc:name="Choice" doc:id="196b337c-9d76-45af-8155-8afa99c2e5fc">
+            <when expression="#[sizeOf(payload)&gt;0]">
+                <logger level="INFO" doc:name="Logger" doc:id="22e02002-e707-448d-a2a6-6422be2f7905" message="Account found" />
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="f0047132-3457-4ef1-9ecb-2d41c56c99f5">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"AccountContract": {
+	},
+	"AccountRestriction": {
+	},
+	"Balance": payload[0].acct_balance,
+	"CurrencyCode": payload[0].currency,
+	"ClosingDate": "2002-10-02T10:00:00-05:00",
+	"CollateralAccountType": "1",
+	"CurrencyExchange": {
+		"Adjustment": {
+		},
+		"CalcuatedAssetValue": [ 
+        {
+			"AmmortizedFaceValue": {
+				"Ammount": 123.33,
+				"Currency": "USD"
+			},
+			"Balance": [{
+			}]
+		}
+      ],
+		"CurrenceyExchangeForCashDistribution": {
+		},
+		"CurrentyExchangeForCashEntry": {
+			"Amount": {
+				"Ammount": 333.33,
+				"Currency": "USD"
+			},
+			"Interest": {
+				"Amount": {
+					"Ammount": 333.33,
+					"Currency": "USD"
+				},
+				"AccruedInterestAmpount": {
+					"Ammount": 333.33,
+					"Currency": "USD"
+				},
+				"InterestCalculation": [{
+				}],
+				"InterestName": {
+				},
+				"InterestTax": {
+				},
+				"PaymentDate": {
+					"date": "2018-11-29"
+				},
+				"Rate": {
+					"rate": 1.5
+				}
+			}
+		},
+		"ExchangeRate": {
+		},
+		"OriginalAmount": {
+			"Ammount": 333.33,
+			"Currency": "USD"
+		},
+		"QuotationDate": {
+			"DateTime": "2019-10-02T10:00:00-05:00"
+		},
+		"QuotedCurrency": "USD",
+		"RateType": {
+		},
+		"RealtedInvoice": {
+		},
+		"ResultingAmount": {
+			"Ammount": 333.33,
+			"Currency": "USD"
+		},
+		"SourceCurrency": "USD",
+		"TargetCurrency": "CAD",
+		"Tax": {
+		},
+		"UnitCurrency": "USD"
+	},
+	"DefaultFundAccountOwner": {
+	},
+	"DefaultFundContribution": {
+	},
+	"Entry": {
+		Country: payload[0].country,
+		BankName: payload[0].bank_name
+	},
+	"Identification": {
+		"AccountId": payload[0].acct_id,
+		"BBAN": payload[0].bban,
+		"IBAN": payload[0].iban,
+		"Name": payload[0].acct_name,  
+		"Number": payload[0].bank_num,
+		"UPIC": payload[0].upic
+	},
+	"IvestmentFundPartyRole": {
+	},
+	"Language": "en",
+	"LiveDate": "2019-10-02T10:00:00-05:00",
+	"ManagedAcountProduct": {
+		"Agreement": {
+		},
+		"Characterisitics": {
+		},
+		"Delivery": {
+		},
+		"Description": "",
+		"Name": "",
+		"ProductBrokerMasterAgreement": {
+		},
+		"ProductCategory": {
+		},
+		"ProductIdentification": {
+		},
+		"Quality": "",
+		"Quantity": 3
+	},
+	"OpeningDate": "2019-10-02T10:00:00-05:00",
+	"PartyRole": {
+	},
+	"Purpose": payload[0].purpose,
+	"Reconciliation": {
+	},
+	"RelatedCollateralProcess": {
+	},
+	"RelatedCorporateActionPartyRole": {
+	},
+	"RelatedFundProcessingCharacteristics": {
+	},
+	"RelatedProceedsDelivery": {
+	},
+	"ReportedPeriod": "2019-10-02T10:00:00-05:00",
+	"ReportingCurrency": "USD",
+	"SettlementPartyRole": {
+	},
+	"Status": {
+	},
+	"System": {
+	},
+	"SystemMember": {
+	},
+	"TradePartyRole": {
+	},
+	"Type": {
+	}
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </when>
+            <otherwise>
+                <logger level="INFO" doc:name="Logger" doc:id="a6abcade-4dac-48a6-9c84-c37159e414f9" message="********** Before Transformation #[payload]" />
+                <set-payload value="#[ %dw 2.0 output application/json --- {  message : &quot;The account with account number &quot; ++ vars.account_id as String ++ &quot; not found&quot; }]" doc:name="Set Payload" doc:id="ff49021c-2e3b-495b-bc97-d87d93f9e8ab" mimeType="application/json" />
+                <logger level="INFO" doc:name="Logger" doc:id="bc0f0c62-4eee-4545-b484-2f5e5df343b1" message="***************** After transformation #[payload]" />
+            </otherwise>
+        </choice>
+    </flow>
+	<flow name="post:\Account:account-config">
+		<logger level="INFO" doc:name="Logger" doc:id="20e06cc0-683e-4877-bf44-8a8e6db51533" message="******************* Customer ID #[payload.Identification.AccountId]"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="a95cabe7-44aa-4b77-8441-a4130d21e69f" variableName="originalPayload"/>
+		<set-variable value="#[payload.Identification.AccountId]" doc:name="Set Variable" doc:id="4a08d05d-e183-4493-a62c-093c93cf82ef" variableName="accountID"/>
+		<db:select doc:name="Select" doc:id="c34b0a7e-df0d-483a-b046-200a1be1d14a" config-ref="Database_Config">
+			<db:sql >select 
+	customer_accounts.acct_id 	
+from 
+	customer_accounts
+where
+	customer_accounts.acct_id = :account_id;</db:sql>
+			<db:input-parameters ><![CDATA[#[
+	{
+		'account_id' : vars.accountID
+	}
+]]]></db:input-parameters>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="e7c99397-6a65-471e-8525-b8e15a9ed302" message=" size of payload #[sizeOf(payload)] "/>
+		<choice doc:name="Choice" doc:id="10e4693e-f0be-40fe-8a87-0f839f3393f9" >
+			<when expression="#[sizeOf(payload)&gt;0]" >
+				<logger level="INFO" doc:name="Logger" doc:id="92b1fb67-fcd2-46e3-929d-0318dc808b56" message="******************* Account Number #[vars.accountID] already exist." />
+				<ee:transform doc:name="Transform Message" doc:id="a6a3a15e-fbbc-473c-963c-52ee51a2f2ea">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Account already exists.",
+  account_id : vars.accountID
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<db:insert doc:name="Insert" doc:id="9714ce2b-c2c9-4828-843b-ba99e72d0573" config-ref="Database_Config">
+			<db:sql>INSERT INTO customer_accounts(acct_id, bban, iban, acct_name, bank_num , upic, bank_name, country,  acct_balance, currency)
+	VALUES(:acct_id, :bban, :iban, :acct_name, :bank_num, :upic, :bank_name, :country, :acct_balance, :currency);
+</db:sql>
+			<db:input-parameters><![CDATA[#[
+	{
+		'acct_id' : vars.originalPayload.Identification.AccountId,
+		'bban' : vars.originalPayload.Identification.BBAN,
+		'iban' : vars.originalPayload.Identification.IBAN,
+		'acct_name' : vars.originalPayload.Identification.Name,
+		'bank_num' : vars.originalPayload.Identification.Number,
+		'upic': vars.originalPayload.Identification.UPIC,
+		'bank_name' : vars.originalPayload.Entry.BankName,
+    		'country' : vars.originalPayload.Entry.Country,
+		'acct_balance':vars.originalPayload.Balance,
+		'currency': vars.originalPayload.CurrencyCode		
+	}
+]]]></db:input-parameters>
+		</db:insert>
+				<logger level="INFO" doc:name="Logger" doc:id="101fa822-ce44-493f-93a7-0ac3b8cd654d" message="**************** number of rows updated #[payload.affectedRows]" />
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="ae4c6840-d06a-456c-b8a9-c2e7c37e3d1d">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Account created successfully",
+  account_id : vars.accountID
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3ef4f3a4-4a47-4e81-9c8c-0b4178531002" >
+				<logger level="INFO" doc:name="Logger" doc:id="1852e49e-2b02-49b5-ae3a-7e427a6e64d6" message='------------------------------------------------------ Error  #[error.cause.message]'/>
+			</on-error-continue>
+		</error-handler>
+    </flow>
+</mule>

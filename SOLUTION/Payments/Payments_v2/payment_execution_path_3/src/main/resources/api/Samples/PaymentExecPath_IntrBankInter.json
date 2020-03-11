@@ -1,0 +1,12 @@
+{
+ 	"Amount" : 333.33,
+  "CreditorBank":  "BOFMCAM2",
+  "CreditorAccountType": "SavingsSpecial",
+  "CreditorAcountCurrency":  "USD",
+  "DebtorBank": "BOFMCAM2",
+  "DebtorAccountType":  "SavingsSpecial",
+  "DebtorAcountCurrency": "CAD",
+  "DebtorNostroVostroAccount": "NA",
+  "CreditorNostroVostroAccount":  "NA",
+   "TransferType":"CREDIT_TRANSFER"
+}

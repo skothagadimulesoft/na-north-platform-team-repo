@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="aspsp-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="aspsp-config" raml="aspsp.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" >
+		<apikit:flow-mappings >
+			<apikit:flow-mapping resource="/payment-submission" action="post" flow-ref="post:\payment-submission:application\json:aspsp-config" />
+		</apikit:flow-mappings>
+	</apikit:config>
+    <configuration-properties doc:name="Configuration properties" doc:id="8a39595c-fb33-4cf5-8ab9-953a45a36681" file="mule-custom-app.properties" />
+	<http:request-config name="HTTP_Request_configuration_authorization" doc:name="HTTP Request configuration" doc:id="85f5545a-83a9-4244-9998-d7fb7a7214c4" >
+		<http:request-connection host="${aspsp.auth.host}" port="${aspsp.auth.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_risk" doc:name="HTTP Request configuration" doc:id="9e0a9db0-020f-4ba9-976e-36abc5272687" >
+		<http:request-connection host="${aspsp.risk.host}" port="${aspsp.risk.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_PaymentProcessor" doc:name="HTTP Request configuration" doc:id="f5a7e557-a6f3-4f25-a170-db4a1ca16c82" >
+		<http:request-connection host="${payment.processor.host}" port="${payment.processor.port}" />
+	</http:request-config>
+	<flow name="aspsp-main">
+		<http:listener config-ref="aspsp-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+		<apikit:router config-ref="aspsp-config" />
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="aspsp-console">
+        <http:listener config-ref="aspsp-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="aspsp-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\payment:aspsp-config">
+        <logger level="INFO" message="get:\payment:aspsp-config" />
+    </flow>
+    <flow name="get:\payment-submission:aspsp-config">
+        <logger level="INFO" message="get:\payment-submission:aspsp-config" />
+    </flow>
+    <flow name="get:\payment-submission\(id):aspsp-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.id</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\payment-submission\(id):aspsp-config" />
+    </flow>
+    <flow name="get:\payment\(id):aspsp-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.id</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\payment\(id):aspsp-config" />
+    </flow>
+	<flow name="post:\payment-submission:application\json:aspsp-config">
+        <logger level="INFO" doc:name="Logger" doc:id="44bf4f35-285a-4bd8-b994-e5a94985da7b" message="---3) Payment Submission : #[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="e29b1cce-88c8-49b1-b576-983e2a026537" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn = "everything"
+---
+{
+	Ammount: {
+		Ammount: payload.Data.Initiation.InstructedAmount.Amount,
+		Currency: payload.Data.Initiation.InstructedAmount.Currency
+	},
+	CreditorAcount: {
+		CurrencyCode: "",
+		Entry: {
+			Country: "",
+			BankName: payload.Data.Initiation.CreditorAgent.Identification[0 to 3]
+		},
+		Identification: {
+			AccountId: payload.Data.Initiation.CreditorAccount.Identification default "",
+			IBAN: payload.Data.Initiation.CreditorAgent.Identification default "",
+			Name: payload.Data.Initiation.CreditorAccount.Name default ""
+		}
+	},
+	CurrencyExchange: {
+		ExchangeRate: {
+			rate: ""
+		}
+	},
+	Date: now() as String,
+	DebtorAcount: {
+		Entry: {
+			Country: null,
+			BankName: payload.Data.Initiation.DebtorAgent.Identification[0 to 3]
+		},
+		Identification: {
+			AccountId: payload.Data.Initiation.DebtorAccount.Identification default "",
+			IBAN: payload.Data.Initiation.DebtorAgent.Identification default "",
+			Name: payload.Data.Initiation.DebtorAccount.Name default ""
+		}
+	},
+	InstructedAmmount: {
+		Ammount: payload.Data.Initiation.InstructedAmount.Amount,
+		Currency: payload.Data.Initiation.InstructedAmount.Currency
+	},
+	PaymentExecution: {
+		PaymentInitiation: {
+			Next: {
+				FirstSettlementAgent: {
+					BIC: payload.Data.Initiation.DebtorAgent.Identification default ""
+				},
+				LastSettlementAgent: {
+					BIC: payload.Data.Initiation.CreditorAgent.Identification default ""
+				},
+				SettlementInstruction: {
+					SettlementMethod: "INGA"
+				}
+			},
+			ProcessingInstructions: [{
+				BankTransaction: payload.Data.Initiation.InstructionIdentification
+			}]
+		}
+	},
+	PaymentRelatedIdentifications: [{
+		EndToEndIdentification: payload.Data.PaymentId,
+		TransactionIdentification: payload.Data.Initiation.InstructionIdentification
+	}],
+	PaymentStatus: "PAYMENT_INNITIATED"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="processPayment" doc:id="39b6c356-b0db-4f56-a6fb-e648e7f6edd7" path="/api/PaymentOrderTransaction" config-ref="HTTP_Request_configuration_PaymentProcessor"/>
+		<ee:transform doc:name="Transform Message" doc:id="6321ff41-5c09-41bd-ba7c-e9f416b9ef69" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Data: {
+		PaymentSubmissionId: payload.PaymentSubmissionID,
+		Status: payload.Status,
+		CreationDateTime: now() as String,
+		PaymentId: payload.PaymentOrderID
+	},
+	Links: {
+		Self: "https://api.alphabank.com/open-banking/v1.0/payment-submissions/7290-003"
+	},
+	Meta: {
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="post:\payment:application\json:aspsp-config">
+        <logger level="INFO" doc:name="Logger" doc:id="39c1c36e-884b-41e1-a89b-a276f1d638f7" message="---2) ASPSP Payment  Initiation : #[payload]"/>
+		<set-variable value="#[payload]" doc:name="payment_req" doc:id="3fe04c5d-8f60-4afe-ba7b-aa097def4da2" variableName="payment_init_req" mimeType="application/json"/>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="80298cad-79a9-447a-914a-6bd327732f2c">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentID: payload.Data.Initiation.EndToEndIdentification,
+	InstructedAmount: {
+		Amount: payload.Data.Initiation.InstructedAmount.Amount,
+		Currency: payload.Data.Initiation.InstructedAmount.Currency
+	},
+	DebtorAgent: {
+		SchemeName: payload.Data.Initiation.DebtorAgent.SchemeName,
+		Identification: payload.Data.Initiation.DebtorAgent.Identification
+	},
+	DebtorAccount: {
+		SchemeName: payload.Data.Initiation.DebtorAccount.SchemeName,
+		Identification: payload.Data.Initiation.DebtorAccount.Identification,
+		Name: payload.Data.Initiation.DebtorAccount.Name
+	}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<http:request method="POST" doc:name="ASPSP Authorization" doc:id="f9d95de1-6c08-4346-b1a4-bf3a7c3c343c" config-ref="HTTP_Request_configuration_authorization" path="/api/payment_authorization"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e227e2b9-3661-4fc4-a3f8-469cd4c91ca5" message="+++Authorization response: #[payload]"/>
+		<set-variable value="#[payload]" doc:name="auth_resp" doc:id="86825380-d633-45a3-9b6b-a677eee925ff" variableName="auth_resp" mimeType="application/json"/>
+		<ee:transform doc:name="Transform Message" doc:id="e0edf251-46c4-4016-be67-2aec7c660230" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Amount: vars.payment_init_req.Data.Initiation.InstructedAmount.Amount,
+	Currency: vars.payment_init_req.Data.Initiation.InstructedAmount.Currency,
+	PersonId: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+	TransactionId: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+	AccountId: vars.payment_init_req.Data.Initiation.DebtorAccount.Identification,
+	OriginationLocation: "",
+	OriginationCountry: "",
+	OriginationMedium: ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="RiskAssessment" doc:id="aac86d82-8419-4ed7-9d0c-66b41d467d97" config-ref="HTTP_Request_configuration_risk" path="/api/Risk"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0b58b638-6319-4801-99de-e30b347f4794" message="+++Risk Assessment Response: #[payload]"/>
+		<set-variable value="#[payload]" doc:name="risk_resp" doc:id="5624986b-e904-4d31-9854-d45695e9acdb" variableName="risk_resp" mimeType="application/json"/>
+		<choice doc:name="Choice" doc:id="ac1bff9f-66f8-4c94-a116-0aac045d3793" >
+			<when expression='#[vars.auth_resp.Status == "VALID"  and vars.risk_resp.RiskLevel &lt;=3]' >
+				<logger level="INFO" doc:name="Vlid_No_Risk_Logger" doc:id="314f37cf-736e-45bb-9533-4c6323a24791" message="# aspsp: payment valid: sufficient funds and low risk !"/>
+				<ee:transform doc:name="Transform Message" doc:id="289b65e1-8971-45da-84c3-1e5981e3d858">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Meta: {
+		Message: "Valid: Sufficient Funds & Low risk !"
+	},
+	Risk: {
+		PaymentContextCode: (vars.payment_init_req.Risk.PaymentContextCode default ""),
+		MerchantCategoryCode: (vars.payment_init_req.Risk.MerchantCategoryCode default ""),
+		MerchantCustomerIdentification: (vars.payment_init_req.Risk.MerchantCustomerIdentification default "")
+	},
+	Data: {
+		Status: "VALID",
+		PaymentId: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+		Initiation: {
+			DebtorAccount: {
+				SchemeName: vars.payment_init_req.Data.Initiation.DebtorAccount.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.DebtorAccount.Identification,
+				Name: vars.payment_init_req.Data.Initiation.DebtorAccount.Name
+			},
+			CreditorAgent: {
+				SchemeName: vars.payment_init_req.Data.Initiation.CreditorAgent.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.CreditorAgent.Identification
+			},
+			EndToEndIdentification: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+			InstructionIdentification: vars.payment_init_req.Data.Initiation.InstructionIdentification,
+			CreditorAccount: {
+				SecondaryIdentification: vars.payment_init_req.Data.Initiation.CreditorAccount.SecondaryIdentification,
+				SchemeName: vars.payment_init_req.Data.Initiation.CreditorAccount.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.CreditorAccount.Identification,
+				Name: vars.payment_init_req.Data.Initiation.CreditorAccount.Name
+			},
+			DebtorAgent: {
+				SchemeName: vars.payment_init_req.Data.Initiation.DebtorAgent.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.DebtorAgent.Identification
+			},
+			InstructedAmount: {
+				Amount: vars.payment_init_req.Data.Initiation.InstructedAmount.Amount,
+				Currency: vars.payment_init_req.Data.Initiation.InstructedAmount.Currency
+			}
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<when expression='#[vars.auth_resp.Status == "VALID"  and vars.risk_resp.RiskLevel &gt; 3]' >
+				<logger level="INFO" doc:name="Valid_Risk_Logger" doc:id="fa9abd2b-f643-4f8d-b62e-c7f1a0a9aef0" message="# aspsp: payment valid: suffiicient funds BUT HIGH risk !"/>
+				<ee:transform doc:name="Transform Message" doc:id="ea9051fd-e061-407e-8e36-d778b8cb5bde" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Meta: {
+		Message: "Valid: Sufficient Funds & High risk !"
+	},
+	Risk: {
+		PaymentContextCode: (vars.payment_init_req.Risk.PaymentContextCode default ""),
+		MerchantCategoryCode: (vars.payment_init_req.Risk.MerchantCategoryCode default ""),
+		MerchantCustomerIdentification: (vars.payment_init_req.Risk.MerchantCustomerIdentification default "")
+	},
+	Data: {
+		Status: "VALID",
+		CreationDateTime: now() as String,
+		PaymentId: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+		Initiation:{
+			DebtorAccount: {
+				SchemeName: vars.payment_init_req.Data.Initiation.DebtorAccount.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.DebtorAccount.Identification,
+				Name: vars.payment_init_req.Data.Initiation.DebtorAccount.Name
+			},
+			CreditorAgent: {
+				SchemeName: vars.payment_init_req.Data.Initiation.CreditorAgent.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.CreditorAgent.Identification
+			},
+			EndToEndIdentification: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+			InstructionIdentification: vars.payment_init_req.Data.Initiation.InstructionIdentification,
+			CreditorAccount: {
+				SecondaryIdentification: vars.payment_init_req.Data.Initiation.CreditorAccount.SecondaryIdentification,
+				SchemeName: vars.payment_init_req.Data.Initiation.CreditorAccount.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.CreditorAccount.Identification,
+				Name: vars.payment_init_req.Data.Initiation.CreditorAccount.Name
+			},
+			DebtorAgent: {
+				SchemeName: vars.payment_init_req.Data.Initiation.DebtorAgent.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.DebtorAgent.Identification
+			},
+			InstructedAmount: {
+				Amount: vars.payment_init_req.Data.Initiation.InstructedAmount.Amount,
+				Currency: vars.payment_init_req.Data.Initiation.InstructedAmount.Currency
+			}
+		}
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.auth_resp.Status == "INVALID"  and vars.risk_resp.RiskLevel &lt;=3]' >
+				<logger level="INFO" doc:name="Invalid_No_Risk_Logger" doc:id="a682b8e6-4803-4176-ad75-bd565958b082" message="# aspsp: payment invalid: insufficient funds and low risk !"/>
+				<ee:transform doc:name="Transform Message" doc:id="950cabea-be1d-40c9-86a6-30e5855814d8" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Meta: {
+		Message: "Inalid: Inufficient Funds & Low risk !"
+	},
+	Risk: {
+		PaymentContextCode: (vars.payment_init_req.Risk.PaymentContextCode default ""),
+		MerchantCategoryCode: (vars.payment_init_req.Risk.MerchantCategoryCode default ""),
+		MerchantCustomerIdentification: (vars.payment_init_req.Risk.MerchantCustomerIdentification default "")
+	},
+	Data: {
+		Status: "INVALID",
+		CreationDateTime: now() as String,
+		PaymentId: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+		Initiation: {
+			DebtorAccount: {
+				SchemeName: vars.payment_init_req.Data.Initiation.DebtorAccount.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.DebtorAccount.Identification,
+				Name: vars.payment_init_req.Data.Initiation.DebtorAccount.Name
+			},
+			CreditorAgent: {
+				SchemeName: vars.payment_init_req.Data.Initiation.CreditorAgent.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.CreditorAgent.Identification
+			},
+			EndToEndIdentification: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+			InstructionIdentification: vars.payment_init_req.Data.Initiation.InstructionIdentification,
+			CreditorAccount: {
+				SecondaryIdentification: vars.payment_init_req.Data.Initiation.CreditorAccount.SecondaryIdentification,
+				SchemeName: vars.payment_init_req.Data.Initiation.CreditorAccount.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.CreditorAccount.Identification,
+				Name: vars.payment_init_req.Data.Initiation.CreditorAccount.Name
+			},
+			DebtorAgent: {
+				SchemeName: vars.payment_init_req.Data.Initiation.DebtorAgent.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.DebtorAgent.Identification
+			},
+			InstructedAmount: {
+				Amount: vars.payment_init_req.Data.Initiation.InstructedAmount.Amount,
+				Currency: vars.payment_init_req.Data.Initiation.InstructedAmount.Currency
+			}
+		}
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Invalid_Risk_Logger" doc:id="762014d7-760a-4564-a28a-50fdca5178c5" message="# aspsp: payment invalid: insufficient funds and HIGH risk !"/>
+				<ee:transform doc:name="Transform Message" doc:id="0c8ad965-d098-409b-acf1-98acbaf6c302" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Meta: {
+		Message: "Invalid: Insufficient Funds & High risk !"
+	},
+	Risk: {
+		PaymentContextCode: vars.risk_resp.RiskLevel,
+		DeliveryAddress: vars.payment_init_req.Risk.DeliveryAddress,	
+		//PaymentContextCode: (vars.payment_init_req.Risk.PaymentContextCode default ""),
+		MerchantCategoryCode: (vars.payment_init_req.Risk.MerchantCategoryCode default ""),
+		MerchantCustomerIdentification: (vars.payment_init_req.Risk.MerchantCustomerIdentification default "")
+	},
+	Data: {
+		Status: "INVALID",
+		PaymentId: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+		Initiation: {
+			DebtorAccount: {
+				SchemeName: vars.payment_init_req.Data.Initiation.DebtorAccount.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.DebtorAccount.Identification,
+				Name: vars.payment_init_req.Data.Initiation.DebtorAccount.Name
+			},
+			CreditorAgent: {
+				SchemeName: vars.payment_init_req.Data.Initiation.CreditorAgent.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.CreditorAgent.Identification
+			},
+			EndToEndIdentification: vars.payment_init_req.Data.Initiation.EndToEndIdentification,
+			InstructionIdentification: vars.payment_init_req.Data.Initiation.InstructionIdentification,
+			CreditorAccount: {
+				SecondaryIdentification: vars.payment_init_req.Data.Initiation.CreditorAccount.SecondaryIdentification,
+				SchemeName: vars.payment_init_req.Data.Initiation.CreditorAccount.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.CreditorAccount.Identification,
+				Name: vars.payment_init_req.Data.Initiation.CreditorAccount.Name
+			},
+			DebtorAgent: {
+				SchemeName: vars.payment_init_req.Data.Initiation.DebtorAgent.SchemeName,
+				Identification: vars.payment_init_req.Data.Initiation.DebtorAgent.Identification
+			},
+			InstructedAmount: {
+				Amount: vars.payment_init_req.Data.Initiation.InstructedAmount.Amount,
+				Currency: vars.payment_init_req.Data.Initiation.InstructedAmount.Currency
+			}
+		}
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+    </flow>
+</mule>

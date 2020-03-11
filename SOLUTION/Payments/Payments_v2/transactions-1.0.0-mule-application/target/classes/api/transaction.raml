@@ -1,0 +1,53 @@
+#%RAML 1.0
+version: v0.1
+title: Transaction
+
+uses:
+  daata_types:  exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/paymentorder_banking_datatypes/1.0.12/payment_banking_datatypes.raml
+
+/Transaction:
+  get:
+    responses: 
+      200:
+        body:
+          application/json:
+                      
+            example: !include samples/PaymentTxList.json        
+  post:
+    description: Create a new Tx Record
+    body: 
+      application/json:
+        example: !include samples/PaymentTx.json 
+    responses: 
+      200:
+        body: 
+          application/json:
+            example:  
+             { 
+               "message": "Transaction created successfully",
+                "TxId" : "123"
+             }
+  /{TxId}:
+    get:
+      responses: 
+        200:
+          body: 
+            application/json:
+              example: !include samples/PaymentTx.json 
+    put:
+      queryParameters: 
+                
+        TxStatus:
+          description: TxId Status be updated 
+          required: true
+          type: string
+      responses: 
+        200:
+          body: 
+            application/json:
+              example: 
+                { 
+                  "message": "Tx updated successfully",
+                  "TxId": "123",
+                  "Status": ""
+                } 

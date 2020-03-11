@@ -1,0 +1,22 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/3bac4ed7-b82c-4f3c-bf41-b1018d4dbb70 # 
+version: 0.7
+title: ASPSP_Authorization
+
+uses:
+  data_types: exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/payment_ob_datatypes/1.0.1/payment_ob_datatypes.raml
+
+
+/payment_authorization:
+  post:
+    body: 
+      application/json:
+        type: data_types.PaymentAuthorizationRequest
+        example:  !include examples/payment-authorization-request-example.json
+
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: data_types.PaymentAuthorizationResponse
+            example:  !include examples/payment-authorization-response-example.json

@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="auth_resp" format="json">
+      <types:shape format="weave" example="api/examples/payment-authorization-response-example.json"><![CDATA[%dw 2.0
+type auth_resp = {|
+  PaymentID: String, 
+  DebtorAgent: {|
+    SchemeName: String, 
+    Identification: String
+  |}, 
+  DebtorAccount: {|
+    SchemeName: String, 
+    Identification: String, 
+    Name: String
+  |}, 
+  Status: String
+|} {"MetadataFormat": "json",
+"example": "{\"PaymentID\":\"1234567\",\"DebtorAgent\":{\"SchemeName\":\"SortCodeAccountNumber\",\"Identification\":\"11280001234567\"},\"DebtorAccount\":{\"SchemeName\":\"SortCodeAccountNumber\",\"Identification\":\"11280001234567\",\"Name\":\"Andrea Smith\"},\"Status\":\"PaymentAuthorized\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#64a85f15-11e7-44ee-99f6-e5244475c44c">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="auth_resp"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

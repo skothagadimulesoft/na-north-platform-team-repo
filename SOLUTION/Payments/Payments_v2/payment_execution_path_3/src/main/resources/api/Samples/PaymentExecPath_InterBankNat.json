@@ -1,0 +1,12 @@
+{
+ 	"Amount" : 333.33,
+  "CreditorBank":  "BOFAUS3N",
+  "CreditorAccountType": "SavingsSpecial",
+  "CreditorAcountCurrency":  "USD",
+  "DebtorBank": "CITIUS33",
+  "DebtorAccountType":  "SavingsSpecial",
+  "DebtorAcountCurrency": "USD",
+  "DebtorNostroVostroAccount": "NA",
+  "CreditorNostroVostroAccount":  "NA",
+   "TransferType":"CREDIT_TRANSFER"
+}

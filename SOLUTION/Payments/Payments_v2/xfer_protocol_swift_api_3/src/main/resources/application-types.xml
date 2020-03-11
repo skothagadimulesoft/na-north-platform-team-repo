@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="pacs008" format="xml">
+      <types:shape format="xml-schema" element="{urn:iso:std:iso:20022:tech:xsd:pacs.008.001.02}Document" location="schemas/pacs.008.001.02.xsd"/>
+    </types:type>
+    <types:type name="pacs002" format="xml">
+      <types:shape format="xml-schema" element="{urn:iso:std:iso:20022:tech:xsd:pacs.002.001.02}Document" location="schemas/pacs.002.001.02.xsd"/>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#a246ac4d-1649-4c81-a654-c58f6fcedc48">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="pacs008"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="pacs_payload" type="pacs008"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#170e69e1-efc1-4928-aa64-eda6ec1b1251">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="pacs002"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="pacs_message" type="pacs008"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#ca35de09-6c13-4454-8544-e30f681149f2">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="pacs_message" type="pacs008"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

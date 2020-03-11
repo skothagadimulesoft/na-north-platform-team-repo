@@ -1,0 +1,55 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<Document xmlns = "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.02" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance" >
+	<FIToFICstmrCdtTrf>
+		<GrpHdr>
+			<MsgId>ABCD12345</MsgId>
+			<CreDtTm>9999-12-31T00:00:00</CreDtTm>
+			<NbOfTxs>1</NbOfTxs>
+			<SttlmInf>
+				<SttlmMtd>INDA</SttlmMtd>
+			</SttlmInf>
+			<InstgAgt>
+				<FinInstnId>
+					<BIC>CITIUS33</BIC>
+				</FinInstnId>
+			</InstgAgt>
+			<InstdAgt>
+				<FinInstnId>
+					<BIC>CITIDEFF</BIC>
+				</FinInstnId>
+			</InstdAgt>
+		</GrpHdr>
+		<CdtTrfTxInf>
+			<PmtId>
+				<EndToEndId>REF12345ABC</EndToEndId>
+				<TxId>ABC123456</TxId>
+			</PmtId>
+			<IntrBkSttlmAmt Ccy = "USD">1000000</IntrBkSttlmAmt>
+			<IntrBkSttlmDt>2007-08-17</IntrBkSttlmDt>
+			<ChrgBr>SHAR</ChrgBr>
+			<Dbtr>
+				<Nm>NAME DEBTOR</Nm>
+				<PstlAdr>
+					<Ctry>US</Ctry>
+				</PstlAdr>
+			</Dbtr>
+			<DbtrAgt>
+				<FinInstnId>
+					<BIC>CITIUS33MIA</BIC>
+				</FinInstnId>
+			</DbtrAgt>
+			<CdtrAgt>
+				<FinInstnId>
+					<BIC>CITIGB22</BIC>
+				</FinInstnId>
+			</CdtrAgt>
+			<Cdtr>
+				<Nm>NAME CREDITOR</Nm>
+				<PstlAdr>
+					<Ctry>GB</Ctry>
+				</PstlAdr>
+			</Cdtr>
+		</CdtTrfTxInf>
+	</FIToFICstmrCdtTrf>
+</Document>

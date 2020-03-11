@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="687ddd9b-57df-45b7-83bc-ae9a9d9eedf5" >
+
+		<http:listener-connection host="localhost" port="8081" />
+
+	</http:listener-config>
+
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="0098615d-0f14-4991-9bfb-1d4bc3dd2483" >
+
+		<wsc:connection wsdlLocation="http://tshirt-service.cloudhub.io/?wsdl" service="TshirtServicePortTypeService" port="TshirtServicePortTypePort" address="http://tshirts.demos.mulesoft.com/">
+
+			<wsc:web-service-security actor="http://schemas.xmlsoap.org/soap/actor/next" />
+
+		</wsc:connection>
+
+	</wsc:config>
+
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="5f586318-aa56-426c-b579-dd8a62eb4352" >
+		<http:request-connection host="tshirt-service.cloudhub.io/?wsdl" port="80" />
+	</http:request-config>
+	<wsc:config name="Web_Service_Consumer_Config1" doc:name="Web Service Consumer Config" doc:id="c42bee7a-c59a-4705-abec-7c54022ac3c3" >
+		<wsc:connection wsdlLocation="http://tshirts.demos.mulesoft.com/?wsdl" service="TshirtServicePortTypeService" port="TshirtServicePortTypePort" address="http://tshirts.demos.mulesoft.com/"/>
+	</wsc:config>
+	<flow name="temperatureconversionFlow" doc:id="e4b12725-1f8b-4940-aae7-c152d5eeea43" >
+
+		<http:listener doc:name="Listener" doc:id="e16fc954-c5e9-44ee-9618-22161686a75d" config-ref="HTTP_Listener_config" path="/tshirt" outputMimeType="application/json" allowedMethods="GET"/>
+		<ee:transform doc:name="Transform Message" doc:id="3a4d51e8-1130-4460-9f7f-4002b348ec38" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://mulesoft.org/tshirt-service
+---
+{
+	ns0#ListInventory: null
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="f650a6a7-de5c-453a-9a41-dd82b4aabbd0" config-ref="Web_Service_Consumer_Config1" operation="ListInventory"/>
+		<logger level="INFO" doc:name="Logger" doc:id="08140124-5f76-4a95-894a-16beb1989d8e" message="Got Response: #[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="a34c282a-0c41-49c5-bce2-ca4ef4236494" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+
+	</flow>
+
+</mule>

@@ -1,0 +1,61 @@
+{
+  "Data": {
+    "PaymentId": "58923",
+    "Status": "AcceptedTechnicalValidation",
+    "CreationDateTime": "2017-06-05T15:15:13+00:00",
+    "Initiation": {
+      "InstructionIdentification": "CREDIT_TRANSFER",
+      "EndToEndIdentification": "FRESCO.21302.GFX.20",
+      "InstructedAmount": {
+        "Amount": "165.88",
+        "Currency": "GBP"
+      },
+        "DebtorAgent":{
+         "Identification":"Bank ABC",
+         "SchemeName": "SortCodeAccountNumber"
+      },
+      "DebtorAccount": {
+        "SchemeName": "SortCodeAccountNumber",
+        "Identification": "11280001234567",
+        "Name": "Andrea Smith"
+      },
+       "CreditorAgent":{
+         "Identification":"Bank XYZ",
+        "SchemeName": "SortCodeAccountNumber"
+      },
+      "CreditorAccount": {
+        "SchemeName": "SortCodeAccountNumber",
+        "Identification": "08080021325698",
+        "Name": "ACME Inc",
+        "SecondaryIdentification": "0002"
+      },
+      "RemittanceInformation": {
+        "Reference": "FRESCO-101",
+        "Unstructured": "Internal ops code 5120101"
+      }
+    }
+  },
+  "Risk": {
+    "PaymentContextCode": "EcommerceGoods",
+    "MerchantCategoryCode": "5967",
+    "MerchantCustomerIdentification": "053598653254",
+    "DeliveryAddress": {
+      "AddressLine": [
+        "Flat 7",
+        "Acacia Lodge"
+      ],
+      "StreetName": "Acacia Avenue",
+      "BuildingNumber": "27",
+      "PostCode": "GU31 2ZZ",
+      "TownName": "Sparsholt",
+      "CountySubDivision": [
+        "Wessex"
+      ],
+      "Country": "UK"
+    }
+  },
+  "Links": {
+    "Self": "https://api.alphabank.com/open-banking/v1.0/payments/58923"
+  },
+  "Meta": {}
+}

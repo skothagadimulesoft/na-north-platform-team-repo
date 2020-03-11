@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   
+   <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03" xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance">
+	<CstmrCdtTrfInitn>
+		<GrpHdr>
+			<MsgId>MSSGID/PAINCT/SMRT6</MsgId>
+			<CreDtTm>2008-08-11T11:00:00</CreDtTm>
+			<Authstn><Prtry>123Auth okay456</Prtry></Authstn>
+			<NbOfTxs>2</NbOfTxs>
+			
+			<InitgPty>
+				<Id>
+					<OrgId>
+						<BICOrBEI>FOMOUS33</BICOrBEI>
+					</OrgId>
+				</Id>
+			</InitgPty>
+		</GrpHdr>
+		<PmtInf><PmtInfId>12345</PmtInfId>
+			<PmtMtd>TRF</PmtMtd>
+			<ReqdExctnDt>2008-08-13</ReqdExctnDt>
+			<Dbtr>
+				<Nm>JOE BLOGGS</Nm>
+				<PstlAdr>
+						
+					<StrtNm>PIAZZA GABRIELE D'ANNUNZIO</StrtNm>
+					<BldgNb>22</BldgNb>
+					<TwnNm>MILANO</TwnNm>
+					<Ctry>IT</Ctry>
+					</PstlAdr>
+			</Dbtr>
+			<DbtrAcct>
+				<Id>
+					<IBAN>BE97DEBTACCTIBAN</IBAN>
+				</Id>
+			</DbtrAcct>
+			<DbtrAgt>
+				<FinInstnId>
+					
+						<BIC>CITIUS33</BIC>
+				
+				</FinInstnId>
+			</DbtrAgt>
+			<ChrgBr>SHAR</ChrgBr>
+			<CdtTrfTxInf>
+				<PmtId>
+					<EndToEndId>E2EID/PAINCT/SMRT6/E2EID1</EndToEndId>
+				</PmtId>
+				<Amt>
+					<InstdAmt Ccy="USD">4000</InstdAmt>
+				</Amt>
+				<CdtrAgt>
+					<FinInstnId>
+						
+							<Nm>NAMECREDAGNT</Nm>
+							<PstlAdr>
+								<TwnNm>BELIZE</TwnNm>
+									<Ctry>BZ</Ctry>
+								<AdrLine>AVDA PRADA 125</AdrLine>
+								
+							
+							</PstlAdr>
+					
+					</FinInstnId>
+				</CdtrAgt>
+				<Cdtr>
+						
+					<Nm>DAISY BELLE</Nm>
+					<PstlAdr>
+						<TwnNm>BELIZE</TwnNm>
+						<Ctry>BZ</Ctry>
+						<AdrLine>CALLE MAYOR 1234</AdrLine>
+						
+					
+					</PstlAdr>
+				</Cdtr>
+				<CdtrAcct>
+					<Id>
+						<Othr>
+							<Id>CREDACT</Id>
+						</Othr>
+					</Id>
+				</CdtrAcct>
+			</CdtTrfTxInf>
+		</PmtInf>
+	</CstmrCdtTrfInitn>
+</Document>
+

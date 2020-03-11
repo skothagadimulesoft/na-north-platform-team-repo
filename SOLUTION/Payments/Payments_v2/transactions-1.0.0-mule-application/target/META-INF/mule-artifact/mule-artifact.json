@@ -1,0 +1,29 @@
+{
+  "configs": [
+    "transaction.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:transactions:1.0.0",
+  "minMuleVersion": "4.1.3",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "log4j2.xml",
+        "transaction.xml",
+        "mule-custom-app.properties",
+        "api/exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/paymentorder_banking_datatypes/1.0.12/payment_banking_datatypes.raml",
+        "api/transaction.raml",
+        "api/samples/PaymentTx.json",
+        "api/samples/PaymentTxList.json"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

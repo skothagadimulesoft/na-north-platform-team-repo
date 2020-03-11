@@ -1,0 +1,23 @@
+#%RAML 1.0
+version: v1
+title: Remittance
+
+uses:
+  banking_types: exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/paymentorder_banking_datatypes/1.0.4/payment_banking_datatypes.raml
+
+/Remittance:
+ post:
+    body: 
+      application/json:
+         type: banking_types.Payment
+         example: !include Samples/Payment_sample_2.json
+
+    responses: 
+      200:  
+        body: 
+          application/json:
+            type: banking_types.PaymentResponse
+            example:  !include Samples/PaymentResponse_Sample.json
+
+
+           

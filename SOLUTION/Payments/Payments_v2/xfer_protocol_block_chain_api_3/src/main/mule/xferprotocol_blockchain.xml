@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="xferprotocol_blockchain-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="xferprotocol_blockchain-config" raml="xferprotocol_blockchain.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" disableValidations="true"/>
+    <configuration-properties doc:name="Configuration properties" doc:id="eb97506e-8692-43d4-808f-c18bab5e30ba" file="mule-custom-app-bc.properties" />
+    <http:request-config name="BlockChain_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="ced2fd50-e470-45be-a10a-c87ba10dbebb" requestStreamingMode="NEVER">
+        <http:request-connection host="${rpchostip}" port="${rpcport}">
+            <http:authentication>
+                <http:basic-authentication username="${rpcuser}" password="${rpcpassword}" />
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
+    <flow name="xferprotocol_blockchain-main">
+        <http:listener config-ref="xferprotocol_blockchain-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="xferprotocol_blockchain-config" />
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="3df5530d-527f-47bd-9097-82888f7b1770">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="c4dd4b6b-f86c-43bc-825d-a2ccce49999b">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="4c82ea89-3c24-42dc-9116-b0b468387114">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="df9fa2a6-182a-4b2f-b1e4-d7d41851c48f">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="62cdc325-1439-475b-bd33-dcd536e67758">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="d49291f3-7280-476d-8fa2-50dc401bdaac">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="xferprotocol_blockchain-console">
+        <http:listener config-ref="xferprotocol_blockchain-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="xferprotocol_blockchain-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\BlocChainTMessage:application\json:xferprotocol_blockchain-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="b644ced8-51c1-43e2-8022-7c6a5a6439c9" variableName="InitialPayment" />
+        <logger level="INFO" doc:name="Logger" doc:id="e00993c1-6e9c-4713-9eb0-7796aa89f3fb" message="Sending to Block Chain API" />
+        <flow-ref doc:name="Flow Reference" doc:id="d73cf78a-50bc-4703-baaa-9afb0c0364dc" name="blockchainFlow" />
+        <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="a48143df-7de6-40c7-a49f-4fad5f2f3599">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	PaymentId: vars.InitialPayment.PaymentRelatedIdentifications[0].EndToEndIdentification,
+	Amount: {
+		Amount: vars.InitialPayment.Ammount.Ammount,
+		Currency: vars.InitialPayment.Ammount.Currency
+	},
+	TransasctionCost: 10.00,
+	TransferProtocol: "MULTICHAIN",
+	PaymentPath: "XFER_REMIT",
+	PaymentStatus: "Processed",
+	Debtor: {
+		Account: {
+			AccountId: vars.InitialPayment.DebtorAcount.Identification.AccountId,
+			AccountType: vars.InitialPayment.DebtorAcount.Identification.Name,
+			BankId: vars.InitialPayment.DebtorAcount.Identification.IBAN,
+			BankName: vars.InitialPayment.DebtorAcount.Entry.BankName
+		}
+	},
+	Creditor: {
+		Account: {
+			AccountId: vars.InitialPayment.CreditorAcount.Identification.AccountId,
+			AccountType: vars.InitialPayment.CreditorAcount.Identification.Name,
+			BankId: vars.InitialPayment.CreditorAcount.Identification.IBAN,
+			BankName: vars.InitialPayment.CreditorAcount.Entry.BankName
+		}
+	}
+}
+
+
+
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="blockchainFlow" doc:id="b1859bca-0c21-4890-8b32-ecf76e047fb7">
+        <logger level="INFO" doc:name="Logger" doc:id="3f1a2422-b179-4a65-aad1-d6bb98015b3a" message="***** Entering Block Chain Flow ****** with TO: #[vars.InitialPayment.CreditorAcount.Identification.AccountId] From: #[vars.InitialPayment.DebtorAcount.Identification.AccountId] Quantity: #[vars.InitialPayment.InstructedAmmount.Ammount]" />
+        <ee:transform doc:name="Transform Message" doc:id="3339ceee-fb8d-4df6-a83b-c7c37fefb926">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json indent=false
+var debtorAccount = vars.InitialPayment.DebtorAcount.Identification.AccountId
+var creditorAccount = vars.InitialPayment.CreditorAcount.Identification.AccountId
+var totalAmount = vars.InitialPayment.InstructedAmmount.Ammount as Number
+---
+{
+	"method":"sendassetfrom",
+	"params": [debtorAccount,creditorAccount,"USD",totalAmount]
+}]]></ee:set-payload>
+            </ee:message>
+            <ee:variables>
+                <ee:set-variable variableName="xformedVar"><![CDATA[%dw 2.0
+output application/json indent=false
+var debtorAccount = vars.InitialPayment.DebtorAcount.Identification.AccountId
+var creditorAccount = vars.InitialPayment.CreditorAcount.Identification.AccountId
+var totalAmount = vars.InitialPayment.InstructedAmmount.Ammount
+---
+{
+	"method":"sendassetfrom",
+	"params": [debtorAccount,creditorAccount,"USD",totalAmount]
+}]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Copy_of_Logger" doc:id="00555fde-ceee-4555-bd03-2c8deab75415" message="DATA WEAVE PAYLOAD: #[payload]" />
+        <http:request method="POST" doc:name="Request" doc:id="bfa93343-b112-47d6-8974-ade5a0f44c70" config-ref="BlockChain_HTTP_Request_configuration" path="/" />
+        <logger level="INFO" doc:name="Logger" doc:id="47caf269-ee87-4724-93ad-e63894af8f8b" message="MultiChain API response: #[payload]" />
+    </flow>
+    <flow name="get:\BlocChainTMessage\(address):xferprotocol_blockchain-config">
+		<ee:transform doc:id="0f9db7b3-f885-4a64-a3ff-0fc8c6a1d09a">
+            <ee:variables>
+                <ee:set-variable variableName="address"><![CDATA[attributes.uriParams.address]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="e78b1da4-3a1f-44d6-bb6a-afd1c6b393b4" message="****** Getting transactions for address #[vars.address] *******"/>
+		<ee:transform doc:name="Transform Message" doc:id="827db6ff-223b-4b26-ac52-21ab47d616ee" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json indent=false
+var address = vars.address
+---
+{"method":"listaddresstransactions","params":[address]}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Copy_of_Request" doc:id="81e2513e-e68e-49e0-821f-b3b45f40cbbd" config-ref="BlockChain_HTTP_Request_configuration" path="/" />
+		<logger level="INFO" doc:name="Logger" doc:id="d3f80be6-e801-42f4-bb21-d43c15d416c6" message="Response from Blockchain API: #[payload]"/>
+		<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="53624b45-8162-4be7-a3c3-baca44a1d9d2">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  PaymentId: "end-to-end-number",
+  Amount: {
+    Amount: 333.33,
+    Currency: "USD"
+  },
+  TransasctionCost: 10.00,
+  TransferProtocol: "SWIFT",
+  PaymentPath: "XFER_INTER_BANK_INT",
+  PaymentStatus: "PROCESSED",
+  Debtor: {
+    Account: {
+      AccountId: "123456",
+      AccountType: "CHECKING",
+      BankId: "IBAN_NUM",
+      BankName: "BOA"
+    }
+  },
+  Creditor: {
+    Account: {
+      AccountId: "123456",
+      AccountType: "CHECKING",
+      BankId: "IBAN_NUM",
+      BankName: "BOA"
+    }
+  }
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

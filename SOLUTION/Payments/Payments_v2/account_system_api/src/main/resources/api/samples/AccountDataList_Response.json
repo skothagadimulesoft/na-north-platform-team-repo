@@ -1,0 +1,15 @@
+[
+  {
+  "account_id": "12345",
+  "bban": "abc123",
+  "iban": "xyz123",
+  "account_name": "checking",
+  "bank_num": "67800",
+  "upic": "77777",
+  "bank_name":  "BoA",
+  "country":  "US",
+  "account_balance":  "33.33",
+  "currency": "USD",
+  "open_date":  "2019-08-26T13:32:10.64-07:00"
+}
+]

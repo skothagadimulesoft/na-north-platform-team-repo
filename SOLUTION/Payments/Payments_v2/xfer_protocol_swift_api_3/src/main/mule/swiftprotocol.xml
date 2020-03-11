@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+   
+    <http:listener-config name="swiftprotocol-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    
+    <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="92ce7b6b-5579-48ee-bbb0-7214351002ff" >
+		<http:request-connection protocol="HTTPS" host="volmsg.cloud.volantetech.net" port="443" />
+	</http:request-config>
+    
+    <apikit:config name="swiftprotocol-config" raml="swiftprotocol.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" disableValidations="true"/>
+	<os:config name="ObjectStore_Config_1" doc:name="ObjectStore Config" doc:id="9870e6c4-3ede-48ec-b8c5-e00ea354698a" >
+		<os:connection />
+	</os:config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="81c3f301-f6aa-4929-adf8-394d32e2405c" persistent="false" config-ref="ObjectStore_Config_1" />
+	<http:request-config name="HTTP_Request_configuration_messaging" doc:name="HTTP Request configuration" doc:id="0ae3047e-4e85-4ce0-a18f-141fb5b1fdbf" >
+		<http:request-connection host="${messaging.host}" port="${messaging.port}" connectionIdleTimeout="3000000"/>
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="9ba94b8f-8927-4eca-8433-09845f8a7a54" file="mule-custom-app-swift.properties" />
+	<flow name="swiftprotocol-main">
+        <http:listener config-ref="swiftprotocol-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="swiftprotocol-config" />
+		<error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="swiftprotocol-console">
+        <http:listener config-ref="swiftprotocol-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="swiftprotocol-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\SWIFTMessage:application\json:swiftprotocol-config">
+		<set-variable value="#[message.attributes.queryParams.sendToClearingHouse]" doc:name="Set Variable" doc:id="69516aa1-ded1-4c08-b310-02bb3cf4a7ab" variableName="send_to_clearing_house"/>
+		<set-variable value="#[uuid()]" doc:name="Set Variable" doc:id="b3363809-68e9-43fc-b657-d0a1b9c25757" variableName="UUID"/>
+		<ee:transform doc:name="Transform Message" doc:id="a246ac4d-1649-4c81-a654-c58f6fcedc48" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 urn:iso:std:iso:20022:tech:xsd:pacs.008.001.02
+---
+{
+	ns0#Document: {
+		ns0#FIToFICstmrCdtTrf: {
+			ns0#GrpHdr: {
+				ns0#MsgId: vars.UUID[1 to 35],
+				ns0#CreDtTm: now(),
+				ns0#NbOfTxs: "1",
+				ns0#SttlmInf: {
+					ns0#SttlmMtd: (payload.PaymentExecution.PaymentInitiation.Next.SettlementInstruction.SettlementMethod as String default "INDA")
+				},
+				ns0#InstgAgt: {
+					ns0#FinInstnId: {
+						ns0#BIC: payload.PaymentExecution.PaymentInitiation.Next.FirstSettlementAgent.BIC,
+						ns0#Nm: payload.DebtorAcount.Entry.BankName
+					}
+				},
+				ns0#InstdAgt: {
+					ns0#FinInstnId: {
+						ns0#BIC: payload.PaymentExecution.PaymentInitiation.Next.LastSettlementAgent.BIC,
+						ns0#Nm: payload.CreditorAcount.Entry.BankName
+					}
+				}
+			},
+			ns0#CdtTrfTxInf: {
+				ns0#PmtId: {
+					ns0#EndToEndId: payload.PaymentRelatedIdentifications[0].EndToEndIdentification,
+					ns0#TxId: payload.PaymentRelatedIdentifications[0].TransactionIdentification
+				},
+				ns0#IntrBkSttlmAmt @(Ccy: payload.InstructedAmmount.Currency): payload.InstructedAmmount.Ammount,
+				ns0#IntrBkSttlmDt: if(payload.Date !=null) payload.Date else (now() as String) [0 to 9],
+				ns0#InstdAmt @(Ccy: payload.InstructedAmmount.Currency): payload.InstructedAmmount.Ammount as String,
+				ns0#XchgRate: if(sizeOf(payload.CurrencyExchange.ExchangeRate.rate as String) <=4) payload.CurrencyExchange.ExchangeRate.rate else (payload.CurrencyExchange.ExchangeRate.rate as String)[0 to 3] as Number ,
+				ns0#ChrgBr: "SHAR",
+				ns0#Dbtr: {
+					ns0#Nm: payload.DebtorAcount.Identification.Name,
+					ns0#PstlAdr: {
+						ns0#Ctry: (payload.DebtorAcount.Entry.Country default "US")
+					}
+				},
+				ns0#DbtrAcct: {
+					ns0#Id: {
+						ns0#Othr: {
+							ns0#Id: payload.DebtorAcount.Identification.AccountId
+						}
+					},
+					ns0#Ccy: payload.DebtorAcount.CurrencyCode,
+					ns0#Nm: payload.DebtorAcount.Identification.Name
+				},
+				ns0#DbtrAgt: {
+					ns0#FinInstnId: {
+						ns0#BIC: (payload.DebtorAcount.Identification.IBAN default "CITIUS33MIA"),
+						ns0#Nm: payload.DebtorAcount.Entry.BankName
+					}
+				},
+				ns0#CdtrAgt: {
+					ns0#FinInstnId: {
+						ns0#BIC: (payload.CreditorAcount.Identification.IBAN default "CITIUS33MIA"),
+						ns0#Nm: payload.CreditorAcount.Entry.BankName
+					}
+				},
+				ns0#Cdtr: {
+					ns0#Nm: payload.CreditorAcount.Identification.Name,
+					ns0#PstlAdr: {
+						ns0#Ctry: (payload.CreditorAcount.Entry.Country default "US")
+					}
+				},
+				ns0#CdtrAcct: {
+					ns0#Id: {
+						ns0#Othr: {
+							ns0#Id: payload.CreditorAcount.Identification.AccountId
+						}
+					},
+					ns0#Ccy: payload.CreditorAcount.CurrencyCode,
+					ns0#Nm: payload.CreditorAcount.Identification.Name
+				}
+			}
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="pacs_payload" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-variable>
+				<ee:set-variable variableName="EndToEnd_ID" ><![CDATA[%dw 2.0
+output application/java
+---
+
+payload.PaymentRelatedIdentifications.EndToEndIdentification]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="d5b48b5d-d65b-4700-a454-0e18b0d3b24c" variableName="pacs_message" mimeType="application/xml"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e2ecc41a-bf00-4d43-9b10-183aa1164167" message="pacs converted message: #[payload]"/>
+		<os:store doc:name="Store" doc:id="06fa1734-8f65-422c-a0d3-81a4c39acab2" key="EndToEnd_ID" objectStore="Object_store">
+			<os:value ><![CDATA[#[vars.EndToEnd_ID]]]></os:value>
+		</os:store>
+		<os:store doc:name="Store" doc:id="270d2a59-cbfc-4b1c-af35-462293be989f" key="#[vars.UUID]" objectStore="Object_store">
+		</os:store>
+		<os:contains doc:name="Contains" doc:id="2f0f2a3c-3b77-47b6-8587-ff936a74ce31" objectStore="Object_store" key="volante_token"/>
+		<choice doc:name="Choice" doc:id="4130ea2f-7e1d-4695-a547-8db4c2af2db0" >
+			<when expression="#[payload == false]" >
+				<logger level="INFO" doc:name="Logger" doc:id="8fd06da6-2705-47b8-ae22-65c30a5b5cce" message="Token does not exist, getting new Token"/>
+				<flow-ref doc:name="utilsFlow_getToken" doc:id="63f60975-ed99-40aa-acf3-94a012c70a19" name="utilsFlow_getToken"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="629c98b6-e1ea-486e-90fb-880dd85072b9" message="Token Exits"/>
+				<flow-ref doc:name="testRefreshToken" doc:id="1cf4f915-f23b-46bf-8bb4-893428a37e04" name="utilsFlow_refreshToken"/>
+			</otherwise>
+		</choice>
+		<os:retrieve doc:name="Retrieve" doc:id="485e3f8d-09d4-43c2-b3cb-91a9f003f46d" key="volante_token" objectStore="Object_store"/>
+    		<logger level="INFO" doc:name="Logger" doc:id="61b17ef3-f8b9-467e-ac06-d39736a21878" message="got vToken: #[payload]"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="27cffdc8-5b37-41a4-a293-5019cfed7013" variableName="vToken"/>
+		<set-payload value="#[vars.pacs_message]" doc:name="Set Payload" doc:id="4cd4423a-75e0-4285-8ddc-ad96d20f1ff7" />
+		<http:request method="POST" doc:name="PaymentRequestRaw" doc:id="567e0ede-30f8-4883-99cc-fb068f1dcf97" config-ref="HTTP_Request_configuration" path="/VolanteMessagingServices/rest/transformation" sendBodyMode="ALWAYS">
+				<http:headers ><![CDATA[#[output applicaton/java
+---
+{
+	Authorization : 'Bearer $(vars.vToken)'
+}]]]></http:headers>
+			</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="5336ead2-d9cd-4e9b-889f-f1c66cecea16" message="sendToClearignHouse: #[vars.send_to_clearing_house], payment request: #[payload]"/>
+		<choice doc:name="Choice" doc:id="7c016a0d-b9d8-4f80-8404-bcb722d1d605" >
+			<when expression="#[vars.send_to_clearing_house == 'false']" >
+				<logger level="INFO" doc:name="Int Logger" doc:id="41b4b0ff-adfa-4ecb-a5ad-587436f86f65" message="+++enacting International Transfer !"/>
+				<http:request method="POST" doc:name="SendSWIFTMessageRaw" doc:id="ebb54453-c0d2-490a-becb-f37080b286c4" config-ref="HTTP_Request_configuration_messaging" path="/api/Message" responseTimeout="10000000">
+			<http:query-params><![CDATA[#[output applicaton/java
+---
+{
+	"transport" : '${messaging.transport}',
+	"messageExchangePattern" : "synch"
+}]]]></http:query-params>
+		</http:request>
+				<logger level="INFO" doc:name="Logger" doc:id="486e0d05-db1f-451f-bfee-fb035ef85461" message="FInal Payment Response: #[payload]" />
+				<ee:transform doc:name="Transform Message" doc:id="170e69e1-efc1-4928-aa64-eda6ec1b1251">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+ns ns0 urn:iso:std:iso:20022:tech:xsd:pacs.002.001.02
+ns ns01 urn:iso:std:iso:20022:tech:xsd:pacs.008.001.02
+---
+{
+	Debtor: {
+		Account: {
+			BankName: vars.pacs_message.ns01#Document.ns01#FIToFICstmrCdtTrf.*ns01#CdtTrfTxInf.ns01#DbtrAgt.ns01#FinInstnId.ns01#Nm default "",
+			AccountId: vars.pacs_message.ns01#Document.ns01#FIToFICstmrCdtTrf.*ns01#CdtTrfTxInf.ns01#DbtrAcct.ns01#Id.ns01#Othr.ns01#Id default "",
+			AccountType: vars.pacs_message.ns01#Document.ns01#FIToFICstmrCdtTrf.*ns01#CdtTrfTxInf.ns01#DbtrAcct.ns01#Nm default "",
+			BankId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#InstgAgt.ns0#FinInstnId.ns0#BIC default ""
+		}
+	},
+	Amount: {
+		Amount: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#Amt.ns0#InstdAmt,
+		Currency: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlTxRef.ns0#Amt.ns0#InstdAmt.@Ccy default ""
+	},
+	PaymentId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#OrgnlEndToEndId default "",
+	TransasctionCost: 10.00,
+	PaymentPath: "",
+	Creditor: {
+		Account: {
+			BankId: payload.ns0#Document.ns0#"pacs.002.001.02".*ns0#TxInfAndSts.ns0#InstdAgt.ns0#FinInstnId.ns0#BIC default "",
+			BankName: vars.pacs_message.ns01#Document.ns01#FIToFICstmrCdtTrf.*ns01#CdtTrfTxInf.ns01#CdtrAgt.ns01#FinInstnId.ns01#Nm default "",
+			AccountId: vars.pacs_message.ns01#Document.ns01#FIToFICstmrCdtTrf.*ns01#CdtTrfTxInf.ns01#CdtrAcct.ns01#Id.ns01#Othr.ns01#Id default "",
+			AccountType: vars.pacs_message.ns01#Document.ns01#FIToFICstmrCdtTrf.*ns01#CdtTrfTxInf.ns01#CdtrAcct.ns01#Nm default ""
+		
+		}
+	},
+	PaymentStatus: "Processed",
+	TransferProtocol: "SWIFT"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="5f86ecf6-bd55-4ae1-b81c-6c82bb09e506" message="JSON Payment Response: #[payload]" />
+			</when>
+			<when expression="#[vars.send_to_clearing_house == 'true']" >
+				<logger level="INFO" doc:name="NatLogger" doc:id="71c0fd5b-4a60-4f38-909e-da33f269efe6" message="+++enacting National Transfer via a ClearingHouse !" />
+				<http:request method="POST" doc:name="Copy_of_SendSWIFTMessageRaw" doc:id="323a3ca8-78f1-4125-8432-70c2f9c7f06c" config-ref="HTTP_Request_configuration_messaging" path="/api/Message" responseTimeout="10000000">
+					<http:query-params><![CDATA[#[output applicaton/java
+---
+{
+	"transport" : '${messaging.transport}',
+	"messageExchangePattern" : "asynch"
+}]]]></http:query-params>
+				</http:request>
+				<ee:transform doc:name="Transform Message" doc:id="ca35de09-6c13-4454-8544-e30f681149f2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 urn:iso:std:iso:20022:tech:xsd:pacs.008.001.02
+---
+{
+	Debtor: {
+		Account: {
+			BankName: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#DbtrAgt.ns0#FinInstnId.ns0#Nm default "",
+			AccountId: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#DbtrAcct.ns0#Id.ns0#Othr.ns0#Id default "",
+			AccountType: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#DbtrAcct.ns0#Nm default "",
+			BankId: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#DbtrAgt.ns0#FinInstnId.ns0#BIC default ""
+		}
+	},
+	Amount: {
+		Amount: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#InstdAmt,
+		Currency: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#InstdAmt.@Ccy default ""
+	},
+	PaymentId: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#PmtId.ns0#EndToEndId,
+	TransasctionCost: 10.00,
+	PaymentPath: "",
+	Creditor: {
+		Account: {
+			BankName: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#CdtrAgt.ns0#FinInstnId.ns0#Nm default "",
+			AccountId: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#CdtrAcct.ns0#Id.ns0#Othr.ns0#Id default "",
+			AccountType: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#CdtrAcct.ns0#Nm default "",
+			BankId: vars.pacs_message.ns0#Document.ns0#FIToFICstmrCdtTrf.*ns0#CdtTrfTxInf.ns0#CdtrAgt.ns0#FinInstnId.ns0#BIC default ""
+		}
+	},
+	PaymentStatus: "IN_PROCESS",
+	TransferProtocol: "SWIFT"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="2daf50c6-4c79-4e7d-b8b4-73a7215a20c2" message="+++INVALID TRANSACTION++++!"/>
+			</otherwise>
+		</choice>
+    
+    </flow>
+</mule>

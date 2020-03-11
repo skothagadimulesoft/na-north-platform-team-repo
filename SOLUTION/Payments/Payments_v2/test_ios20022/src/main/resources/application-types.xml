@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="CredtTransferInitiation" format="xml">
+      <types:shape format="xml-schema" element="{urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10}Document" location="schemas/pacs.002.001.10.xsd"/>
+    </types:type>
+    <types:type name="PSD2_PaymentInitiation" format="json">
+      <types:shape format="weave" example="examples/payment_req_example.json"><![CDATA[%dw 2.0
+
+type PSD2_PaymentInitiation = {|
+  Data: {|
+    Initiation: {|
+      InstructionIdentification: String, 
+      EndToEndIdentification: String, 
+      InstructedAmount: {|
+        Amount: String, 
+        Currency: String
+      |}, 
+      DebtorAgent: {|
+        Identification: String, 
+        SchemeName: String
+      |}, 
+      DebtorAccount: {|
+        SchemeName: String, 
+        Identification: String, 
+        Name: String
+      |}, 
+      CreditorAgent: {|
+        Identification: String, 
+        SchemeName: String
+      |}, 
+      CreditorAccount: {|
+        SchemeName: String, 
+        Identification: String, 
+        Name: String, 
+        SecondaryIdentification: String
+      |}, 
+      RemittanceInformation: {|
+        Reference: String, 
+        Unstructured: String
+      |}
+    |}
+  |}, 
+  Risk: {|
+    PaymentContextCode: String, 
+    MerchantCategoryCode: String, 
+    MerchantCustomerIdentification: String, 
+    DeliveryAddress: {|
+      AddressLine: Array<String>, 
+      StreetName: String, 
+      BuildingNumber: String, 
+      PostCode: String, 
+      TownName: String, 
+      CountySubDivision: Array<String>, 
+      Country: String
+    |}
+  |}
+|} {"example": "{\"Data\":{\"Initiation\":{\"InstructionIdentification\":\"CREDIT_TRANSFER\",\"EndToEndIdentification\":\"FRESCO.21302.GFX.20\",\"InstructedAmount\":{\"Amount\":\"165.88\",\"Currency\":\"GBP\"},\"DebtorAgent\":{\"Identification\":\"Bank ABC\",\"SchemeName\":\"SortCodeAccountNumber\"},\"DebtorAccount\":{\"SchemeName\":\"SortCodeAccountNumber\",\"Identification\":\"11280001234567\",\"Name\":\"Andrea Smith\"},\"CreditorAgent\":{\"Identification\":\"Bank XYZ\",\"SchemeName\":\"SortCodeAccountNumber\"},\"CreditorAccount\":{\"SchemeName\":\"SortCodeAccountNumber\",\"Identification\":\"08080021325698\",\"Name\":\"ACME Inc\",\"SecondaryIdentification\":\"0002\"},\"RemittanceInformation\":{\"Reference\":\"FRESCO-101\",\"Unstructured\":\"Internal ops code 5120101\"}}},\"Risk\":{\"PaymentContextCode\":\"EcommerceGoods\",\"MerchantCategoryCode\":\"5967\",\"MerchantCustomerIdentification\":\"053598653254\",\"DeliveryAddress\":{\"AddressLine\":[\"Flat 7\",\"Acacia Lodge\"],\"StreetName\":\"Acacia Avenue\",\"BuildingNumber\":\"27\",\"PostCode\":\"GU31 2ZZ\",\"TownName\":\"Sparsholt\",\"CountySubDivision\":[\"Wessex\"],\"Country\":\"UK\"}}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#ae00aa18-339d-4610-8a1f-1b6b1cf6522b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="PSD2_PaymentInitiation"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="CredtTransferInitiation"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

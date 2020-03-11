@@ -1,0 +1,12 @@
+{
+  "Data": {
+    "PaymentSubmissionId": "7290-003",
+    "PaymentId": "7290",
+    "Status": "AcceptedSettlementInProcess",
+    "CreationDateTime": "2017-06-05T15:15:22+00:00"
+  },
+  "Links": {
+    "Self": "https://api.alphabank.com/open-banking/v1.0/payment-submissions/7290-003"
+  },
+  "Meta": {}
+}

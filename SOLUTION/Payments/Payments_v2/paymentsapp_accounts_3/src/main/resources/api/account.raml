@@ -1,0 +1,68 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/23feb9e1-7428-407e-b6b7-bd2af0a701d4 # 
+version: v0.1
+title: Account
+
+uses:
+  daata_types:  exchange_modules/13d9279c-5e29-4b40-b236-56641f4e0737/paymentorder_banking_datatypes/1.0.3/payment_banking_datatypes.raml
+
+types: 
+  AccountList:
+    type: array
+    items: daata_types.Account
+
+
+/Account:
+  get:
+    responses: 
+      200:
+        body:
+          application/json:
+            type: AccountList
+            example: !include samples/accountDataList.json        
+  post:
+    description: Create a new Account
+    body: 
+      application/json:
+        example: !include samples/accountData.json
+    responses: 
+      200:
+        body: 
+          application/json:
+            example:  
+             { 
+               "message": "Account created successfully",
+                "account_id" : "123"
+             }
+  /{AccountId}:
+    get:
+      responses: 
+        200:
+          body: 
+            application/json:
+              type:  daata_types.Account
+              example: !include samples/accountData.json
+    put:
+      queryParameters: 
+        action:
+          description: Action to be taken, Either debit or credit
+          required: true
+          example: debit
+          type: string
+        
+        amount:
+          description: Amount to be debited or credited
+          required: true
+          type: number
+      responses: 
+        200:
+          body: 
+            application/json:
+              example: 
+                { 
+                  "message": "Account updated successfully",
+                  "acct_num": "123",
+                  "action": "debit",
+                  "amount": "100"
+                }     
+    delete:
