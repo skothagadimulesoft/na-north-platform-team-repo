@@ -1,3 +1,6 @@
+Created By: Bruno Baloi
+
+
 # SNMP Connector/Extension
 
 This is a prototypal Mule Connector for SNMP. It is bi-directional in that it supports both the sending and reception of SNMP Traps (v1,v2c, v3).
